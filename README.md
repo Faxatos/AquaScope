@@ -5,9 +5,9 @@ Real-time distributed platform for analyzing maritime traffic data from multiple
 Project for the Scalable and Distributed Computing Course - Final Grade: x/30
 
 ## Problem Context
-Maritime traffic monitoring is crucial for navigation safety, port management, and operational efficiency. The Automatic Identification System (AIS), placed in every vessel, provides vital data on vessel position, speed, and route. However, AIS data is often scattered across:
-- **AIS antennas** and **VTS stations** for localized coverage.
-- **Satellite-based systems** (e.g., INMARSAT) for remote areas or redundancy.
+Maritime traffic monitoring is crucial for navigation safety, port management, and operational efficiency. The Automatic Identification System (AIS), placed in every vessel, provides vital data on vessel position, speed, and route. However, [AIS](https://shipping.nato.int/nsc/operations/news/2021/ais-automatic-identification-system-overview) data is often scattered across:
+- **AIS antennas** and **VTS stations** for coverage in coastal areas.
+- **Satellite-based systems** (e.g., INMARSAT) for remote or open ocean regions or for ensuring redundancy.
 
 Click [here](#map-example) to have a look at a real map containing those elements.
 
