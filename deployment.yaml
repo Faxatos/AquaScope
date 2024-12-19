@@ -1,0 +1,493 @@
+# -----------------------------------------
+# Zookeeper (necessario per Kafka e Druid)
+# -----------------------------------------
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: druid-environment
+data:
+  DRUID_SINGLE_NODE_CONF: micro-quickstart
+  druid_emitter_logging_logLevel: debug
+  druid_extensions_loadList: '["druid-histogram", "druid-datasketches", "druid-lookups-cached-global", "postgresql-metadata-storage", "druid-multi-stage-query"]'
+  druid_zk_service_host: zookeeper
+  druid_metadata_storage_host: ""
+  druid_metadata_storage_type: postgresql
+  druid_metadata_storage_connector_connectURI: jdbc:postgresql://postgres:5432/druid
+  druid_metadata_storage_connector_user: druid
+  druid_metadata_storage_connector_password: FoolishPassword
+  druid_coordinator_balancer_strategy: cachingCost
+  druid_indexer_runner_javaOptsArray: '["-server", "-Xmx1g", "-Xms1g", "-XX:MaxDirectMemorySize=3g", "-Duser.timezone=UTC", "-Dfile.encoding=UTF-8", "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"]'
+  druid_indexer_fork_property_druid_processing_buffer_sizeBytes: 256MiB
+  druid_storage_type: local
+  druid_storage_storageDirectory: /opt/shared/segments
+  druid_indexer_logs_type: file
+  druid_indexer_logs_directory: /opt/shared/indexing-logs
+  druid_processing_numThreads: "2"
+  druid_processing_numMergeBuffers: "2"
+  DRUID_LOG4J: |
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <Configuration status="WARN">
+      <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+          <PatternLayout pattern="%d{ISO8601} %p [%t] %c - %m%n"/>
+        </Console>
+      </Appenders>
+      <Loggers>
+        <Root level="info">
+          <AppenderRef ref="Console"/>
+        </Root>
+        <Logger name="org.apache.druid.jetty.RequestLog" additivity="false" level="DEBUG">
+          <AppenderRef ref="Console"/>
+        </Logger>
+      </Loggers>
+    </Configuration>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: druid-coordinator-overlord
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: druid-coordinator-overlord
+  template:
+    metadata:
+      labels:
+        app: druid-coordinator-overlord
+    spec:
+      containers:
+        - name: druid-coordinator-overlord
+          image: apache/druid:31.0.0
+          env:
+            - name: DRUID_ZK_SERVICE_HOST
+              value: "zookeeper"
+            - name: DRUID_ZK_SERVICE_PORT
+              value: "2181"
+          envFrom:
+          - configMapRef:
+              name: druid-environment
+
+          args:
+            - "coordinator"
+          ports:
+            - containerPort: 8081
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+  labels:
+    app: zookeeper
+spec:
+  ports:
+    - port: 2181
+      name: client
+  selector:
+    app: zookeeper
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: bitnami/zookeeper:latest
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+            - name: ALLOW_ANONYMOUS_LOGIN
+              value: "yes"
+          envFrom:
+          - configMapRef:
+              name: druid-environment
+          ports:
+            - containerPort: 2181
+---
+# -----------------------------------------
+# Kafka (singolo broker per demo)
+# -----------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+spec:
+  ports:
+    - name: kafka
+      port: 9092
+      targetPort: 9092
+  selector:
+    app: kafka
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: bitnami/kafka:latest
+          envFrom:
+          env:
+            - name: KAFKA_BROKER_ID
+              value: "1"
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "zookeeper:2181"
+            - name: ALLOW_PLAINTEXT_LISTENER
+              value: "yes"
+            - name: KAFKA_LISTENERS
+              value: "PLAINTEXT://:9092"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://kafka:9092"
+          ports:
+            - containerPort: 9092
+---
+# -----------------------------------------
+# Apache Druid
+# Per una demo semplificata, lanciare i vari servizi Druid.
+# Druid richiede: Coordinator-Overlord, Broker, Historical, MiddleManager, Router.
+# Qui forniremo un setup minimalista e non ottimizzato.
+# -----------------------------------------
+
+# Coordinator-Overlord
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-coordinator-overlord
+spec:
+  ports:
+    - name: http
+      port: 8081
+      targetPort: 8081
+  selector:
+    app: druid-coordinator-overlord
+
+---
+# Broker
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-broker
+spec:
+  ports:
+    - name: http
+      port: 8082
+      targetPort: 8082
+  selector:
+    app: druid-broker
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: druid-broker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: druid-broker
+  template:
+    metadata:
+      labels:
+        app: druid-broker
+    spec:
+      containers:
+        - name: druid-broker
+          image: apache/druid:31.0.0
+          env:
+            - name: DRUID_ZK_SERVICE_HOST
+              value: "zookeeper"
+            - name: DRUID_ZK_SERVICE_PORT
+              value: "2181"
+          env:
+          - configMapRef:
+              name: druid-environment
+          args:
+            - "broker"
+          ports:
+            - containerPort: 8082
+---
+# Historical
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-historical
+spec:
+  ports:
+    - name: http
+      port: 8083
+      targetPort: 8083
+  selector:
+    app: druid-historical
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: druid-historical
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: druid-historical
+  template:
+    metadata:
+      labels:
+        app: druid-historical
+    spec:
+      containers:
+        - name: druid-historical
+          image: apache/druid:31.0.0
+          env:
+            - name: DRUID_ZK_SERVICE_HOST
+              value: "zookeeper"
+            - name: DRUID_ZK_SERVICE_PORT
+              value: "2181"
+          envFrom:
+            - configMapRef:
+                name: druid-environment
+          args:
+            - "historical"
+          ports:
+            - containerPort: 8083
+---
+# Middle Manager
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-middlemanager
+spec:
+  ports:
+    - name: http
+      port: 8091
+      targetPort: 8091
+  selector:
+    app: druid-middlemanager
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: druid-middlemanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: druid-middlemanager
+  template:
+    metadata:
+      labels:
+        app: druid-middlemanager
+    spec:
+      containers:
+        - name: druid-middlemanager
+          image: apache/druid:31.0.0
+          env:
+            - name: DRUID_ZK_SERVICE_HOST
+              value: "zookeeper"
+            - name: DRUID_ZK_SERVICE_PORT
+              value: "2181"
+          envFrom:
+            - configMapRef:
+                name: druid-environment
+          args:
+            - "middleManager"
+          ports:
+            - containerPort: 8091
+---
+# Router
+apiVersion: v1
+kind: Service
+metadata:
+  name: druid-router
+spec:
+  ports:
+    - name: http
+      port: 8888
+      targetPort: 8888
+  selector:
+    app: druid-router
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: druid-router
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: druid-router
+  template:
+    metadata:
+      labels:
+        app: druid-router
+    spec:
+      containers:
+        - name: druid-router
+          image: apache/druid:31.0.0
+          env:
+            - name: DRUID_ZK_SERVICE_HOST
+              value: "zookeeper"
+            - name: DRUID_ZK_SERVICE_PORT
+              value: "2181"
+          envFrom:
+            - configMapRef:
+                name: druid-environment
+          args:
+            - "router"
+          ports:
+            - containerPort: 8888
+---
+# -----------------------------------------
+# Apache Spark (Master + Worker)
+# Per semplicità, un master e un singolo worker.
+# -----------------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-master
+spec:
+  ports:
+    - name: webui
+      port: 8080
+      targetPort: 8080
+    - name: spark
+      port: 7077
+      targetPort: 7077
+  selector:
+    app: spark-master
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-master
+  template:
+    metadata:
+      labels:
+        app: spark-master
+    spec:
+      containers:
+        - name: spark-master
+          image: bitnami/spark:latest
+          command: ["/opt/bitnami/spark/bin/spark-class"]
+          args: ["org.apache.spark.deploy.master.Master", "--host", "spark-master"]
+          ports:
+            - containerPort: 7077
+            - containerPort: 8080
+          env:
+            - name: SPARK_MODE
+              value: "master"
+            - name: SPARK_MASTER_WEBUI_PORT
+              value: "8080"
+            - name: SPARK_MASTER_PORT
+              value: "7077"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spark-worker
+spec:
+  ports:
+    - name: workerui
+      port: 8081
+      targetPort: 8081
+  selector:
+    app: spark-worker
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-worker
+  template:
+    metadata:
+      labels:
+        app: spark-worker
+    spec:
+      containers:
+        - name: spark-worker
+          image: bitnami/spark:latest
+          command: ["/opt/bitnami/spark/bin/spark-class"]
+          args: ["org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
+          env:
+            - name: SPARK_MODE
+              value: "worker"
+            - name: SPARK_WORKER_WEBUI_PORT
+              value: "8081"
+          ports:
+            - containerPort: 8081
+
+# -----------------------------------------
+# Grafana
+# -----------------------------------------
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: grafana
+#spec:
+#  type: NodePort
+#  ports:
+#    - port: 3000
+#  selector:
+#    app: grafana
+
+#---
+#apiVersion: apps/v1
+#kind: Deployment
+#metadata:
+#  name: grafana
+#spec:
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: grafana
+#  template:
+#    metadata:
+#      labels:
+#        app: grafana
+#    spec:
+#      containers:
+#        - name: grafana
+#          image: grafana/grafana:latest
+#          ports:
+#            - containerPort: 3000
+#          env:
+#            - name: GF_SECURITY_ADMIN_PASSWORD
+#              value: "admin"
+#            - name: GF_SECURITY_ADMIN_USER
+#              value: "admin"
