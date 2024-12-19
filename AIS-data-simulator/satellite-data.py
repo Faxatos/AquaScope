@@ -4,18 +4,86 @@ from datetime import datetime, timedelta
 import json
 #from kafka import KafkaProducer
 
+import geopandas as gpd
+from shapely.geometry import Point
+
 # Constants
 WORLD_LAT_RANGE = (-90.0, 90.0)
 WORLD_LON_RANGE = (-180.0, 180.0)
 DEFAULT_SPEED = (5, 20)  # Knots
 ETA_UPDATE_INTERVAL = 10  # We assume to get data every 10 seconds
+MAX_DESTINATION_OFFSET = 1  # Max offset for destination in degrees (about 60 nautical miles)
+
 
 # Helper functions
-def generate_random_coordinates():
-    return round(random.uniform(*WORLD_LAT_RANGE), 6), round(random.uniform(*WORLD_LON_RANGE), 6)
+def load_ocean_shapefile(filepath):
+    """
+    Loads a shapefile of global oceans into a GeoDataFrame.
+    """
+    return gpd.read_file(filepath)
+
+# Check if a point is on land
+def is_in_ocean(lat, lon, ocean_gdf):
+    """
+    Checks if the given latitude and longitude are in the ocean.
+    
+    Args:
+    - lat (float): Latitude of the point.
+    - lon (float): Longitude of the point.
+    - ocean_gdf (GeoDataFrame): GeoDataFrame containing ocean polygons.
+    
+    Returns:
+    - bool: True if the point is in the ocean, False if it's on land.
+    """
+    point = Point(lon, lat)  # Note: GeoPandas uses (longitude, latitude)
+    return ocean_gdf.contains(point).any()
+
+def generate_random_coordinates(ocean_gdf):
+    """
+    Generates random coordinates and ensures they are on water.
+    
+    Args:
+    - ocean_gdf (GeoDataFrame): GeoDataFrame containing ocean polygons.
+    
+    Returns:
+    - tuple: (lat, lon) coordinates that are on water.
+    """
+    while True:
+        lat = round(random.uniform(*WORLD_LAT_RANGE), 6)
+        lon = round(random.uniform(*WORLD_LON_RANGE), 6)
+        #print(f"New coordinates: {lat}, {lon} is_in_ocean: {is_in_ocean(lat, lon, ocean_gdf)}") #debug print
+        if is_in_ocean(lat, lon, ocean_gdf):
+            return lat, lon
+    
+def generate_destination_coordinates(lat, lon):
+    """
+    Generates a destination coordinate close to the initial coordinate (lat, lon).
+    
+    Args:
+    - lat (float): Latitude of the origin.
+    - lon (float): Longitude of the origin.
+    
+    Returns:
+    - tuple: (destination_lat, destination_lon) coordinates close to the origin.
+    """
+    # Generate random offsets for the destination within a small range
+    lat_offset = random.uniform(-MAX_DESTINATION_OFFSET, MAX_DESTINATION_OFFSET)
+    lon_offset = random.uniform(-MAX_DESTINATION_OFFSET, MAX_DESTINATION_OFFSET)
+    
+    # Ensure the destination stays within valid geographic bounds
+    destination_lat = lat + lat_offset
+    destination_lon = lon + lon_offset
+    
+    # Make sure destination is still within valid ranges
+    destination_lat = max(min(destination_lat, WORLD_LAT_RANGE[1]), WORLD_LAT_RANGE[0])
+    destination_lon = max(min(destination_lon, WORLD_LON_RANGE[1]), WORLD_LON_RANGE[0])
+
+    return round(destination_lat, 6), round(destination_lon, 6)
 
 def calculate_new_position(lat, lon, speed, heading, time_interval):
-    # Basic approximation for new position
+    """
+    Calculates the new position of a vessel given its current position, speed, and heading.
+    """
     distance = (speed * 1852) * (time_interval / 3600)  # Convert knots to meters and time to hours
     delta_lat = distance * math.cos(math.radians(heading)) / 111320  # 1 degree latitude = ~111.32 km
     delta_lon = distance * math.sin(math.radians(heading)) / (111320 * math.cos(math.radians(lat)))
@@ -25,11 +93,21 @@ def random_heading():
     return random.randint(0, 359)
 
 def random_speed():
+    """
+    Generates a random speed within the given range (See DEFAULT_SPEED const).
+    """
     return round(random.uniform(*DEFAULT_SPEED), 2)
 
-def generate_vessel():
-    lat, lon = generate_random_coordinates()
-    destination_lat, destination_lon = generate_random_coordinates()
+def generate_vessel(ocean_gdf):
+    """
+    Generates a random vessel with dynamic attributes.
+    """
+    lat, lon = generate_random_coordinates(ocean_gdf)
+    destination_lat, destination_lon = generate_destination_coordinates(lat, lon)
+
+    # Debugging print statement for coordinates
+    print(f"Generated coordinates: {lat}, {lon}")
+    print(f"Generated destination coordinates: {destination_lat}, {destination_lon}")
 
     # Static data
     vessel = {
@@ -67,13 +145,17 @@ def generate_vessel():
     return vessel
 
 def calculate_eta(lat, lon, dest_lat, dest_lon, speed):
-    # Haversine formula approximation for distance
+    """
+    Calculates the ETA based on the current position and destination.
+    """
     distance = haversine_distance(lat, lon, dest_lat, dest_lon)
     hours = distance / speed if speed > 0 else float("inf")
     return (datetime.utcnow() + timedelta(hours=hours)).isoformat()
 
 def haversine_distance(lat1, lon1, lat2, lon2):
-    # Calculate distance between two lat/lon pairs in nautical miles
+    """
+    Calculates the Haversine distance between two coordinates in nautical miles.
+    """
     from math import radians, sin, cos, sqrt, atan2
     R = 6371  # Earth radius in kilometers
     dlat = radians(lat2 - lat1)
@@ -84,6 +166,10 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     return distance_km / 1.852  # Convert km to nautical miles
 
 def update_vessel(vessel):
+    """
+    Updates the vessel's position and ETA.
+    """
+
     # Update timestamp
     vessel["TIMESTAMP"] = datetime.utcnow().isoformat()
 
@@ -103,8 +189,8 @@ def update_vessel(vessel):
     vessel["ETA_AIS"] = eta_time.isoformat()
     return True
 
-def simulate_vessels():
-    vessels = [generate_vessel() for _ in range(5)]
+def simulate_vessels(ocean_gdf):
+    vessels = [generate_vessel(ocean_gdf) for _ in range(5)]
 
     while True:
         print(f"=== Current Vessel Data @ {datetime.utcnow().isoformat()} ===")
@@ -112,7 +198,7 @@ def simulate_vessels():
             if not update_vessel(vessel):
                 print(f"Vessel {vessel['MMSI']} reached destination. Removing.")
                 vessels.remove(vessel)
-                vessels.append(generate_vessel())
+                vessels.append(generate_vessel(ocean_gdf))
             print(vessel)
             #with open("simulated_ais_data.json", "w") as f:
             #    json.dump(vessel, f, indent=4)
@@ -122,4 +208,11 @@ def simulate_vessels():
 if __name__ == "__main__":
     import math
     import time
-    simulate_vessels()
+
+    shapefile_path = "natural_earth_oceans/ne_110m_ocean.shp"
+    
+    # Load the land GeoDataFrame
+    ocean_gdf = load_ocean_shapefile(shapefile_path)
+    
+    # Start the vessel simulation
+    simulate_vessels(ocean_gdf)
