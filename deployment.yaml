@@ -42,6 +42,48 @@ data:
       </Loggers>
     </Configuration>
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-env
+data:
+  POSTGRES_USER: druid
+  POSTGRES_DB: druid
+  POSTGRES_PASSWORD: FoolishPassword
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          envFrom:
+          - configMapRef:
+              name: postgres-env
+          ports:
+            - containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -221,7 +263,7 @@ spec:
               value: "zookeeper"
             - name: DRUID_ZK_SERVICE_PORT
               value: "2181"
-          env:
+          envFrom:
           - configMapRef:
               name: druid-environment
           args:
@@ -368,89 +410,76 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: spark-master
+  name: flink-jobmanager
 spec:
   ports:
     - name: webui
-      port: 8080
-      targetPort: 8080
-    - name: spark
-      port: 7077
-      targetPort: 7077
+      port: 8081
+      targetPort: 8081
   selector:
-    app: spark-master
-
+    app: flink-jobmanager
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spark-master
+  name: flink-jobmanager
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: spark-master
+      app: flink-jobmanager
   template:
     metadata:
       labels:
-        app: spark-master
+        app: flink-jobmanager
     spec:
       containers:
-        - name: spark-master
-          image: bitnami/spark:latest
-          command: ["/opt/bitnami/spark/bin/spark-class"]
-          args: ["org.apache.spark.deploy.master.Master", "--host", "spark-master"]
+        - name: flink-jobmanager
+          image: flink:latest
+          args: ["jobmanager"]
           ports:
-            - containerPort: 7077
-            - containerPort: 8080
+            - containerPort: 8081
           env:
-            - name: SPARK_MODE
-              value: "master"
-            - name: SPARK_MASTER_WEBUI_PORT
-              value: "8080"
-            - name: SPARK_MASTER_PORT
-              value: "7077"
-
+            - name: JOB_MANAGER_RPC_ADDRESS
+              value: "flink-jobmanager"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: spark-worker
+  name: flink-taskmanager
 spec:
   ports:
-    - name: workerui
-      port: 8081
-      targetPort: 8081
+    - name: taskmanager-rpc
+      port: 6121
+      targetPort: 6121
   selector:
-    app: spark-worker
-
+    app: flink-taskmanager
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spark-worker
+  name: flink-taskmanager
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: spark-worker
+      app: flink-taskmanager
   template:
     metadata:
       labels:
-        app: spark-worker
+        app: flink-taskmanager
     spec:
       containers:
-        - name: spark-worker
-          image: bitnami/spark:latest
-          command: ["/opt/bitnami/spark/bin/spark-class"]
-          args: ["org.apache.spark.deploy.worker.Worker", "spark://spark-master:7077"]
-          env:
-            - name: SPARK_MODE
-              value: "worker"
-            - name: SPARK_WORKER_WEBUI_PORT
-              value: "8081"
+        - name: flink-taskmanager
+          image: flink:latest
+          args: ["taskmanager"]
           ports:
-            - containerPort: 8081
+            - containerPort: 6121
+          env:
+            - name: JOB_MANAGER_RPC_ADDRESS
+              value: "flink-jobmanager"
+---
+
 
 # -----------------------------------------
 # Grafana
