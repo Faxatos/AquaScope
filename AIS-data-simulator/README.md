@@ -26,9 +26,25 @@ Install the required dependencies:
  ```
   To run the script simulating the movement of vessels within a specific coordinate range (--vess = number of vessels, latitude and longitude boundaries):
  ```
- python3 satellite-data.py --vess <vess_num> --lat_min <min_lat> --lat_max <max_lat> --lon_min <min_lon> --lon_max <max_lon> 
+ python3 vts-data.py --vess <vess_num> --lat_min <min_lat> --lat_max <max_lat> --lon_min <min_lon> --lon_max <max_lon> 
  ```
-## ToDo:
--   Containerize this.
--   Define standard coordinate ranges for the `vts-data.py` script, specifically for coastal areas, and dynamically apply them based on the machine running the script
+##  Containerizing the Application
+
+To build a Docker images named `ais-satellite-simulator` and `ais-vts-simulator`, run the following commands:
+```
+ docker build -t ais-satellite-simulator -f Dockerfile.satellite .
+ docker build -t ais-vts-simulator -f Dockerfile.vts .
+```
+
+ Once you've built the images, you can run the corresponding containers:
+ - To run the containers with the default parameters values (vessels: 10, latitude: [30, 60], longitude: [-120, -60]):
+	 ```
+	 docker run ais-satellite-simulator
+	 docker run ais-vts-simulator
+	 ```
+- To run the containers with custom parameters values
+	 ```
+	 docker run ais-satellite-simulator --vess <vess_num>
+	docker run ais-vts-simulator --vess <vess_num> --lat_min <min_lat> --lat_max <max_lat> --lon_min <min_lon> --lon_max <max_lon>
+	```
  
