@@ -1,6 +1,6 @@
 import random
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 #from kafka import KafkaProducer
 
@@ -139,7 +139,7 @@ def generate_vessel(ocean_gdf):
         "ETA_AIS": eta,
         "DEST_LAT": destination_lat,
         "DEST_LON": destination_lon,
-        "TIMESTAMP": datetime.utcnow().isoformat(),
+        "TIMESTAMP": datetime.now(timezone.utc).isoformat(),
     })
 
     return vessel
@@ -150,7 +150,7 @@ def calculate_eta(lat, lon, dest_lat, dest_lon, speed):
     """
     distance = haversine_distance(lat, lon, dest_lat, dest_lon)
     hours = distance / speed if speed > 0 else float("inf")
-    return (datetime.utcnow() + timedelta(hours=hours)).isoformat()
+    return (datetime.now(timezone.utc) + timedelta(hours=hours)).isoformat()
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """
@@ -171,7 +171,7 @@ def update_vessel(vessel):
     """
 
     # Update timestamp
-    vessel["TIMESTAMP"] = datetime.utcnow().isoformat()
+    vessel["TIMESTAMP"] = datetime.now(timezone.utc).isoformat()
 
     # Update position
     vessel["LATITUDE"], vessel["LONGITUDE"] = calculate_new_position(
@@ -183,7 +183,7 @@ def update_vessel(vessel):
     eta_time -= timedelta(seconds=ETA_UPDATE_INTERVAL)
 
     # If ETA_AIS reaches 0, return False to indicate vessel removal
-    if eta_time <= datetime.utcnow():
+    if eta_time <= datetime.now(timezone.utc):
         return False
 
     vessel["ETA_AIS"] = eta_time.isoformat()
@@ -193,7 +193,7 @@ def simulate_vessels(ocean_gdf):
     vessels = [generate_vessel(ocean_gdf) for _ in range(5)]
 
     while True:
-        print(f"=== Current Vessel Data @ {datetime.utcnow().isoformat()} ===")
+        print(f"=== Current Vessel Data @ {datetime.now(timezone.utc).isoformat()} ===")
         for vessel in vessels[:]:  # Iterate over a copy of the list
             if not update_vessel(vessel):
                 print(f"Vessel {vessel['MMSI']} reached destination. Removing.")
