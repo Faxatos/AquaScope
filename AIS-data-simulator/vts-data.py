@@ -187,8 +187,8 @@ def update_vessel(vessel):
     vessel["ETA_AIS"] = eta_time.isoformat()
     return True
 
-def simulate_vessels(ocean_gdf, lat_range, lon_range):
-    vessels = [generate_vessel(ocean_gdf, lat_range, lon_range) for _ in range(5)]
+def simulate_vessels(ocean_gdf, lat_range, lon_range, vess_num):
+    vessels = [generate_vessel(ocean_gdf, lat_range, lon_range) for _ in range(vess_num)]
 
     while True:
         print(f"=== Current Vessel Data @ {datetime.now(timezone.utc).isoformat()} ===")
@@ -209,6 +209,7 @@ if __name__ == "__main__":
 
     # Command-line arguments parsing
     parser = argparse.ArgumentParser(description="Simulate vessels within a specified area.")
+    parser.add_argument('--vess', type=int, required=True, help="Number of vessels to simulate.")
     parser.add_argument('--lat_min', type=float, required=True, help="Minimum latitude of the area.")
     parser.add_argument('--lat_max', type=float, required=True, help="Maximum latitude of the area.")
     parser.add_argument('--lon_min', type=float, required=True, help="Minimum longitude of the area.")
@@ -221,6 +222,7 @@ if __name__ == "__main__":
     # Define the area (latitude and longitude ranges) where you want to generate coordinates
     lat_range = (args.lat_min, args.lat_max)
     lon_range = (args.lon_min, args.lon_max)
+    vess_num = args.vess
     
     # Start the vessel simulation
-    simulate_vessels(ocean_gdf, lat_range, lon_range)
+    simulate_vessels(ocean_gdf, lat_range, lon_range, vess_num)

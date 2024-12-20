@@ -2,6 +2,7 @@ import random
 import uuid
 from datetime import datetime, timedelta, timezone
 import json
+import argparse 
 #from kafka import KafkaProducer
 
 import geopandas as gpd
@@ -189,8 +190,8 @@ def update_vessel(vessel):
     vessel["ETA_AIS"] = eta_time.isoformat()
     return True
 
-def simulate_vessels(ocean_gdf):
-    vessels = [generate_vessel(ocean_gdf) for _ in range(5)]
+def simulate_vessels(ocean_gdf, vess_num):
+    vessels = [generate_vessel(ocean_gdf) for _ in range(vess_num)]
 
     while True:
         print(f"=== Current Vessel Data @ {datetime.now(timezone.utc).isoformat()} ===")
@@ -210,9 +211,15 @@ if __name__ == "__main__":
     import time
 
     shapefile_path = "natural_earth_oceans/ne_110m_ocean.shp"
+
+    # Command-line arguments parsing
+    parser = argparse.ArgumentParser(description="Simulate vessels within a specified area.")
+    parser.add_argument('--vess', type=int, required=True, help="Number of vessels to simulate.")
+    args = parser.parse_args()
     
     # Load the land GeoDataFrame
     ocean_gdf = load_ocean_shapefile(shapefile_path)
     
     # Start the vessel simulation
-    simulate_vessels(ocean_gdf)
+    vess_num = args.vess
+    simulate_vessels(ocean_gdf, vess_num)
