@@ -17,21 +17,21 @@ This project aims to build a scalable platform to ingest, process, and analyze t
 The platform is designed around modern, distributed technologies to ensure scalability, fault tolerance, and low latency. 
 
 <p align="center">
-<img src="https://github.com/user-attachments/assets/00af7707-aa20-4a73-9a54-c52b369c8900" alt="drawing" width="700"/>
+<img src="https://github.com/user-attachments/assets/aacae806-d505-4760-bca7-e72729d72d76" alt="drawing" width="700"/>
 </p>
 
 ## Objectives
 1. **Ingest data**: Data streams from AIS antennas, VTS stations, and satellite providers are ingested into Kafka clusters. Kafka acts as a durable buffer, ensuring reliable data delivery to downstream systems.
 
-2. **Process data streams** Spark Structured Streaming processes data from Kafka in real-time. This includes:
+2. **Process data streams**: Flink Structured Streaming processes data from Kafka in real-time. This includes:
   - Aggregations and metrics calculations.
   - Window-based analysis for trends.
   - Anomaly detection based on deviations, patterns, and thresholds.
-  - Enrichment with metadata (e.g., vessel type, distance from the coast).
+  - Enrichment with metadata (e.g. distance from the coast).
   
-3. **Store enriched data** Processed data is stored in Apache Druid. This enables ultra-fast query performance and supports interactive analytics.
+3. **Store enriched data**: Processed data is stored in Apache Druid. This enables ultra-fast query performance and supports interactive analytics.
 
-5. **Visualize results** Dashboards will visualize vessel positions, anomalies, and trends on an interactive map. Operators can execute queries and drill down into data for informed decision-making.
+5. **Visualize results**: Dashboards will visualize vessel positions, anomalies, and trends on an interactive map. Operators can execute queries and drill down into data for informed decision-making.
 
 ## Key Features
 - **Multi-Site Data Handling:** Each site processes its local data but also integrates with a central system for global insights.
@@ -43,15 +43,15 @@ The platform is designed around modern, distributed technologies to ensure scala
 | Component              | Technology                                                                 |
 |------------------------|---------------------------------------------------------------------------|
 | **Ingestion**         | Apache Kafka                                                             |
-| **Stream Processing** | Apache Spark                                                             |
+| **Stream Processing** | Apache Flink                                                             |
 | **Storage**           | Apache Druid                                                            |
 | **Orchestration**     | Kubernetes (K8s)                                                        |
 | **Infrastructure**    | Terraform for Infrastructure as Code (IaC)                              |
-| **Visualization**     | Custom UI (to be developed) or integration with existing frameworks      |
+| **Visualization**     | Operator UI (to be developed) or integration with existing frameworks      |
 
 ## Deployment and Scalability
 - **Kubernetes (K8s):**
-  - Orchestrates Spark, Kafka, and Druid clusters.
+  - Orchestrates Flink, Kafka, and Druid clusters.
   - Provides fault tolerance through pod rescheduling and scaling.
   - Enables auto-scaling based on system load.
 
