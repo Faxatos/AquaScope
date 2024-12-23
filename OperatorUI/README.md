@@ -57,7 +57,6 @@ This will launch the Next.js app, and you can view it in your browser at: http:/
 - Create package
 - Connect DBs to fetch data
 - Implement LogIn
-- Fix sidebar logo
 - Fix skeleton pages
 
   
