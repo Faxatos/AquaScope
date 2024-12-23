@@ -50,4 +50,14 @@ pnpm dev
 
 This will launch the Next.js app, and you can view it in your browser at: http://localhost:3000
 
+### ToDos:
+
+- Logs page
+- Vessels page
+- Create package
+- Connect DBs to fetch data
+- Implement LogIn
+- Fix sidebar logo
+- Fix skeleton pages
+
   
