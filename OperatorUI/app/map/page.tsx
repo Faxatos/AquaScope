@@ -69,7 +69,6 @@ export default function Page() {
           bearing: 0,
           pitch: 0
         }}
-        //mapStyle="mapbox://styles/mapbox/dark-v9"
         mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
       >
         <GeolocateControl position="top-left" />
