@@ -9,15 +9,47 @@ export async function fetchVesselStaticData(mmsi: number): Promise<Vessel | unde
 }
 
 // Fetch a page of vessel logs
-export async function fetchVesselLogPage(mmsi: number, currentPage: number, itemsPerPage: number = 10): Promise<VesselLog[]> {
-  const logs = vesselLogs.filter((log) => log.mmsi === mmsi);
+export async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPage: number = 10): Promise<VesselLog[]> {
+  if (mmsi === "") {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return vesselLogs.slice(startIndex, startIndex + itemsPerPage);
+  }
+
+  // Try to parse mmsi string to a number
+  const mmsiNumber = parseInt(mmsi, 10);
+
+  // If mmsi cannot be parsed into a valid number, handle the case accordingly
+  if (isNaN(mmsiNumber)) {
+    console.error('Invalid MMSI value:', mmsi);
+    return []; // Or return a suitable fallback value (like 0)
+  }
+
+  const logs = vesselLogs.filter((log) => log.mmsi === mmsiNumber);
+
+  // Filter logs by the parsed mmsi number
   const startIndex = (currentPage - 1) * itemsPerPage;
   return logs.slice(startIndex, startIndex + itemsPerPage);
 }
 
 // Fetch the total number of pages for logs
-export async function fetchTotalLogPages(mmsi: number, itemsPerPage: number = 10): Promise<number> {
-  const logs = vesselLogs.filter((log) => log.mmsi === mmsi);
+export async function fetchTotalLogPages(mmsi: string, itemsPerPage: number = 10): Promise<number> {
+  if (mmsi === "") {
+    const totalPages = Math.ceil(vesselLogs.length / itemsPerPage);
+    return totalPages;
+  }
+
+  // Try to parse mmsi string to a number
+  const mmsiNumber = parseInt(mmsi, 10);
+
+  // If mmsi cannot be parsed into a valid number, handle the case accordingly
+  if (isNaN(mmsiNumber)) {
+    console.error('Invalid MMSI value:', mmsi);
+    return 0; // Or return a suitable fallback value (like 0)
+  }
+
+  const logs = vesselLogs.filter((log) => log.mmsi === mmsiNumber);
+
+  // Calculate and return the total number of pages based on the filtered log list
   const totalPages = Math.ceil(logs.length / itemsPerPage);
   return totalPages;
 }
