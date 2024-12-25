@@ -4,10 +4,8 @@ import Table from '@/app/ui/alarms/table';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 
-import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { lusitana } from '@/app/ui/fonts';
 import { fetchTotalAlarmPages } from '@/app/lib/data'; 
-import { AlarmCard } from '@/app/ui/alarms/alarm-card';
 
 export default async function Page(props: {
   searchParams?: Promise<{
