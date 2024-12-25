@@ -1,21 +1,21 @@
-import AquaScopeLogo from '@/app/ui/aquascope-logo';
+import AquaScopeLogoHome from '@/app/ui/aquascope-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 export default function Page() {
   return (
     <main className="flex min-h-screen flex-col p-6">
-      <div className="flex h-20 shrink-0 items-end rounded-lg bg-blue-500 p-4 md:h-52">
-        {/* <AcmeLogo /> */}
+      <div className="flex min-h-[5rem] md:min-h-[10rem] items-center justify-center rounded-lg bg-blue-500 p-4">
+        <AquaScopeLogoHome />
       </div>
       <div className="mt-4 flex grow flex-col gap-4 md:flex-row">
         <div className="flex flex-col justify-center gap-6 rounded-lg bg-gray-50 px-6 py-10 md:w-2/5 md:px-20">
           <p className={`text-xl text-gray-800 md:text-3xl md:leading-normal`}>
-            <strong>Welcome to Acme.</strong> This is the example for the{' '}
-            <a href="https://nextjs.org/learn/" className="text-blue-500">
-              Next.js Learn Course
-            </a>
-            , brought to you by Vercel.
+            <strong>Real-time distributed platform</strong> for analyzing maritime traffic data from multiple sources.
+          </p>
+          <p className="text-gray-600">
+            This project enhances anomaly detection and decision-making for maritime operators by processing and analyzing AIS data 
+            from coastal and satellite systems, ensuring navigation safety and operational efficiency.
           </p>
           <Link
             href="/login"
@@ -24,9 +24,14 @@ export default function Page() {
             <span>Log in</span> <ArrowRightIcon className="w-5 md:w-6" />
           </Link>
         </div>
-        <div className="flex items-center justify-center p-6 md:w-3/5 md:px-28 md:py-12">
-          {/* Add Hero Images Here */}
+        <div className="flex flex-col items-center justify-center gap-6 p-6 md:w-3/5 md:px-28 md:py-12">
+          {/* add platform image here */}
         </div>
+      </div>
+      <div className="mt-8 flex items-center justify-center">
+        <p className="text-gray-500 text-sm md:text-base">
+          Project for the <strong>Scalable and Distributed Computing</strong> course.
+        </p>
       </div>
     </main>
   );
