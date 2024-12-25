@@ -36,7 +36,7 @@ export function LogCardMobile({ log }: { log: VesselLog }) {
         <td className="whitespace-nowrap px-3 py-3">{log.longitude}</td>
         <td className="whitespace-nowrap px-3 py-3">{log.speed}</td>
         <td className="whitespace-nowrap px-3 py-3">{log.course}</td>
-        <td className="whitespace-nowrap px-3 py-3">{log.eta_ais}</td>
+        <td className="whitespace-nowrap px-3 py-3">{formatDateToLocal(log.eta_ais)}</td>
         <td className="whitespace-nowrap px-3 py-3">{formatDateToLocal(log.timestamp)}</td>
         <td className="whitespace-nowrap px-3 py-3">{log.eca ? 'Yes' : 'No'}</td>
         <td className="whitespace-nowrap px-3 py-3">{log.src}</td>
