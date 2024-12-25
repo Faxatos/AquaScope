@@ -3,9 +3,51 @@ import { Vessel, VesselLog, Alarm } from './definitions';
 import { vessels, vesselLogs, alarms } from './placeholder-data';
 
 // Fetch static vessel data by mmsi
-export async function fetchVesselStaticData(mmsi: number): Promise<Vessel | undefined> {
-  const vessel = vessels.find((vessel) => vessel.mmsi === mmsi);
-  return vessel;
+export async function fetchVesselInfosPage(mmsi: string, currentPage: number, itemsPerPage: number = 10): Promise<Vessel[]> {
+  if (mmsi === "") {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return vessels.slice(startIndex, startIndex + itemsPerPage); // Return a page of all vessels
+  }
+
+  // Try to parse MMSI string to a number
+  const mmsiNumber = parseInt(mmsi, 10);
+
+  // If MMSI cannot be parsed into a valid number, handle the case accordingly
+  if (isNaN(mmsiNumber)) {
+    console.error('Invalid MMSI value:', mmsi);
+    return []; // Or return a suitable fallback value (like empty array)
+  }
+
+  // Filter vessels by the parsed MMSI number
+  const filteredVessels = vessels.filter((vessel) => vessel.mmsi === mmsiNumber);
+
+  // Paginate the filtered vessels
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  return filteredVessels.slice(startIndex, startIndex + itemsPerPage);
+}
+
+// Fetch the total number of pages for vessels
+export async function fetchTotalVesselInfosPage(mmsi: string, itemsPerPage: number = 10): Promise<number> {
+  if (mmsi === "") {
+    const totalPages = Math.ceil(vessels.length / itemsPerPage);
+    return totalPages; // Calculate and return total pages for all vessels
+  }
+
+  // Try to parse MMSI string to a number
+  const mmsiNumber = parseInt(mmsi, 10);
+
+  // If MMSI cannot be parsed into a valid number, handle the case accordingly
+  if (isNaN(mmsiNumber)) {
+    console.error('Invalid MMSI value:', mmsi);
+    return 0; // Return 0 if MMSI is invalid
+  }
+
+  // Filter vessels by the parsed MMSI number
+  const filteredVessels = vessels.filter((vessel) => vessel.mmsi === mmsiNumber);
+
+  // Calculate and return the total number of pages based on the filtered vessels list
+  const totalPages = Math.ceil(filteredVessels.length / itemsPerPage);
+  return totalPages;
 }
 
 // Fetch a page of vessel logs
@@ -99,16 +141,6 @@ export async function fetchAlarmPage(mmsi: string, currentPage: number, itemsPer
   const alarmList = alarms.filter((alarm) => alarm.mmsi === mmsiNumber);
   const startIndex = (currentPage - 1) * itemsPerPage;
   return alarmList.slice(startIndex, startIndex + itemsPerPage);
-}
-
-// Fetch alarms for a specific vessel
-export async function fetchAlarmsByVessel(mmsi: number){
-  return alarms.filter((alarm) => alarm.mmsi === mmsi);
-}
-
-// Fetch alarm details by alarm_id
-export async function fetchAlarmDetails(alarmId: string){
-  return alarms.find((alarm) => alarm.alarm_id === alarmId);
 }
 
 // methods requiring a real postgres db:
