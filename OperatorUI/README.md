@@ -52,8 +52,8 @@ This will launch the Next.js app, and you can view it in your browser at: http:/
 
 ### ToDos:
 
-- Vessels page
-- Implement LogIn
+- Implement Auth
+- Implement HomePage
 - Create package
 - Connect DBs to fetch data
 - Implement "Solve Alarm" button functionality
