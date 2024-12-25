@@ -4,6 +4,7 @@ import {
   MapIcon,
   BellAlertIcon,
   FolderOpenIcon,
+  LifebuoyIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -23,6 +24,11 @@ const links = [
     href: '/map/logs',
     icon: FolderOpenIcon,
   },
+  {
+    name: 'Vessels',
+    href: '/map/vessels',
+    icon: LifebuoyIcon,
+  }
 ];
 
 export default function NavLinks() {
