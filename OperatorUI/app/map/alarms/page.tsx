@@ -1,4 +1,4 @@
-import Pagination from '@/app/ui/alarms/pagination';
+import Pagination from '@/app/ui/pagination';
 import Search from '@/app/ui/search';
 import Table from '@/app/ui/alarms/table';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
