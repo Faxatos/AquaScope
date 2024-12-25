@@ -1,7 +1,7 @@
 import { AlarmCardMobile, AlarmCardDesktop } from '@/app/ui/alarms/alarm-card';
 import { fetchAlarmPage } from '@/app/lib/data';
 
-export default async function InvoicesTable({
+export default async function Table({
   query,
   currentPage,
   }: {
