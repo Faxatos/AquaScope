@@ -1,4 +1,3 @@
-import { formatDateToLocal } from '@/app/lib/utils'; 
 import { Vessel } from '@/app/lib/definitions';
 
 export function VesselCardMobile({ vessel }: { vessel: Vessel }) {

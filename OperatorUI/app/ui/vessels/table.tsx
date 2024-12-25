@@ -43,9 +43,6 @@ export default async function VesselTable({
                 <th className="px-3 py-5 font-medium">IMO</th>
                 <th className="px-3 py-5 font-medium">Draught (m)</th>
                 <th className="px-3 py-5 font-medium">Dimensions (A x B x C x D)</th>
-                <th className="relative py-3 pl-6 pr-3">
-                  <span className="sr-only">Actions</span>
-                </th>
               </tr>
             </thead>
             <tbody className="bg-white">

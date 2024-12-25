@@ -14,7 +14,6 @@ import Map, {
 import 'maplibre-gl/dist/maplibre-gl.css';
 import maplibregl from 'maplibre-gl';
 
-import ControlPanel from '@/app/ui/map/control-panel';
 import VesselPin from '@/app/ui/map/pins';
 
 import { vesselLogs } from '@/app/lib/placeholder-data';
@@ -106,8 +105,6 @@ export default function Page() {
           </Popup>
         )}
       </Map>
-
-      <ControlPanel />
     </>
   );
 }

@@ -1,5 +1,3 @@
-import { ShowVesselDetails } from '@/app/ui/logs/buttons';
-import { formatDateToLocal } from '@/app/lib/utils';
 import { fetchVesselLogPage } from '@/app/lib/data';
 
 import { LogCardDesktop, LogCardMobile } from '@/app/ui/logs/log-card'
