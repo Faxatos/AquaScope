@@ -1,7 +1,7 @@
 import Pagination from '@/app/ui/pagination';
 import Search from '@/app/ui/search';
 import VesselsTable from '@/app/ui/vessels/table'; // Assuming VesselsTable component
-import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
+import { VesselTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 
 import { fetchTotalVesselInfosPage } from '@/app/lib/data'; // Function to fetch total pages for vessels
@@ -25,7 +25,7 @@ export default async function Page(props: {
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search with MMSI..." />
       </div>
-      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+      <Suspense key={query + currentPage} fallback={<VesselTableSkeleton />}>
         <VesselsTable query={query} currentPage={currentPage} /> {/* Render VesselsTable component */}
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
