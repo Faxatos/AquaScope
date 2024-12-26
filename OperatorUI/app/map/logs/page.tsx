@@ -1,7 +1,7 @@
 import Pagination from '@/app/ui/pagination';
 import Search from '@/app/ui/search';
 import LogsTable from '@/app/ui/logs/table';
-import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
+import { LogsTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 
 import { fetchTotalLogPages } from '@/app/lib/data';
@@ -25,7 +25,7 @@ export default async function Page(props: {
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search with MMSI..." />
       </div>
-      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+      <Suspense key={query + currentPage} fallback={<LogsTableSkeleton />}>
         <LogsTable query={query} currentPage={currentPage} /> {/* Render LogsTable component */}
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
