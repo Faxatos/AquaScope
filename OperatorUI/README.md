@@ -56,7 +56,6 @@ This will launch the Next.js app, and you can view it in your browser at: http:/
 - Connect DBs to fetch data
 - Implement "Solve Alarm" button functionality
 - Implement "Vessel Details" button functionality
-- Fix skeleton pages
 - Add metadata
 
   
