@@ -2,8 +2,8 @@
 FROM node:18-alpine AS builder
 
 # Install Python (required by node-gyp)
-RUN apt-get update && apt-get install -y python3 python3-pip python3-venv
-RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN apk add --no-cache python3 py3-pip build-base
+RUN ln -sf /usr/bin/python3 /usr/bin/python
 
 # Set the working directory
 WORKDIR /app
@@ -31,6 +31,9 @@ FROM node:18-alpine AS runner
 
 # Set the working directory
 WORKDIR /app
+
+RUN apk add --no-cache python3 py3-pip build-base
+RUN ln -sf /usr/bin/python3 /usr/bin/python
 
 # Install pnpm globally
 RUN npm install -g pnpm
