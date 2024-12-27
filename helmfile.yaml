@@ -19,6 +19,9 @@ releases:
     version: ~31.1.1    # Esempio di versione (verifica la più recente)
     values:
       - kafka/values.yaml   # Se preferisci, puoi inlined qui i valori
+    set:
+      - name: kraft.clusterId
+        value: ${KRAFT_CLUSTER_ID}
     
   # ---------------------------------------------------------------------------
   # Cassandra
@@ -30,6 +33,9 @@ releases:
     version: ~12.1.0     # Esempio di versione (verifica la più recente)
     values:
       - cassandra/values.yaml
+    set:
+      - name: dbUser.password
+        value: ${CASSANDRA_PASSWORD}
     
   # ---------------------------------------------------------------------------
   # Druid
