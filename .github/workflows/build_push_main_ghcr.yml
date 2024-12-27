@@ -79,8 +79,8 @@ jobs:
           context: ./Operator-UI
           file: ./Operator-UI/Dockerfile
           tags: |
-            ghcr.io/${{ faxatos }}/smartfactory/operator-ui:latest
-            ghcr.io/${{ faxatos }}/smartfactory/operator-ui:${{ steps.vars.outputs.sha_short }}
+            ghcr.io/faxatos/smartfactory/operator-ui:latest
+            ghcr.io/faxatos/smartfactory/operator-ui:${{ steps.vars.outputs.sha_short }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -117,8 +117,8 @@ jobs:
           context: ./AIS-data-simulator
           file: ./AIS-data-simulator/Dockerfile
           tags: |
-            ghcr.io/${{ github.repository_owner }}/smartfactory/ais-data-simulator:latest
-            ghcr.io/${{ github.repository_owner }}/smartfactory/ais-data-simulator:${{ steps.vars.outputs.sha_short }}
+            ghcr.io/faxatos/smartfactory/ais-data-simulator:latest
+            ghcr.io/faxatos/smartfactory/ais-data-simulator:${{ steps.vars.outputs.sha_short }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
