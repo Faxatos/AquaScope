@@ -111,14 +111,27 @@ jobs:
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Build and push AIS-data-simulator container
+      - name: Build and push AIS-data-simulator satellite container
         uses: docker/build-push-action@v3
         with:
           context: ./AIS-data-simulator
-          file: ./AIS-data-simulator/Dockerfile
+          file: ./AIS-data-simulator/Dockerfile.satellite
           tags: |
-            ghcr.io/faxatos/smartfactory/ais-data-simulator:latest
-            ghcr.io/faxatos/smartfactory/ais-data-simulator:${{ steps.vars.outputs.sha_short }}
+            ghcr.io/faxatos/smartfactory/ais-data-simulator-satellite:latest
+            ghcr.io/faxatos/smartfactory/ais-data-simulator-satellite:${{ steps.vars.outputs.sha_short }}
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push AIS-data-simulator vts container
+        uses: docker/build-push-action@v3
+        with:
+          context: ./AIS-data-simulator
+          file: ./AIS-data-simulator/Dockerfile.vts
+          tags: |
+            ghcr.io/faxatos/smartfactory/ais-data-simulator-vts:latest
+            ghcr.io/faxatos/smartfactory/ais-data-simulator-vts:${{ steps.vars.outputs.sha_short }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
