@@ -8,9 +8,9 @@ on:
 
 jobs:
   detect-changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
-      changed-services: ${{ steps.parse-changes.outputs.changed }}
+      changed-services: ${{ env.changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,11 +38,11 @@ jobs:
             done
           fi
           echo "Changed services: $changed_services"
-          echo "::set-output name=changed::$changed_services"
+          echo "changed=$changed_services" >> $GITHUB_ENV
 
   print-changed-containers:
     needs: detect-changes
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Print changed containers
         run: |
@@ -54,7 +54,7 @@ jobs:
     concurrency:
       group: build-operator-ui
       cancel-in-progress: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -92,7 +92,7 @@ jobs:
     concurrency:
       group: build-ais-data-simulator
       cancel-in-progress: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
