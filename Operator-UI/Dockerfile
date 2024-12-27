@@ -34,9 +34,6 @@ RUN npm install -g pnpm
 # Install TypeScript and the required dependencies for Next.js with TypeScript support
 RUN npm install -g typescript @types/react @types/node
 
-# Copy the .env file to the image (it will be used by Next.js and Auth.js)
-COPY .env .env
-
 # Set environment variable for trustHost to true (for Auth.js configuration)
 ENV AUTH_TRUST_HOST=true
 
