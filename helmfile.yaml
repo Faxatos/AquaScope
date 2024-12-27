@@ -1,0 +1,54 @@
+# helmfile.yaml
+repositories:
+  # Repository per i chart Bitnami (Kafka, Cassandra, Flink)
+  - name: bitnami
+    url: "https://charts.bitnami.com/bitnami"
+
+  # Repository ufficiale per Druid (Apache)
+  - name: druid
+    url: "https://asdf2014.github.io/druid-helm"
+
+releases:
+  # ---------------------------------------------------------------------------
+  # Kafka
+  # ---------------------------------------------------------------------------
+  - name: kafka
+    namespace: kafka
+    createNamespace: true
+    chart: bitnami/kafka
+    version: ~31.1.1    # Esempio di versione (verifica la più recente)
+    values:
+      - kafka/values.yaml   # Se preferisci, puoi inlined qui i valori
+    
+  # ---------------------------------------------------------------------------
+  # Cassandra
+  # ---------------------------------------------------------------------------
+  - name: cassandra
+    namespace: cassandra
+    createNamespace: true
+    chart: bitnami/cassandra
+    version: ~12.1.0     # Esempio di versione (verifica la più recente)
+    values:
+      - cassandra/values.yaml
+    
+  # ---------------------------------------------------------------------------
+  # Druid
+  # ---------------------------------------------------------------------------
+  - name: druid
+    namespace: druid
+    createNamespace: true
+    chart: druid/druid
+    version: ~31.0.0     # Esempio di versione (verifica la più recente)
+    values:
+      - druid/values.yaml
+
+  # ---------------------------------------------------------------------------
+  # Flink
+  # ---------------------------------------------------------------------------
+  - name: flink
+    namespace: flink
+    createNamespace: true
+    chart: bitnami/flink
+    version: ~1.4.1     # Esempio di versione (verifica la più recente)
+    values:
+      - flink/values.yaml
