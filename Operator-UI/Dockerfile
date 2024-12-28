@@ -1,6 +1,10 @@
 # Stage 1: Build
 FROM node:18-alpine AS builder
 
+# Install Python (required by node-gyp)
+RUN apk add --no-cache python3 py3-pip build-base
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+
 # Set the working directory
 WORKDIR /app
 
@@ -28,14 +32,14 @@ FROM node:18-alpine AS runner
 # Set the working directory
 WORKDIR /app
 
+RUN apk add --no-cache python3 py3-pip build-base
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+
 # Install pnpm globally
 RUN npm install -g pnpm
 
 # Install TypeScript and the required dependencies for Next.js with TypeScript support
 RUN npm install -g typescript @types/react @types/node
-
-# Copy the .env file to the image (it will be used by Next.js and Auth.js)
-COPY .env .env
 
 # Set environment variable for trustHost to true (for Auth.js configuration)
 ENV AUTH_TRUST_HOST=true

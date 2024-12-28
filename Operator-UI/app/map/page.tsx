@@ -46,7 +46,7 @@ export default function Page() {
           longitude={vessel.longitude}
           latitude={vessel.latitude}
           anchor="bottom"
-          onClick={(e: MapMouseEvent) => {
+          onClick={(e: any) => {
             e.originalEvent.stopPropagation();
             setPopupInfo(vessel);
           }}
