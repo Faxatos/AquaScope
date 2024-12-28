@@ -11,6 +11,7 @@
     "@vercel/postgres": "^0.10.0",
     "@vis.gl/react-maplibre": "1.0.0-alpha.4",
     "autoprefixer": "10.4.20",
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
     "maplibre-gl": "^4.7.1",

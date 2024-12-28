@@ -17,6 +17,7 @@ import maplibregl from 'maplibre-gl';
 import VesselPin from '@/app/ui/map/pins';
 
 import { vesselLogs } from '@/app/lib/placeholder-data';
+//import { fetchLatestLogs } from '@/app/lib/data';
 
 // Define the VesselLog type
 export type VesselLog = {
@@ -38,6 +39,7 @@ export type VesselLog = {
 export default function Page() {
   const [popupInfo, setPopupInfo] = useState<VesselLog | null>(null);
 
+  //const vesselLogs = fetchLatestLogs() to fetch the latest logs from Druid
   const pins = useMemo(
     () =>
       vesselLogs.map((vessel, index) => (
