@@ -79,8 +79,8 @@ jobs:
           context: ./Operator-UI
           file: ./Operator-UI/Dockerfile
           tags: |
-            ghcr.io/faxatos/smartfactory/operator-ui:latest
-            ghcr.io/faxatos/smartfactory/operator-ui:${{ steps.vars.outputs.sha_short }}
+            ghcr.io/faxatos/aquascope/operator-ui:latest
+            ghcr.io/faxatos/aquascope/operator-ui:${{ steps.vars.outputs.sha_short }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -117,8 +117,8 @@ jobs:
           context: ./AIS-data-simulator
           file: ./AIS-data-simulator/Dockerfile.satellite
           tags: |
-            ghcr.io/faxatos/smartfactory/ais-data-simulator-satellite:latest
-            ghcr.io/faxatos/smartfactory/ais-data-simulator-satellite:${{ steps.vars.outputs.sha_short }}
+            ghcr.io/faxatos/aquascope/ais-data-simulator-satellite:latest
+            ghcr.io/faxatos/aquascope/ais-data-simulator-satellite:${{ steps.vars.outputs.sha_short }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -130,8 +130,8 @@ jobs:
           context: ./AIS-data-simulator
           file: ./AIS-data-simulator/Dockerfile.vts
           tags: |
-            ghcr.io/faxatos/smartfactory/ais-data-simulator-vts:latest
-            ghcr.io/faxatos/smartfactory/ais-data-simulator-vts:${{ steps.vars.outputs.sha_short }}
+            ghcr.io/faxatos/aquascope/ais-data-simulator-vts:latest
+            ghcr.io/faxatos/aquascope/ais-data-simulator-vts:${{ steps.vars.outputs.sha_short }}
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
