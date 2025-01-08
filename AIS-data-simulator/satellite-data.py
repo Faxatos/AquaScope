@@ -5,7 +5,7 @@ import json
 import os
 import argparse 
 from kafka import KafkaProducer
-
+from kafka.admin import KafkaAdminClient
 import geopandas as gpd
 from shapely.geometry import Point
 
@@ -29,6 +29,25 @@ producer = KafkaProducer(
     bootstrap_servers=[KAFKA_SERVER],
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
+
+def check_kafka_connection_until_ready(kafka_server, delay=3):
+    """
+    Continuously checks if Kafka is reachable every `delay` seconds until it becomes available.
+    
+    Args:
+    - kafka_server (str): Kafka server address.
+    - delay (int): Delay between connection attempts in seconds.
+    """
+    while True:
+        try:
+            admin_client = KafkaAdminClient(bootstrap_servers=kafka_server)
+            print(f"Kafka is reachable")
+            admin_client.close()
+            break  # Exit the loop when Kafka becomes available
+        except Exception as e:
+            print(f"Kafka is not reachable: {e}")
+            print(f"Retrying in {delay} seconds...")
+            time.sleep(delay)
 
 # Helper functions
 def load_ocean_shapefile(filepath):
@@ -238,6 +257,9 @@ if __name__ == "__main__":
     parser.add_argument('--vess', type=int, required=True, help="Number of vessels to simulate.")
     args = parser.parse_args()
     
+    print("Checking Kafka connectivity...")
+    check_kafka_connection_until_ready(KAFKA_SERVER, delay=3)
+
     # Load the land GeoDataFrame
     ocean_gdf = load_ocean_shapefile(shapefile_path)
     
