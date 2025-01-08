@@ -1,4 +1,4 @@
-import AquaScopeLogoHome from '@/app/ui/aquascope-logo';
+import AquaScopeLogoHome from '@/app/ui/shared/aquascope-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 

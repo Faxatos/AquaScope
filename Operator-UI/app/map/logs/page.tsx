@@ -1,7 +1,7 @@
-import Pagination from '@/app/ui/pagination';
-import Search from '@/app/ui/search';
+import Pagination from '@/app/ui/shared/pagination';
+import Search from '@/app/ui/shared/search';
 import LogsTable from '@/app/ui/logs/table';
-import { LogsTableSkeleton } from '@/app/ui/skeletons';
+import { LogsTableSkeleton } from '@/app/ui/logs/skeleton';
 import { Suspense } from 'react';
 
 import { fetchTotalLogPages } from '@/app/lib/data';

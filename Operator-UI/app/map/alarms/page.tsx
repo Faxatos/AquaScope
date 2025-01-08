@@ -1,7 +1,7 @@
-import Pagination from '@/app/ui/pagination';
-import Search from '@/app/ui/search';
+import Pagination from '@/app/ui/shared/pagination';
+import Search from '@/app/ui/shared/search';
 import Table from '@/app/ui/alarms/table';
-import { AlarmsTableSkeleton } from '@/app/ui/skeletons';
+import { AlarmsTableSkeleton } from '@/app/ui/alarms/skeleton';
 import { Suspense } from 'react';
 
 import { fetchTotalAlarmPages } from '@/app/lib/data'; 
