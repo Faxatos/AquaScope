@@ -121,7 +121,7 @@ def generate_vessel(ocean_gdf, lat_range, lon_range):
         "LOCODE": f"LOC-{random.randint(1, 100)}",
         "ZONE": f"Zone-{random.randint(1, 10)}",
         "ECA": random.choice([True, False]),
-        "SRC": "SAT"
+        "SRC": "TER"
     }
 
     # Dynamic data
