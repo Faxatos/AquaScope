@@ -1,4 +1,4 @@
-# Default values for operator-ui.
+# Default values for ais-data-simulator-satellite.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -7,7 +7,7 @@ replicaCount: 1
 
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: ghcr.io/faxatos/aquascope/operator-ui
+  repository: ghcr.io/faxatos/aquascope/ais-data-simulator-satellite
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
@@ -54,7 +54,7 @@ service:
   # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
-  port: 3000
+  port: 80
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -121,7 +121,3 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
-
-secrets:
-  AUTH_URL: http://localhost:3000/api/auth
-  AUTH_SECRET: RmNY/1BR/MwInwAVCRz6gRKumKfP7tRSRr5Kln4FAXI=

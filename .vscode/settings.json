@@ -1,0 +1,5 @@
+{
+   "yaml.schemas": {
+      "kubernetes://schema/v1@secret": "file:///Users/belgio/git-repos/AquaScope/secret.yaml"
+   }
+}

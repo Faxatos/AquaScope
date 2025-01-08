@@ -2,9 +2,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "ais-data-simulator.fullname" . }}
+  name: {{ include "ais-data-simulator-vts.fullname" . }}
   labels:
-    {{- include "ais-data-simulator.labels" . | nindent 4 }}
+    {{- include "ais-data-simulator-vts.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -35,7 +35,7 @@ spec:
             {{- end }}
             backend:
               service:
-                name: {{ include "ais-data-simulator.fullname" $ }}
+                name: {{ include "ais-data-simulator-vts.fullname" $ }}
                 port:
                   number: {{ $.Values.service.port }}
           {{- end }}
