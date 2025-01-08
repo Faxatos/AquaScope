@@ -218,7 +218,9 @@ def simulate_vessels(ocean_gdf, vess_num):
             
             # Send the vessel data to Kafka
             try:
-                producer.send(TOPIC, value=vessel)
+                future = producer.send(TOPIC, value=vessel)
+                print("waiting for end future send call")
+                future.get(timeout=10)  # Add a timeout for safety
                 producer.flush()
             except Exception as e:
                 print(f"Failed to send vessel data to Kafka: {e}")
