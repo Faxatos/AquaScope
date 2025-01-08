@@ -4,13 +4,28 @@ from datetime import datetime, timedelta, timezone
 import json
 import geopandas as gpd
 from shapely.geometry import Point
+import os
 import argparse 
+from kafka import KafkaProducer
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Constants
 DEFAULT_SPEED = (5, 20)  # Knots
 ETA_UPDATE_INTERVAL = 10  # We assume to get data every 10 seconds
 MAX_DESTINATION_OFFSET = 1  # Max offset for destination in degrees (about 60 nautical miles)
 
+# Kafka Configuration
+KAFKA_SERVER = os.getenv('KAFKA_SERVER')
+TOPIC = os.getenv('TOPIC', 'sat')
+
+# Initialize Kafka Producer
+producer = KafkaProducer(
+    bootstrap_servers=[KAFKA_SERVER],
+    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
 
 # Helper functions
 def load_ocean_shapefile(filepath):
@@ -198,6 +213,10 @@ def simulate_vessels(ocean_gdf, lat_range, lon_range, vess_num):
                 vessels.remove(vessel)
                 vessels.append(generate_vessel(ocean_gdf, lat_range, lon_range))
             print(vessel)
+
+            # Send the vessel data to Kafka
+            producer.send(TOPIC, value=vessel)
+            producer.flush()
 
         time.sleep(ETA_UPDATE_INTERVAL)  # Wait before the next update
 
