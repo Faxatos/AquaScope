@@ -29,7 +29,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/lib/placeholder-data.ts",
-    "scripts/seed.js"
-  ],
+    "scripts/seed.js",
+    "app/lib/druid/*.ts",
+    "app/lib/cassandra/*.ts"  ],
   "exclude": ["node_modules"]
 }
