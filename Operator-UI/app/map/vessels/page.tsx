@@ -1,10 +1,10 @@
-import Pagination from '@/app/ui/pagination';
-import Search from '@/app/ui/search';
+import Pagination from '@/app/ui/shared/pagination';
+import Search from '@/app/ui/shared/search';
 import VesselsTable from '@/app/ui/vessels/table'; // Assuming VesselsTable component
-import { VesselTableSkeleton } from '@/app/ui/skeletons';
+import { VesselTableSkeleton } from '@/app/ui/vessels/skeleton';
 import { Suspense } from 'react';
 
-import { fetchTotalVesselInfosPage } from '@/app/lib/data'; // Function to fetch total pages for vessels
+import { fetchTotalVesselInfosPage } from '@/app/lib/cassandra/vessels'; // Function to fetch total pages for vessels
 
 export default async function Page(props: {
   searchParams?: Promise<{

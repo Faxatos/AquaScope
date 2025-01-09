@@ -6,10 +6,10 @@ import {
   ExclamationCircleIcon,
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
-import { Button } from '@/app/ui/button';
+import { Button } from '@/app/ui/shared/button';
 import { useActionState } from 'react';
 import { authenticate } from '@/app/lib/actions';
-import AquaScopeLogoHome from '@/app/ui/aquascope-logo';
+import AquaScopeLogoHome from '@/app/ui/shared/aquascope-logo';
 
 import Link from 'next/link';
 

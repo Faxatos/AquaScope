@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import NavLinks from '@/app/ui/map/nav-links';
-import AquaScopeLogo from '@/app/ui/aquascope-logo';
+import AquaScopeLogo from '@/app/ui/shared/aquascope-logo';
 import { PowerIcon } from '@heroicons/react/24/outline';
 import { signOut } from '@/auth';
 

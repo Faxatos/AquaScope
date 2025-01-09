@@ -1,8 +1,10 @@
-//import { sql } from '@vercel/postgres';
+//import axios from 'axios';
 import { Vessel, VesselLog, Alarm } from './definitions';
 import { vessels, vesselLogs, alarms } from './placeholder-data';
 
-// Fetch static vessel data by mmsi
+//const DRUID_SQL_API = 'http://druid:8888/druid/v2/sql';
+
+// Fetch static vessel data by mmsi [mockup data]
 export async function fetchVesselInfosPage(mmsi: string, currentPage: number, itemsPerPage: number = 10): Promise<Vessel[]> {
   if (mmsi === "") {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -26,7 +28,7 @@ export async function fetchVesselInfosPage(mmsi: string, currentPage: number, it
   return filteredVessels.slice(startIndex, startIndex + itemsPerPage);
 }
 
-// Fetch the total number of pages for vessels
+// Fetch the total number of pages for vessels [mockup data]
 export async function fetchTotalVesselInfosPage(mmsi: string, itemsPerPage: number = 10): Promise<number> {
   if (mmsi === "") {
     const totalPages = Math.ceil(vessels.length / itemsPerPage);
@@ -50,7 +52,7 @@ export async function fetchTotalVesselInfosPage(mmsi: string, itemsPerPage: numb
   return totalPages;
 }
 
-// Fetch a page of vessel logs
+// Fetch a page of vessel logs [mockup data]
 export async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPage: number = 10): Promise<VesselLog[]> {
   if (mmsi === "") {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -73,7 +75,7 @@ export async function fetchVesselLogPage(mmsi: string, currentPage: number, item
   return logs.slice(startIndex, startIndex + itemsPerPage);
 }
 
-// Fetch the total number of pages for logs
+// Fetch the total number of pages for logs [mockup data]
 export async function fetchTotalLogPages(mmsi: string, itemsPerPage: number = 10): Promise<number> {
   if (mmsi === "") {
     const totalPages = Math.ceil(vesselLogs.length / itemsPerPage);
@@ -96,7 +98,7 @@ export async function fetchTotalLogPages(mmsi: string, itemsPerPage: number = 10
   return totalPages;
 }
 
-export async function fetchTotalAlarmPages(mmsi: string, itemsPerPage: number = 10): Promise<number> {
+export async function fetchTotalAlarmPages(mmsi: string, itemsPerPage: number = 10): Promise<number> { //[mockup data]
   // If mmsi is an empty string, return the total number of pages for the entire alarms list
   if (mmsi === "") {
     const totalPages = Math.ceil(alarms.length / itemsPerPage);
@@ -120,7 +122,7 @@ export async function fetchTotalAlarmPages(mmsi: string, itemsPerPage: number = 
   return totalPages;
 }
 
-// Fetch a page of alarms
+// Fetch a page of alarms [mockup data]
 export async function fetchAlarmPage(mmsi: string, currentPage: number, itemsPerPage: number = 10) {
   // If mmsi is an empty string, return the alarm list without filtering
   if (mmsi === "") {
@@ -143,8 +145,88 @@ export async function fetchAlarmPage(mmsi: string, currentPage: number, itemsPer
   return alarmList.slice(startIndex, startIndex + itemsPerPage);
 }
 
-// methods requiring a real postgres db:
-/*export async function fetchVesselStaticData(mmsi: number) {
+/* methods for Druid logs fetch (they are using the same name as the mockup data methods for easy replacement)
+
+export async function fetchVesselLogPage(
+  mmsi: string,
+  currentPage: number,
+  itemsPerPage: number = 10
+): Promise<VesselLog[]> {
+  const offset = (currentPage - 1) * itemsPerPage;
+
+  // Construct SQL query based on MMSI filter (assuming vessel_logs is the datasource)
+  const query = mmsi
+    ? `SELECT * FROM vessel_logs WHERE mmsi = ${parseInt(mmsi, 10)} LIMIT ${itemsPerPage} OFFSET ${offset}`
+    : `SELECT * FROM vessel_logs LIMIT ${itemsPerPage} OFFSET ${offset}`;
+
+  try {
+    const response = await axios.post(DRUID_SQL_API, {
+      query,
+    }, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    return response.data as VesselLog[];
+  } catch (error) {
+    console.error('Error fetching vessel logs from Druid:', error);
+    return []; // Return an empty array in case of error
+  }
+}
+
+export async function fetchTotalLogPages(
+  mmsi: string,
+  itemsPerPage: number = 10
+): Promise<number> {
+
+  // Construct SQL query to count rows (assuming vessel_logs is the datasource)
+  const query = mmsi
+    ? `SELECT COUNT(*) AS total_logs FROM vessel_logs WHERE mmsi = ${parseInt(mmsi, 10)}`
+    : `SELECT COUNT(*) AS total_logs FROM vessel_logs`;
+
+  try {
+    const response = await axios.post(DRUID_SQL_API, {
+      query,
+    }, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const totalLogs = response.data[0]?.total_logs || 0; // Extract total logs count
+    return Math.ceil(totalLogs / itemsPerPage);
+  } catch (error) {
+    console.error('Error fetching total pages from Druid:', error);
+    return 0; // Return 0 pages in case of error
+  }
+}
+
+export async function fetchLatestLogs(): Promise<VesselLog[]> {
+  const query = `
+    SELECT l.* 
+    FROM vessel_logs l
+    INNER JOIN (
+      SELECT mmsi, MAX("timestamp") AS max_timestamp
+      FROM vessel_logs
+      GROUP BY mmsi
+    ) latest
+    ON l.mmsi = latest.mmsi AND l."timestamp" = latest.max_timestamp
+  `;
+
+  try {
+    const response = await axios.post(DRUID_SQL_API, {
+      query,
+    }, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    return response.data as VesselLog[];
+  } catch (error) {
+    console.error('Error fetching latest logs from Druid:', error);
+    return []; // Return an empty array in case of error
+  }
+}
+
+/* methods requiring a real postgres db:
+
+export async function fetchVesselStaticData(mmsi: number) {
   try {
     const data = await sql<Vessel>`SELECT * FROM vessels WHERE mmsi = ${mmsi}`;
     return data.rows[0];

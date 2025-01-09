@@ -1,5 +1,5 @@
 import { VesselCardMobile, VesselCardDesktop } from '@/app/ui/vessels/vessel-card';
-import { fetchVesselInfosPage } from '@/app/lib/data'; // Assuming a function to fetch vessel data page
+import { fetchVesselInfosPage } from '@/app/lib/cassandra/vessels'; // Assuming a function to fetch vessel data page
 
 export default async function VesselTable({
   query,

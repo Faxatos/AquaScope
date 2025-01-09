@@ -1,24 +1,46 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from './auth.config';
-//import { sql } from '@vercel/postgres';
+import { Client } from 'cassandra-driver';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
 
 import type { User } from '@/app/lib/definitions';
 import { users } from '@/app/lib/placeholder-data';
 
+const client = new Client({
+  contactPoints: ['cassandra.cassandra.svc.cluster.local:9042'], // replace with your Cassandra node IPs
+  localDataCenter: 'datacenter1', // replace with your Cassandra data center name
+  keyspace: 'vessel_management', // replace with your Cassandra keyspace
+});
+
 async function getUser(email: string): Promise<User | undefined> {
-    /*try {
-      const user = await sql<User>`SELECT * FROM users WHERE email=${email}`;
-      return user.rows[0];
-    } catch (error) {
-      console.error('Failed to fetch user:', error);
-      throw new Error('Failed to fetch user.');
-    }*/
-    const user = users.find((user) => user.email === email)
-    return user;
+  try {
+    // Query Cassandra for the user with the given email
+    const query = 'SELECT * FROM users WHERE email = ?';
+    const result = await client.execute(query, [email], { prepare: true });
+    
+    // If no user is found, return undefined
+    if (result.rowLength === 0) {
+      return undefined;
+    }
+
+    // Assuming the first row contains the user data
+    const user = result.rows[0];
+
+    // Map the Cassandra row to a User object
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      password: user.password,  // Adjust column names as necessary
+      // Add any other fields as needed
+    };
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    throw new Error('Failed to fetch user from Cassandra.');
   }
+}
  
 export const { auth, signIn, signOut } = NextAuth({
     ...authConfig,

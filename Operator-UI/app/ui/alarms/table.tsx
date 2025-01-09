@@ -1,5 +1,5 @@
 import { AlarmCardMobile, AlarmCardDesktop } from '@/app/ui/alarms/alarm-card';
-import { fetchAlarmPage } from '@/app/lib/data';
+import { fetchAlarmPage } from '@/app/lib/cassandra/alarms';
 
 export default async function Table({
   query,
