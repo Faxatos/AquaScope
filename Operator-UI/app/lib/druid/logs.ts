@@ -2,7 +2,7 @@ import axios from 'axios';
 //import { DRUID_SQL_API } from '@/env';
 import { VesselLog } from '@/app/lib/definitions'; // Shared type definition
 
-const DRUID_SQL_API = 'http://druid:8888/druid/v2/sql';
+const DRUID_SQL_API = 'http://localhost:8888/druid/v2/sql';
 
 export async function fetchVesselLogPage(
   mmsi: string,

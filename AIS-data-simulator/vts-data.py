@@ -4,13 +4,47 @@ from datetime import datetime, timedelta, timezone
 import json
 import geopandas as gpd
 from shapely.geometry import Point
+import os
 import argparse 
+from kafka import KafkaProducer
+from kafka.admin import KafkaAdminClient
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Constants
 DEFAULT_SPEED = (5, 20)  # Knots
-ETA_UPDATE_INTERVAL = 10  # We assume to get data every 10 seconds
+ETA_UPDATE_INTERVAL = int(os.getenv('INTERVAL', '5'))  # We assume to get data every 10 seconds
 MAX_DESTINATION_OFFSET = 1  # Max offset for destination in degrees (about 60 nautical miles)
 
+# Kafka Configuration
+KAFKA_SERVER = os.getenv('KAFKA_SERVER')
+TOPIC = os.getenv('TOPIC', 'sat')
+
+# Initialize Kafka Producer
+producer = KafkaProducer(
+    bootstrap_servers=[KAFKA_SERVER],
+    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+)
+
+def check_kafka_connection_until_ready(kafka_server, delay=3):
+    """
+    Continuously checks if Kafka is reachable every `delay` seconds until it becomes available.
+    
+    Args:
+    - kafka_server (str): Kafka server address.
+    - delay (int): Delay between connection attempts in seconds.
+    """
+    while True:
+        try:
+            admin_client = KafkaAdminClient(bootstrap_servers=kafka_server)
+            print(f"Kafka is reachable")
+            admin_client.close()
+            break  # Exit the loop when Kafka becomes available
+        except Exception as e:
+            print(f"Kafka is not reachable: {e}")
+            print(f"Retrying in {delay} seconds...")
+            time.sleep(delay)
 
 # Helper functions
 def load_ocean_shapefile(filepath):
@@ -199,6 +233,14 @@ def simulate_vessels(ocean_gdf, lat_range, lon_range, vess_num):
                 vessels.append(generate_vessel(ocean_gdf, lat_range, lon_range))
             print(vessel)
 
+            # Send the vessel data to Kafka
+            try:
+                future = producer.send(TOPIC, value=vessel)
+                future.get(timeout=10)  # Add a timeout for safety
+                producer.flush()
+            except Exception as e:
+                print(f"Failed to send vessel data to Kafka: {e}")
+
         time.sleep(ETA_UPDATE_INTERVAL)  # Wait before the next update
 
 if __name__ == "__main__":
@@ -215,6 +257,9 @@ if __name__ == "__main__":
     parser.add_argument('--lon_min', type=float, required=True, help="Minimum longitude of the area.")
     parser.add_argument('--lon_max', type=float, required=True, help="Maximum longitude of the area.")
     args = parser.parse_args()
+
+    print("Checking Kafka connectivity...")
+    check_kafka_connection_until_ready(KAFKA_SERVER, delay=3)
     
     # Load the land GeoDataFrame
     ocean_gdf = load_ocean_shapefile(shapefile_path)
