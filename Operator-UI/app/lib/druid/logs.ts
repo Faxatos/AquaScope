@@ -1,82 +1,62 @@
-import axios from 'axios';
-//import { DRUID_SQL_API } from '@/env';
 import { VesselLog } from '@/app/lib/definitions'; // Shared type definition
 
-const DRUID_SQL_API = 'http://localhost:8888/druid/v2/sql';
-
-export async function fetchVesselLogPage(
-  mmsi: string,
-  currentPage: number,
-  itemsPerPage: number = 10
-): Promise<VesselLog[]> {
-  const offset = (currentPage - 1) * itemsPerPage;
-
-  // Construct SQL query based on MMSI filter (assuming vessel_logs is the datasource)
-  const query = mmsi
-    ? `SELECT * FROM vessel_logs WHERE mmsi = ${parseInt(mmsi, 10)} LIMIT ${itemsPerPage} OFFSET ${offset}`
-    : `SELECT * FROM vessel_logs LIMIT ${itemsPerPage} OFFSET ${offset}`;
-
+// Fetch logs from the API
+export const fetchPageLogs = async (mmsi: string, currentPage: number) => {
   try {
-    const response = await axios.post(DRUID_SQL_API, {
-      query,
-    }, {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await fetch(
+      `/api/logs?action=fetchLogs&mmsi=${mmsi}&currentPage=${currentPage}&itemsPerPage=10`
+    );
 
-    return response.data as VesselLog[];
+    if (!response.ok) {
+      console.error('Error fetching logs:', response.statusText);
+      return [];
+    }
+
+    const data = await response.json();
+    if (data.error) {
+      console.error('API Error:', data.error);
+      return [];
+    }
+
+    return data.data || []; // Return the logs array
   } catch (error) {
-    console.error('Error fetching vessel logs from Druid:', error);
-    return []; // Return an empty array in case of error
+    console.error('Error fetching logs:', error);
+    return [];
   }
-}
+};
 
-export async function fetchTotalLogPages(
-  mmsi: string,
-  itemsPerPage: number = 10
-): Promise<number> {
-
-  // Construct SQL query to count rows (assuming vessel_logs is the datasource)
-  const query = mmsi
-    ? `SELECT COUNT(*) AS total_logs FROM vessel_logs WHERE mmsi = ${parseInt(mmsi, 10)}`
-    : `SELECT COUNT(*) AS total_logs FROM vessel_logs`;
-
+// Fetch the total pages based on the query
+export const fetchTotalPages = async (searchQuery: string): Promise<number> => {
   try {
-    const response = await axios.post(DRUID_SQL_API, {
-      query,
-    }, {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await fetch(`/api/logs?action=fetchTotalPages&mmsi=${searchQuery}`);
+    const data = await response.json();
 
-    const totalLogs = response.data[0]?.total_logs || 0; // Extract total logs count
-    return Math.ceil(totalLogs / itemsPerPage);
+    if (data.error) {
+      console.error('Error fetching total pages:', data.error);
+      return 0; // Default to 0 pages if there's an error
+    }
+
+    return data.totalPages || 0;
   } catch (error) {
-    console.error('Error fetching total pages from Druid:', error);
-    return 0; // Return 0 pages in case of error
+    console.error('Error fetching total pages:', error);
+    return 0; // Default to 0 pages in case of network error
   }
-}
+};
 
-export async function fetchLatestLogs(): Promise<VesselLog[]> {
-  const query = `
-    SELECT l.* 
-    FROM vessel_logs l
-    INNER JOIN (
-      SELECT mmsi, MAX("timestamp") AS max_timestamp
-      FROM vessel_logs
-      GROUP BY mmsi
-    ) latest
-    ON l.mmsi = latest.mmsi AND l."timestamp" = latest.max_timestamp
-  `;
-
+// Function to fetch the latest vessel logs from the API
+export const fetchLatestLogs = async (): Promise<VesselLog[] | null> => {
   try {
-    const response = await axios.post(DRUID_SQL_API, {
-      query,
-    }, {
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await fetch('/api/logs?action=fetchLatestLogs'); // Adjust the endpoint if necessary
+    const data = await response.json();
 
-    return response.data as VesselLog[];
+    if (data.error) {
+      console.error('Error:', data.error);
+      return null; // Return null if there's an error
+    }
+
+    return data.data || [];
   } catch (error) {
-    console.error('Error fetching latest logs from Druid:', error);
-    return []; // Return an empty array in case of error
+    console.error('Error fetching vessel logs:', error);
+    return null; // Return null in case of network error or other issues
   }
-}
+};

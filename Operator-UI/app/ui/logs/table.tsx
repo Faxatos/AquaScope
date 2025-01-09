@@ -1,5 +1,5 @@
-import { fetchVesselLogPage } from '@/app/lib/druid/logs';
-
+import { fetchPageLogs } from '@/app/lib/druid/logs';
+import { VesselLog } from '@/app/lib/definitions';
 import { LogCardDesktop, LogCardMobile } from '@/app/ui/logs/log-card'
 
 export default async function LogsTable({
@@ -22,7 +22,7 @@ export default async function LogsTable({
   // If the query is valid, assign it directly (as a string) or use an empty string
   const mmsi = query === "" ? "" : query;
 
-  const logs = await fetchVesselLogPage(mmsi, currentPage);
+  const logs = await fetchPageLogs(mmsi, currentPage);
 
   return (
     <div className="mt-6 flow-root">
@@ -30,7 +30,7 @@ export default async function LogsTable({
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           {/* Mobile View */}
           <div className="md:hidden">
-            {logs?.map((log) => (
+            {logs?.map((log: VesselLog) => (
               <LogCardMobile key={log.timestamp} log={log} />
             ))}
           </div>
@@ -56,7 +56,7 @@ export default async function LogsTable({
               </tr>
             </thead>
             <tbody className="bg-white">
-              {logs?.map((log) => (
+              {logs?.map((log: VesselLog) => (
                 <LogCardDesktop key={log.timestamp} log={log} />
               ))}
             </tbody>
