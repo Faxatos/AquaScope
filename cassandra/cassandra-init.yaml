@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-initdb
+  namespace: cassandra
+data:
+  init.cql: |
+    -- Create Keyspace
+    CREATE KEYSPACE IF NOT EXISTS my_keyspace
+    WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+
+    -- Use the Keyspace
+    USE my_keyspace;
+
+    -- Table for Vessel
+    CREATE TABLE IF NOT EXISTS vessel (
+        mmsi BIGINT PRIMARY KEY,
+        imo BIGINT,
+        callsign TEXT,
+        a DOUBLE,
+        b DOUBLE,
+        c DOUBLE,
+        d DOUBLE,
+        draught DOUBLE
+    );
+
+    -- Table for Alarm
+    CREATE TABLE IF NOT EXISTS alarm (
+        alarm_id TEXT PRIMARY KEY,
+        timestamp TIMESTAMP,
+        mmsi BIGINT,
+        code TEXT,
+        description TEXT,
+        status TEXT
+    );
+
+    -- Table for User
+    CREATE TABLE IF NOT EXISTS user (
+        id UUID PRIMARY KEY,
+        name TEXT,
+        email TEXT,
+        password TEXT
+    );
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-dummy-data
+  namespace: cassandra
+data:
+  dummy-data.cql: |
+    -- Use the Keyspace
+    USE my_keyspace;
+
+    -- Insert data into Alarm table
+    INSERT INTO alarm (alarm_id, timestamp, mmsi, code, description, status) 
+    VALUES ('ALARM001', '2025-01-01 10:00:00', 123456789, 'E001', 'Engine overheating', 'active');
+
+    INSERT INTO alarm (alarm_id, timestamp, mmsi, code, description, status) 
+    VALUES ('ALARM002', '2025-01-02 12:30:00', 987654321, 'F002', 'Fire detected', 'resolved');
+
+    -- Insert data into User table
+    INSERT INTO user (id, name, email, password) 
+    VALUES (uuid(), 'test', 'test@test.com', 'test');
+
+    INSERT INTO user (id, name, email, password) 
+    VALUES (uuid(), 'Jane Smith', 'jane.smith@example.com', 'hashed_password_2');

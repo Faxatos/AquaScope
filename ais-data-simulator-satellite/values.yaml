@@ -9,7 +9,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/faxatos/aquascope/ais-data-simulator-satellite
   # This sets the pull policy for images.
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
@@ -87,13 +87,19 @@ resources: {}
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe:
-  httpGet:
-    path: /
-    port: http
+  exec:
+    command:
+    - cat
+    - /tmp/healthy
+  initialDelaySeconds: 3
+  periodSeconds: 10
 readinessProbe:
-  httpGet:
-    path: /
-    port: http
+  exec:
+    command:
+    - cat
+    - /tmp/healthy
+  initialDelaySeconds: 3
+  periodSeconds: 10
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
@@ -121,3 +127,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+config:
+  KAFKA_SERVER: kafka.kafka.svc.cluster.local:9092
+  TOPIC: vts
+  INTERVAL: 1

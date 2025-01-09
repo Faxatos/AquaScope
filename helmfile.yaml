@@ -35,7 +35,11 @@ releases:
       - cassandra/values.yaml
     set:
       - name: dbUser.password
-        value: ${CASSANDRA_PASSWORD}
+        value: cassandra
+    hooks:
+      - events: ["postsync"]
+        command: "kubectl"
+        args: ["apply", "-n", "cassandra", "-f", "cassandra/cassandra-init-and-prepopulate.yaml"]
     
   # ---------------------------------------------------------------------------
   # Druid
@@ -43,7 +47,7 @@ releases:
   - name: druid
     namespace: druid
     createNamespace: true
-    chart: druid/druid
+    chart: druid-helm/druid
     version: ~31.0.0     # Esempio di versione (verifica la più recente)
     values:
       - druid/values.yaml
@@ -51,10 +55,30 @@ releases:
   # ---------------------------------------------------------------------------
   # Flink
   # ---------------------------------------------------------------------------
-  - name: flink
-    namespace: flink
+#  - name: flink
+#    namespace: flink
+#    createNamespace: true
+#    chart: bitnami/flink
+#    version: ~1.4.1     # Esempio di versione (verifica la più recente)
+#    values:
+#      - flink/values.yaml
+
+  - name: operator-ui
+    namespace: operator-ui
     createNamespace: true
-    chart: bitnami/flink
-    version: ~1.4.1     # Esempio di versione (verifica la più recente)
+    chart: ./operator-ui
     values:
-      - flink/values.yaml
+      - ./operator-ui/values.yaml
+
+  - name: ais-data-simulator-satellite
+    namespace: ais-data-simulator
+    createNamespace: true
+    chart: ./ais-data-simulator-satellite
+    values:
+      - ./ais-data-simulator-satellite/values.yaml
+    
+  - name: ais-data-simulator-vts
+    namespace: ais-data-simulator
+    chart: ./ais-data-simulator-vts
+    values:
+      - ./ais-data-simulator-satellite/values.yaml

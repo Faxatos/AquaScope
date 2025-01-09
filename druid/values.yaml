@@ -474,7 +474,7 @@ router:
   name: router
   replicaCount: 1
   port: 8888
-  serviceType: ClusterIP
+  serviceType: LoadBalancer
 
   config:
     DRUID_XMX: 128m
@@ -575,4 +575,3 @@ prometheus:
   annotation:
     prometheus.io/scrape: "true"
     prometheus.io/port: "9090"
-

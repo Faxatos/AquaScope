@@ -9,15 +9,15 @@ replicaCount: 1
 image:
   repository: ghcr.io/faxatos/aquascope/ais-data-simulator-vts
   # This sets the pull policy for images.
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
 # This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 # This is to override the chart name.
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: "ais-data-simulator-vts"
+fullnameOverride: "ais-data-simulator-vts"
 
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
@@ -87,13 +87,20 @@ resources: {}
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe:
-  httpGet:
-    path: /
-    port: http
+  exec:
+    command:
+    - cat
+    - /tmp/healthy
+  initialDelaySeconds: 3
+  periodSeconds: 10
+
 readinessProbe:
-  httpGet:
-    path: /
-    port: http
+  exec:
+    command:
+    - cat
+    - /tmp/healthy
+  initialDelaySeconds: 3
+  periodSeconds: 10
 
 # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
 autoscaling:
@@ -121,3 +128,8 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+config: 
+  KAFKA_SERVER: kafka.kafka.svc.cluster.local:9092
+  TOPIC: vts
+  INTERVAL: 1

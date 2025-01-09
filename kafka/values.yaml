@@ -491,7 +491,7 @@ controller:
   ## @param controller.replicaCount Number of Kafka controller-eligible nodes
   ## Ignore this section if running in Zookeeper mode.
   ##
-  replicaCount: 2
+  replicaCount: 3
   ## @param controller.controllerOnly If set to true, controller nodes will be deployed as dedicated controllers, instead of controller+broker processes.
   ##
   controllerOnly: false
@@ -2131,7 +2131,13 @@ provisioning:
   ##     flush.messages: 1
   ##
   topics: 
-      - name: ais
+      - name: sat
+        partitions: 1
+        replicationFactor: 1
+        config:
+          max.message.bytes: 64000
+          flush.messages: 1
+      - name: vts
         partitions: 1
         replicationFactor: 1
         config:

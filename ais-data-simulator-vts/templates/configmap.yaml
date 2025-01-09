@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ais-data-simulator-vts.fullname" . }}
+  labels:
+    {{- include "ais-data-simulator-vts.labels" . | nindent 4 }}
+data:
+  # Chiavi e valori per la tua ConfigMap
+  {{- range $key, $value := .Values.config }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}

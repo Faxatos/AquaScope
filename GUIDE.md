@@ -16,7 +16,7 @@ minikube start
 ```bash
 helm install -n operator-ui operator-ui --values operator-ui/values.yaml ./operator-ui
 helm install --create-namespace -n kafka kafka --values kafka/values.yaml bitnami/kafka
-helm install --create-namespace -n druid druid --values druid/values.yaml bitnami/druid
+helm install --create-namespace -n druid druid --values druid/values.yaml asdf2014/druid
 ```
 
 3. Then, create the data simulator pods by running:

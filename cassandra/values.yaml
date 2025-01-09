@@ -137,7 +137,7 @@ dbUser:
 initDB: {}
 ## @param initDBConfigMap ConfigMap with cql scripts. Useful for creating a keyspace and pre-populating data
 ##
-initDBConfigMap: ""
+initDBConfigMap: "cassandra-init-and-prepopulate"
 ## @param initDBSecret Secret with cql script (with sensitive data). Useful for creating a keyspace and pre-populating data
 ##
 initDBSecret: ""

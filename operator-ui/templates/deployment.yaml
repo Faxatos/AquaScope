@@ -47,15 +47,11 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            {{- if .Values.secrets }}
-            {{- range $key, $value := .Values.secrets }}
-            - name: {{ $key }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-secret
-                  key: {{ $key }}
-            {{- end }}
-            {{- end }}
+          {{- range $key, $value := .Values.secrets }}
+          - name: {{ $key }}
+            value: "{{ $value }}"
+          {{- end }}
+          {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
