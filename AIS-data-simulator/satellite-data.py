@@ -17,7 +17,7 @@ load_dotenv()
 WORLD_LAT_RANGE = (-90.0, 90.0)
 WORLD_LON_RANGE = (-180.0, 180.0)
 DEFAULT_SPEED = (5, 20)  # Knots
-ETA_UPDATE_INTERVAL = 10  # We assume to get data every 10 seconds
+ETA_UPDATE_INTERVAL = int(os.getenv('INTERVAL', '5'))  # We assume to get data every INTERVAL seconds
 MAX_DESTINATION_OFFSET = 1  # Max offset for destination in degrees (about 60 nautical miles)
 
 # Kafka Configuration

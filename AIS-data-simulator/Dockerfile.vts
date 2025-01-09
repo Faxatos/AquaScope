@@ -15,6 +15,9 @@ RUN apt-get update && apt-get install -y \
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Create a file to indicate the container is healthy
+RUN touch /tmp/healthy
+
 # Set the entrypoint to run the script
 ENTRYPOINT ["python3", "vts-data.py"]
 
