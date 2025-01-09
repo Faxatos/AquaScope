@@ -1,10 +1,13 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Pagination from '@/app/ui/shared/pagination';
 import Search from '@/app/ui/shared/search';
 import LogsTable from '@/app/ui/logs/table';
 import { LogsTableSkeleton } from '@/app/ui/logs/skeleton';
 import { Suspense } from 'react';
 
-import { fetchTotalLogPages } from '@/app/lib/druid/logs';
+import { fetchTotalPages } from '@/app/lib/druid/logs';
 
 export default async function Page(props: {
   searchParams?: Promise<{
@@ -15,7 +18,17 @@ export default async function Page(props: {
   const searchParams = await props.searchParams;
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
-  const totalPages = await fetchTotalLogPages(query); // Function to fetch the total pages for logs
+
+  const [totalPages, setTotalPages] = useState<number>(0); // State for total pages
+
+  useEffect(() => {
+    const fetchPages = async () => {
+      const pages = await fetchTotalPages(query); // Fetch total pages using the query
+      setTotalPages(pages);
+    };
+
+    fetchPages();
+  }, [query]); // Re-run when query changes
 
   return (
     <div className="w-full">

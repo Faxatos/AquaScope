@@ -16,37 +16,22 @@ import maplibregl from 'maplibre-gl';
 
 import VesselPin from '@/app/ui/map/pins';
 
-//import { vesselLogs } from '@/app/lib/placeholder-data';
+import { VesselLog } from '@/app/lib/definitions';
 import { fetchLatestLogs } from '@/app/lib/druid/logs';
-
-// Define the VesselLog type
-export type VesselLog = {
-  timestamp: string;
-  mmsi: number;
-  locode: string;
-  zone: string;
-  eca: boolean;
-  src: string;
-  latitude: number;
-  longitude: number;
-  course: number;
-  speed: number;
-  eta_ais: string;
-  dest_lat: number;
-  dest_lon: number;
-};
 
 export default function Page() {
   const [vesselLogs, setVesselLogs] = useState<VesselLog[]>([]);
   const [popupInfo, setPopupInfo] = useState<VesselLog | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Function to fetch latest logs and update state
-  const fetchLogs = async () => {
-    try {
-      const logs = await fetchLatestLogs();
+   // Function to fetch latest logs and update state
+   const fetchLogs = async () => {
+    const logs = await fetchLatestLogs();
+    if (logs === null) {
+      setError('Failed to fetch vessel logs');
+    } else {
       setVesselLogs(logs);
-    } catch (error) {
-      console.error('Error fetching vessel logs:', error);
+      setError(null); // Clear any previous errors
     }
   };
 
