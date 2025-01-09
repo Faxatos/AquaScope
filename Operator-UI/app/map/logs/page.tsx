@@ -4,7 +4,7 @@ import LogsTable from '@/app/ui/logs/table';
 import { LogsTableSkeleton } from '@/app/ui/logs/skeleton';
 import { Suspense } from 'react';
 
-import { fetchTotalLogPages } from '@/app/lib/data';
+import { fetchTotalLogPages } from '@/app/lib/druid/logs';
 
 export default async function Page(props: {
   searchParams?: Promise<{

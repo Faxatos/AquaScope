@@ -1,4 +1,4 @@
-import { fetchVesselLogPage } from '@/app/lib/data';
+import { fetchVesselLogPage } from '@/app/lib/druid/logs';
 
 import { LogCardDesktop, LogCardMobile } from '@/app/ui/logs/log-card'
 

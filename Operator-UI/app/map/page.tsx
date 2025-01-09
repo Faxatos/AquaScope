@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import {useState, useMemo} from 'react';
+import {useState, useEffect, useMemo} from 'react';
 import Map, {
   Marker,
   Popup,
@@ -16,8 +16,8 @@ import maplibregl from 'maplibre-gl';
 
 import VesselPin from '@/app/ui/map/pins';
 
-import { vesselLogs } from '@/app/lib/placeholder-data';
-//import { fetchLatestLogs } from '@/app/lib/data';
+//import { vesselLogs } from '@/app/lib/placeholder-data';
+import { fetchLatestLogs } from '@/app/lib/druid/logs';
 
 // Define the VesselLog type
 export type VesselLog = {
@@ -37,9 +37,28 @@ export type VesselLog = {
 };
 
 export default function Page() {
+  const [vesselLogs, setVesselLogs] = useState<VesselLog[]>([]);
   const [popupInfo, setPopupInfo] = useState<VesselLog | null>(null);
 
-  //const vesselLogs = fetchLatestLogs() to fetch the latest logs from Druid
+  // Function to fetch latest logs and update state
+  const fetchLogs = async () => {
+    try {
+      const logs = await fetchLatestLogs();
+      setVesselLogs(logs);
+    } catch (error) {
+      console.error('Error fetching vessel logs:', error);
+    }
+  };
+
+  // Fetch the logs every second
+  useEffect(() => {
+    fetchLogs(); // Initial fetch
+    const intervalId = setInterval(fetchLogs, 1000); // Fetch every second
+
+    // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
+  }, []);
+
   const pins = useMemo(
     () =>
       vesselLogs.map((vessel, index) => (
@@ -56,7 +75,7 @@ export default function Page() {
           <VesselPin />
         </Marker>
       )),
-    []
+    [vesselLogs] // Re-run this when vesselLogs change
   );
 
   return (

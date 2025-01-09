@@ -4,7 +4,7 @@ import Table from '@/app/ui/alarms/table';
 import { AlarmsTableSkeleton } from '@/app/ui/alarms/skeleton';
 import { Suspense } from 'react';
 
-import { fetchTotalAlarmPages } from '@/app/lib/data'; 
+import { fetchTotalAlarmPages } from '@/app/lib/cassandra/alarms'; 
 
 export default async function Page(props: {
   searchParams?: Promise<{
