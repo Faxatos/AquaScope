@@ -2,12 +2,14 @@ package com.example.flink;
 
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.RichMapFunction;
+import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.connectors.kafka.table.KafkaDynamicSourceFactory;
 import org.apache.flink.connector.kafka.source.KafkaSource;
-import org.apache.flink.connector.kafka.source.reader.deserializer.SimpleStringSchema;
+import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,23 +26,19 @@ public class CassandraCheckJob {
                 .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
                 .setTopics("vts")
                 .setGroupId("flink-vts-consumer-group")
-                // We can start from the latest offsets (or earliest, etc.)
-                .setStartingOffsets(org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema.of(new SimpleStringSchema()))
-                .setValueOnlyDeserializer(new SimpleStringSchema())  // we only need the message value
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
 
-        // Alternatively (shorter), if you want earliest offsets:
-        // .setStartingOffsets(OffsetsInitializer.earliest())
-        // .setValueOnlyDeserializer(new SimpleStringSchema())
-
         // 3) Ingest the Kafka data as a DataStream
-        env.fromSource(kafkaSource, 
-                       org.apache.flink.api.common.eventtime.WatermarkStrategy.noWatermarks(), 
-                       "KafkaVtsSource")
-           // 4) Map each line to a processed result (or do something with it)
-           .map(new CassandraCheckMapFunction())
-           // 5) For demonstration, we print the status result
-           .print();
+        env.fromSource(
+                        kafkaSource,
+                        WatermarkStrategy.noWatermarks(),
+                        "KafkaVtsSource")
+                // 4) Map each line to a processed result (or do something with it)
+                .map(new CassandraCheckMapFunction())
+                // 5) For demonstration, we print the status result
+                .print();
 
         // 6) Execute the Flink job
         env.execute("Flink Cassandra Vessel Check Job (Kafka Source)");
@@ -77,28 +75,28 @@ public class CassandraCheckJob {
                 JsonNode node = MAPPER.readTree(value);
 
                 // Extract relevant fields
-                long mmsi     = node.get("MMSI").asLong();
-                long imo      = node.get("IMO").asLong();
-                String cs     = node.get("CALLSIGN").asText();
-                double a      = node.get("A").asDouble();
-                double b      = node.get("B").asDouble();
-                double c      = node.get("C").asDouble();
-                double d      = node.get("D").asDouble();
+                long mmsi = node.get("MMSI").asLong();
+                long imo = node.get("IMO").asLong();
+                String cs = node.get("CALLSIGN").asText();
+                double a = node.get("A").asDouble();
+                double b = node.get("B").asDouble();
+                double c = node.get("C").asDouble();
+                double d = node.get("D").asDouble();
                 double draught = node.get("DRAUGHT").asDouble();
 
                 // 3) Check if the vessel already exists
                 String selectQuery = "SELECT mmsi FROM vessel WHERE mmsi = ?";
                 boolean vesselExists = session.execute(
-                    session.prepare(selectQuery).bind(mmsi)
+                        session.prepare(selectQuery).bind(mmsi)
                 ).one() != null;
 
                 // 4) If it doesn't exist, insert the record
                 if (!vesselExists) {
                     String insertQuery = "INSERT INTO vessel (mmsi, imo, callsign, a, b, c, d, draught) "
-                                       + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                     session.execute(
-                        session.prepare(insertQuery)
-                               .bind(mmsi, imo, cs, a, b, c, d, draught)
+                            session.prepare(insertQuery)
+                                    .bind(mmsi, imo, cs, a, b, c, d, draught)
                     );
                     return "Inserted new vessel with MMSI " + mmsi;
                 } else {
