@@ -31,6 +31,7 @@ export default function Page() {
       setError('Failed to fetch vessel logs');
     } else {
       setVesselLogs(logs);
+      console.log('fetched vessel logs:', logs);
       setError(null); // Clear any previous errors
     }
   };
@@ -45,12 +46,20 @@ export default function Page() {
   }, []);
 
   const pins = useMemo(
-    () =>
-      vesselLogs.map((vessel, index) => (
+  () =>
+    vesselLogs
+      .filter(
+        (vessel) =>
+          vessel.latitude !== null &&
+          vessel.longitude !== null &&
+          !isNaN(Number(vessel.latitude)) &&
+          !isNaN(Number(vessel.longitude))
+      )
+      .map((vessel, index) => (
         <Marker
           key={`marker-${index}`}
-          longitude={vessel.longitude}
-          latitude={vessel.latitude}
+          longitude={Number(vessel.longitude)}
+          latitude={Number(vessel.latitude)}
           anchor="bottom"
           onClick={(e: any) => {
             e.originalEvent.stopPropagation();
@@ -60,7 +69,7 @@ export default function Page() {
           <VesselPin />
         </Marker>
       )),
-    [vesselLogs] // Re-run this when vesselLogs change
+    [vesselLogs]
   );
 
   return (
