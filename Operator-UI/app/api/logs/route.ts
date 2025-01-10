@@ -2,7 +2,7 @@ import axios from 'axios';
 import { NextResponse } from 'next/server';
 import { VesselLog } from '@/app/lib/definitions'; // Assuming your type definitions are in this file
 
-const DRUID_SQL_API = 'http://druid.druid.svc.cluster.local:8888/druid/v2/sql';
+const DRUID_SQL_API = 'http://druid-router.druid.svc.cluster.local:8888/druid/v2/sql';
 
 async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPage: number) {
   const offset = (currentPage - 1) * itemsPerPage;
