@@ -61,12 +61,11 @@ public class CassandraCheckJob {
         @Override
         public void open(Configuration parameters) throws Exception {
             super.open(parameters);
-            // 1) Build the Cassandra session (update the host, port, and datacenter as needed)
             CqlSessionBuilder builder = CqlSession.builder()
-                    .addContactPoint(new InetSocketAddress("cassandra.cassandra.svc.cluster.local", 9042))
-                    .withLocalDatacenter("dc1") // Ensure this matches your Cassandra datacenter name
-                    .withKeyspace("vessel_management") // Ensure this matches your keyspace name
-                    .withAuthCredentials("cassandra", "cassandra"); // Ensure this matches your Cassandra username/password
+                .addContactPoint(new InetSocketAddress("cassandra.cassandra.svc.cluster.local", 9042))
+                .withLocalDatacenter("datacenter1")
+                .withKeyspace("vessel_management")
+                .withAuthCredentials("cassandra", "cassandra");
             this.session = builder.build();
         }
 
