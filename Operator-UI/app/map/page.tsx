@@ -50,16 +50,14 @@ export default function Page() {
     vesselLogs
       .filter(
         (vessel) =>
-          vessel.latitude !== null &&
-          vessel.longitude !== null &&
-          !isNaN(Number(vessel.latitude)) &&
-          !isNaN(Number(vessel.longitude))
+          !isNaN(vessel.latitude) &&
+          !isNaN(vessel.longitude) // Ensure latitude and longitude are valid numbers
       )
       .map((vessel, index) => (
         <Marker
           key={`marker-${index}`}
-          longitude={Number(vessel.longitude)}
-          latitude={Number(vessel.latitude)}
+          longitude={vessel.longitude}
+          latitude={vessel.latitude}
           anchor="bottom"
           onClick={(e: any) => {
             e.originalEvent.stopPropagation();
@@ -103,18 +101,18 @@ export default function Page() {
               <strong>Vessel Information</strong>
               <ul>
                 <li><strong>Timestamp:</strong> {popupInfo.timestamp}</li>
-                <li><strong>MMSI:</strong> {popupInfo.mmsi}</li>
-                <li><strong>LOCODE:</strong> {popupInfo.locode}</li>
-                <li><strong>Zone:</strong> {popupInfo.zone}</li>
+                <li><strong>MMSI:</strong> {popupInfo.MMSI}</li>
+                <li><strong>LOCODE:</strong> {popupInfo.LOCODE}</li>
+                <li><strong>Zone:</strong> {popupInfo.ZONE}</li>
                 <li><strong>ECA:</strong> {popupInfo.eca ? 'Yes' : 'No'}</li>
-                <li><strong>Source:</strong> {popupInfo.src}</li>
+                <li><strong>Source:</strong> {popupInfo.SRC}</li>
                 <li><strong>Latitude:</strong> {popupInfo.latitude}</li>
                 <li><strong>Longitude:</strong> {popupInfo.longitude}</li>
-                <li><strong>Course:</strong> {popupInfo.course}&deg;</li>
-                <li><strong>Speed:</strong> {popupInfo.speed} knots</li>
-                <li><strong>ETA (AIS):</strong> {popupInfo.eta_ais}</li>
-                <li><strong>Destination Latitude:</strong> {popupInfo.dest_lat}</li>
-                <li><strong>Destination Longitude:</strong> {popupInfo.dest_lon}</li>
+                <li><strong>Course:</strong> {popupInfo.COURSE}&deg;</li>
+                <li><strong>Speed:</strong> {popupInfo.SPEED} knots</li>
+                <li><strong>ETA (AIS):</strong> {popupInfo.ETA_AIS}</li>
+                <li><strong>Destination Latitude:</strong> {popupInfo.DEST_LAT}</li>
+                <li><strong>Destination Longitude:</strong> {popupInfo.DEST_LON}</li>
               </ul>
             </div>
           </Popup>
