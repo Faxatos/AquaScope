@@ -64,7 +64,9 @@ public class CassandraCheckJob {
             // 1) Build the Cassandra session (update the host, port, and datacenter as needed)
             CqlSessionBuilder builder = CqlSession.builder()
                     .addContactPoint(new InetSocketAddress("cassandra.cassandra.svc.cluster.local", 9042))
-                    .withLocalDatacenter("datacenter1"); // Ensure this matches your Cassandra datacenter name
+                    .withLocalDatacenter("datacenter1") // Ensure this matches your Cassandra datacenter name
+                    .withKeyspace("vts") // Ensure this matches your keyspace name
+                    .withAuthCredentials("cassandra", "cassandra"); // Ensure this matches your Cassandra username/password
             this.session = builder.build();
         }
 
