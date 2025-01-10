@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Pagination from '@/app/ui/shared/pagination';
 import Search from '@/app/ui/shared/search';
 import LogsTable from '@/app/ui/logs/table';
@@ -9,13 +10,11 @@ import { Suspense } from 'react';
 
 import { fetchTotalPages } from '@/app/lib/druid/logs';
 
-export default function Page({
-  searchParams,
-}: {
-  searchParams?: { query?: string; page?: string };
-}) {
-  const query = searchParams?.query || ''; // Safely destructure
-  const currentPage = Number(searchParams?.page) || 1;
+export default function Page(){
+  const searchParams = useSearchParams();  // Use the hook to access search params
+
+  const query = searchParams?.get('query') || ''; 
+  const currentPage = Number(searchParams?.get('page')) || 1;
 
   const [totalPages, setTotalPages] = useState<number>(0); // State for total pages
 
