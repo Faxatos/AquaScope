@@ -9,22 +9,25 @@ import { Suspense } from 'react';
 
 import { fetchTotalPages } from '@/app/lib/druid/logs';
 
-export default async function Page(props: {
-  searchParams?: Promise<{
-    query?: string;
-    page?: string;
-  }>;
+export default function Page({
+  searchParams,
+}: {
+  searchParams?: { query?: string; page?: string };
 }) {
-  const searchParams = await props.searchParams;
-  const query = searchParams?.query || '';
+  const query = searchParams?.query || ''; // Safely destructure
   const currentPage = Number(searchParams?.page) || 1;
 
   const [totalPages, setTotalPages] = useState<number>(0); // State for total pages
 
   useEffect(() => {
     const fetchPages = async () => {
-      const pages = await fetchTotalPages(query); // Fetch total pages using the query
-      setTotalPages(pages);
+      try {
+        const pages = await fetchTotalPages(query); // Fetch total pages using the query
+        setTotalPages(pages);
+      } catch (error) {
+        console.error('Failed to fetch total pages:', error);
+        setTotalPages(0); // Fallback in case of error
+      }
     };
 
     fetchPages();

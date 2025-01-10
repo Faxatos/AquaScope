@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Pagination from '@/app/ui/shared/pagination';
 import Search from '@/app/ui/shared/search';
 import Table from '@/app/ui/alarms/table';
@@ -6,16 +9,29 @@ import { Suspense } from 'react';
 
 import { fetchTotalAlarmPages } from '@/app/lib/cassandra/alarms'; 
 
-export default async function Page(props: {
-  searchParams?: Promise<{
-    query?: string;
-    page?: string;
-  }>;
-  }) {
-  const searchParams = await props.searchParams;
-  const query = searchParams?.query || '';
+export default function Page({
+  searchParams,
+}: {
+  searchParams?: { query?: string; page?: string };
+}) {
+  const query = searchParams?.query || ''; // Safely destructure
   const currentPage = Number(searchParams?.page) || 1;
-  const totalPages = await fetchTotalAlarmPages(query);
+
+  const [totalPages, setTotalPages] = useState<number>(0); // State for total pages
+
+  useEffect(() => {
+    const fetchPages = async () => {
+      try {
+        const pages = await fetchTotalAlarmPages(query); // Fetch total pages using the query
+        setTotalPages(pages);
+      } catch (error) {
+        console.error('Failed to fetch total pages:', error);
+        setTotalPages(0); // Fallback in case of error
+      }
+    };
+
+    fetchPages();
+  }, [query]); // Re-run when query changes
 
   return (
     <div className="w-full">
