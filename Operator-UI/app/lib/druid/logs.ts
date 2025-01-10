@@ -18,7 +18,17 @@ export const fetchPageLogs = async (mmsi: string, currentPage: number) => {
       return [];
     }
 
-    return data.data || []; // Return the logs array
+    // Map the data to ensure that latitudes and longitudes are numbers and booleans are correctly handled
+    const normalizedData = data.data.map((log: any) => ({
+      ...log,
+      latitude: parseFloat(log.LATITUDE),  // Convert LATITUDE to latitude (float)
+      longitude: parseFloat(log.LONGITUDE), // Convert LONGITUDE to longitude (float)
+      eca: log.ECA === 'true',  // Normalize ECA as a boolean (true or false)
+      timestamp: log.__time,  // Keep timestamp for use in popup
+    }));
+
+    // Return the normalized data
+    return normalizedData;
   } catch (error) {
     console.error('Error fetching logs:', error);
     return [];
@@ -54,7 +64,17 @@ export const fetchLatestLogs = async (): Promise<VesselLog[] | null> => {
       return null; // Return null if there's an error
     }
 
-    return data.data || [];
+    // Map the data to ensure that latitudes and longitudes are numbers and booleans are correctly handled
+    const normalizedData = data.data.map((log: any) => ({
+      ...log,
+      latitude: parseFloat(log.LATITUDE),  // Convert LATITUDE to latitude (float)
+      longitude: parseFloat(log.LONGITUDE), // Convert LONGITUDE to longitude (float)
+      eca: log.ECA === 'true',  // Normalize ECA as a boolean (true or false)
+      timestamp: log.__time,  // Keep timestamp for use in popup
+    }));
+
+    // Return the normalized data
+    return normalizedData;
   } catch (error) {
     console.error('Error fetching vessel logs:', error);
     return null; // Return null in case of network error or other issues
