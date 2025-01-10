@@ -7,7 +7,7 @@ const DRUID_SQL_API = 'http://druid-router.druid.svc.cluster.local:8888/druid/v2
 async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPage: number) {
   const offset = (currentPage - 1) * itemsPerPage;
   const query = mmsi
-    ? `SELECT * FROM vessel_logs WHERE mmsi = ${parseInt(mmsi, 10)} LIMIT ${itemsPerPage} OFFSET ${offset}`
+    ? `SELECT * FROM vessel_logs WHERE MMSI = ${parseInt(mmsi, 10)} LIMIT ${itemsPerPage} OFFSET ${offset}`
     : `SELECT * FROM vessel_logs LIMIT ${itemsPerPage} OFFSET ${offset}`;
 
   try {
@@ -25,7 +25,7 @@ async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPag
 
 async function fetchTotalLogPages(mmsi: string, itemsPerPage: number) {
   const query = mmsi
-    ? `SELECT COUNT(*) AS total_logs FROM vessel_logs WHERE mmsi = ${parseInt(mmsi, 10)}`
+    ? `SELECT COUNT(*) AS total_logs FROM vessel_logs WHERE MMSI = ${parseInt(mmsi, 10)}`
     : `SELECT COUNT(*) AS total_logs FROM vessel_logs`;
 
   try {
@@ -45,13 +45,13 @@ async function fetchTotalLogPages(mmsi: string, itemsPerPage: number) {
 async function fetchLatestLogs() {
   const query = `
     SELECT l.* 
-    FROM vessel_logs l
-    INNER JOIN (
-      SELECT mmsi, MAX("timestamp") AS max_timestamp
-      FROM vessel_logs
-      GROUP BY mmsi
-    ) latest
-    ON l.mmsi = latest.mmsi AND l."timestamp" = latest.max_timestamp
+  FROM vessel_logs l
+  INNER JOIN (
+    SELECT MMSI, MAX(CAST(__time AS TIMESTAMP)) AS max_timestamp
+    FROM vessel_logs
+    GROUP BY MMSI
+  ) latest
+  ON l.MMSI = latest.MMSI AND l.__time = latest.max_timestamp
   `;
   try {
     const response = await axios.post(DRUID_SQL_API, {
