@@ -1,48 +1,44 @@
-import { Client } from 'cassandra-driver';
+import { Alarm } from '@/app/lib/definitions'; // Shared type definition for Alarm
 
-// Initialize the Cassandra client
-const client = new Client({
-  contactPoints: ['cassandra.cassandra.svc.cluster.local:9042'], // Replace with your Cassandra host
-  localDataCenter: 'datacenter1', // Replace with env value
-  keyspace: 'vessel_management', // Replace with your keyspace
-});
+// Fetch paginated alarm information from the API
+export const fetchAlarmPage = async (mmsi: string, currentPage: number): Promise<Alarm[]> => {
+  try {
+    const response = await fetch(
+      `/api/alarms?action=fetchLogs&mmsi=${mmsi}&currentPage=${currentPage}&itemsPerPage=10`
+    );
 
-// Fetch a page of alarms
-export async function fetchAlarmPage(
-    mmsi: string,
-    currentPage: number,
-    itemsPerPage: number = 10
-): Promise<any[]> {
-    const offset = (currentPage - 1) * itemsPerPage;
-    let query = 'SELECT * FROM alarms';
-    const params: any[] = [];
-
-    if (mmsi) {
-        query += ' WHERE mmsi = ?';
-        params.push(mmsi);
+    if (!response.ok) {
+      console.error('Error fetching alarm data:', response.statusText);
+      return [];
     }
 
-    query += ' LIMIT ? OFFSET ?';
-    params.push(itemsPerPage, offset);
-
-    const result = await client.execute(query, params, { prepare: true });
-    return result.rows;
-}
-
-    // Fetch the total number of pages for alarms
-export async function fetchTotalAlarmPages(
-    mmsi: string,
-    itemsPerPage: number = 10
-): Promise<number> {
-    let query = 'SELECT COUNT(*) FROM alarms';
-    const params: any[] = [];
-
-    if (mmsi) {
-        query += ' WHERE mmsi = ?';
-        params.push(mmsi);
+    const data = await response.json();
+    if (data.error) {
+      console.error('API Error:', data.error);
+      return [];
     }
 
-    const result = await client.execute(query, params, { prepare: true });
-    const totalCount = result.rows[0]['count'];
-    return Math.ceil(totalCount / itemsPerPage);
-}
+    return data.data; // Return the data directly without normalization
+  } catch (error) {
+    console.error('Error fetching alarm data:', error);
+    return [];
+  }
+};
+
+// Fetch the total number of alarm pages based on the query
+export const fetchTotalAlarmPages = async (mmsi: string): Promise<number> => {
+  try {
+    const response = await fetch(`/api/alarms?action=fetchTotalPages&mmsi=${mmsi}`);
+    const data = await response.json();
+
+    if (data.error) {
+      console.error('Error fetching total pages:', data.error);
+      return 0; // Default to 0 pages if there's an error
+    }
+
+    return data.data || 0; // Return the total number of pages
+  } catch (error) {
+    console.error('Error fetching total pages:', error);
+    return 0; // Default to 0 pages in case of network error
+  }
+};
