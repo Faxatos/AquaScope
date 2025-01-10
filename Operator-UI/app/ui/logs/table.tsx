@@ -31,7 +31,7 @@ export default async function LogsTable({
           {/* Mobile View */}
           <div className="md:hidden">
             {logs?.map((log: VesselLog) => (
-              <LogCardMobile key={log.timestamp} log={log} />
+              <LogCardMobile key={`${log.timestamp}-${log.mmsi}`} log={log} />
             ))}
           </div>
 
