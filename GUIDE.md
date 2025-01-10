@@ -11,23 +11,30 @@ To run the Kubernetes application, make sure you have the following tools instal
 minikube start
 ```
 
-2. Next, deploy the application using Helm:
+2. Next, add the required repositories to Helm:
 
 ```bash
-helm install -n operator-ui operator-ui --values operator-ui/values.yaml ./operator-ui
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add druid-helm https://asdf2014.github.io/druid-helm/
+```
+
+3. Next, deploy the application using Helm:
+
+```bash
+helm install --create-namespace -n operator-ui operator-ui --values operator-ui/values.yaml ./operator-ui
 helm install --create-namespace -n kafka kafka --values kafka/values.yaml bitnami/kafka
 helm install --create-namespace -n druid druid --values druid/values.yaml asdf2014/druid
 ```
 
-3. Then, create the data simulator pods by running:
+4. Then, create the data simulator pods by running:
 
 ```bash
-helm install --create-namespace -n ais-data-simulator-satellite ais-data-simulator-satellite --values ais-data-simulator-satellite/values.yaml ./ais-data-simulator
-helm install --create-namespace -n ais-data-simulator-vts ais-data-simulator-vts --values ais-data-simulator-vts/values.yaml ./ais-data-simulator
+helm install --create-namespace -n ais-data-simulator-satellite ais-data-simulator-satellite --values ais-data-simulator-satellite/values.yaml ./ais-data-simulator-satellite
+helm install --create-namespace -n ais-data-simulator-vts ais-data-simulator-vts --values ais-data-simulator-vts/values.yaml ./ais-data-simulator-vts
 ```
 
 
-3. To access the Operator UI, run:
+5. To access the Operator UI, run:
 
 ```bash
 minikube service operator-ui -n operator-ui
