@@ -57,7 +57,7 @@ export default async function LogsTable({
             </thead>
             <tbody className="bg-white">
               {logs?.map((log: VesselLog) => (
-                <LogCardDesktop key={log.timestamp} log={log} />
+                <LogCardDesktop key={`${log.timestamp}-${log.mmsi}`} log={log} />
               ))}
             </tbody>
           </table>
