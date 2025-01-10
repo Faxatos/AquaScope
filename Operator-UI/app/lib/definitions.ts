@@ -16,18 +16,18 @@ export type Vessel = {
 // Dynamic values saved in logs with vessel id as mmsi
 export type VesselLog = {
   timestamp: string; // Timestamp of the vessel's last update (ISO 8601 format)
-  mmsi: number; // MMSI of the vessel
-  locode: string; // Location code of the destination port
-  zone: string; // Navigational zone
+  MMSI: number; // MMSI of the vessel
+  LOCODE: string; // Location code of the destination port
+  ZONE: string; // Navigational zone
   eca: boolean; // Indicates if the vessel is in an Emission Control Area
-  src: string; // Source of the data (e.g., "SAT")
+  SRC: string; // Source of the data (e.g., "SAT")
   latitude: number; // Current latitude of the vessel
   longitude: number; // Current longitude of the vessel
-  course: number; // Current course (degrees)
-  speed: number; // Current speed (knots)
-  eta_ais: string; // Estimated Time of Arrival (from AIS)
-  dest_lat: number; // Destination latitude
-  dest_lon: number; // Destination longitude
+  COURSE: number; // Current course (degrees)
+  SPEED: number; // Current speed (knots)
+  ETA_AIS: string; // Estimated Time of Arrival (from AIS)
+  DEST_LAT: number; // Destination latitude
+  DEST_LON: number; // Destination longitude
 };
 
 // Represents an alarm associated with a vessel
