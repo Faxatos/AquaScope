@@ -78,7 +78,7 @@
                 <configuration>
                 <archive>
                     <manifest>
-                    <mainClass>com.example.flink.CassandraCheckJob</mainClass>
+                    <mainClass>com.example.flink.MainJob</mainClass>
                     </manifest>
                 </archive>
                 </configuration>
