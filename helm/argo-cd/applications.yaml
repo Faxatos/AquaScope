@@ -19,6 +19,8 @@ spec:
       targetRevision: main
       ref: values
   syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
     automated:
       prune: true
 ---
@@ -43,6 +45,8 @@ spec:
       targetRevision: main
       ref: values
   syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
     automated:
       prune: true
 ---
@@ -67,6 +71,8 @@ spec:
       targetRevision: main
       ref: values
   syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
     automated:
       prune: true
 ---
@@ -88,6 +94,8 @@ spec:
         valueFiles:
         - values.yaml
   syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
     automated:
       prune: true
 ---
@@ -109,6 +117,8 @@ spec:
         valueFiles:
         - values.yaml
   syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
     automated:
       prune: true
 ---
@@ -130,5 +140,7 @@ spec:
         valueFiles:
         - values.yaml
   syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
     automated:
       prune: true
