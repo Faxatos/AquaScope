@@ -1,0 +1,134 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: druid
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: druid
+  project: default
+  sources:
+    - repoURL: https://asdf2014.github.io/druid-helm
+      chart: druid
+      targetRevision: 31.0.5
+      helm:
+        valueFiles:
+        - $values/helm/druid/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka
+  project: default
+  sources:
+    - repoURL: registry-1.docker.io/bitnamicharts
+      chart: kafka
+      targetRevision: 31.2.0
+      helm:
+        valueFiles:
+        - $values/helm/kafka/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cassandra
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cassandra
+  project: default
+  sources:
+    - repoURL: registry-1.docker.io/bitnamicharts
+      chart: cassandra
+      targetRevision: 12.1.1
+      helm:
+        valueFiles:
+        - $values/helm/cassandra/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ais-data-simulator-satellite
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ais-data-simulator
+  project: default
+  sources:
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      path: helm/ais-data-simulator-satellite
+      helm:
+        valueFiles:
+        - values.yaml
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ais-data-simulator-vts
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ais-data-simulator
+  project: default
+  sources:
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      path: helm/ais-data-simulator-vts
+      helm:
+        valueFiles:
+        - values.yaml
+  syncPolicy:
+    automated:
+      prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: operator-ui
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: operator-ui
+  project: default
+  sources:
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      path: helm/operator-ui
+      helm:
+        valueFiles:
+        - values.yaml
+  syncPolicy:
+    automated:
+      prune: true
