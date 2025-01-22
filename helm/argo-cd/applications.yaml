@@ -144,3 +144,30 @@ spec:
     - CreateNamespace=true
     automated:
       prune: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hdfs
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: hdfs
+  project: default
+  sources:
+    - repoURL: https://gchq.github.io/gaffer-docker
+      chart: hdfs
+      targetRevision: 2.2.1
+      helm:
+        valueFiles:
+        - $values/helm/hdfs/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      prune: true
+---
