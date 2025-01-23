@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import {useState, useEffect, useMemo} from 'react';
+import useSWR from 'swr';
 import Map, {
   Marker,
   Popup,
@@ -20,30 +21,24 @@ import { VesselLog } from '@/app/lib/definitions';
 import { fetchLatestLogs } from '@/app/lib/druid/logs';
 
 export default function Page() {
-  const [vesselLogs, setVesselLogs] = useState<VesselLog[]>([]);
   const [popupInfo, setPopupInfo] = useState<VesselLog | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-   // Function to fetch latest logs and update state
-   const fetchLogs = async () => {
-    const logs = await fetchLatestLogs();
-    if (logs === null) {
-      setError('Failed to fetch vessel logs');
-    } else {
-      setVesselLogs(logs);
-      console.log('fetched vessel logs:', logs);
-      setError(null); // Clear any previous errors
-    }
-  };
+  // Use SWR to fetch the latest logs
+  const { data, error: fetchError } = useSWR('/api/logs?action=fetchLatestLogs', fetchLatestLogs, {
+    refreshInterval: 2000, // Fetch every second
+    revalidateOnFocus: false, // Optional: Disable revalidation on focus
+  });
 
-  // Fetch the logs every second
-  useEffect(() => {
-    fetchLogs(); // Initial fetch
-    const intervalId = setInterval(fetchLogs, 1000); // Fetch every second
+  // Handle error state
+  if (fetchError) {
+    setError('Failed to fetch vessel logs');
+  } else {
+    setError(null);
+  }
 
-    // Cleanup interval on unmount
-    return () => clearInterval(intervalId);
-  }, []);
+  // Set vessel logs and popup info when data is successfully fetched
+  const vesselLogs: VesselLog[] = data || [];
 
   const pins = useMemo(
   () =>

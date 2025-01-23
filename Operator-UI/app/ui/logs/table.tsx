@@ -1,3 +1,4 @@
+import useSWR from "swr";
 import { fetchPageLogs } from '@/app/lib/druid/logs';
 import { VesselLog } from '@/app/lib/definitions';
 import { LogCardDesktop, LogCardMobile } from '@/app/ui/logs/log-card'
@@ -22,7 +23,15 @@ export default async function LogsTable({
   // If the query is valid, assign it directly (as a string) or use an empty string
   const mmsi = query === "" ? "" : query;
 
-  const logs = await fetchPageLogs(mmsi, currentPage);
+  // Use SWR to fetch logs from the client side
+  const { data, error, isLoading } = useSWR([mmsi, currentPage], () => fetchPageLogs(mmsi, currentPage), {
+    refreshInterval: 60000, // Auto-refresh every 60 seconds
+  });
+
+  if (error) return <div>Error loading logs.</div>;
+  if (isLoading) return <div>Loading...</div>;
+
+  const logs: VesselLog[] = data || [];
 
   return (
     <div className="mt-6 flow-root">
