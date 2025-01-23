@@ -15,6 +15,11 @@ spec:
       helm:
         valueFiles:
         - $values/helm/druid/values.yaml
+        parameters:
+        - name: router.service.type
+          value: LoadBalancer  # Exposes Druid Router externally
+        - name: router.service.port
+          value: "8888"
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values
@@ -139,6 +144,11 @@ spec:
       helm:
         valueFiles:
         - values.yaml
+        parameters:
+        - name: service.type
+          value: LoadBalancer  # Exposes Operator UI externally
+        - name: service.port
+          value: "3000"
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
