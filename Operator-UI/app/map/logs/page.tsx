@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Pagination from '@/app/ui/shared/pagination';
 import Search from '@/app/ui/shared/search';
-import LogsTable from '@/app/ui/logs/table';
+import TotalPages from '@/app/ui/logs/total-pages';
 import { LogsTableSkeleton } from '@/app/ui/logs/skeleton';
 import { Suspense } from 'react';
 
@@ -44,7 +43,7 @@ export default function Page(){
         <LogsTable query={query} currentPage={currentPage} /> {/* Render LogsTable component */}
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
-        <Pagination totalPages={totalPages} />
+        <TotalPages query={query} />
       </div>
     </div>
   );
