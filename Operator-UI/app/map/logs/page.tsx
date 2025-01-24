@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Search from '@/app/ui/shared/search';
 import TotalPages from '@/app/ui/logs/total-pages';
+import LogsTable from '@/app/ui/logs/table';
 import { LogsTableSkeleton } from '@/app/ui/logs/skeleton';
 import { Suspense } from 'react';
 

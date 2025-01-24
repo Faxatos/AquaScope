@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Pagination from '@/app/ui/shared/pagination';
 import Search from '@/app/ui/shared/search';
-import VesselsTable from '@/app/ui/vessels/table'; // Assuming VesselsTable component
+import VesselsTable from '@/app/ui/vessels/table'; 
 import { VesselTableSkeleton } from '@/app/ui/vessels/skeleton';
 import { Suspense } from 'react';
 

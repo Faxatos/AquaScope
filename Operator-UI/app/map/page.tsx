@@ -21,24 +21,29 @@ import { VesselLog } from '@/app/lib/definitions';
 import { fetchLatestLogs } from '@/app/lib/druid/logs';
 
 export default function Page() {
+  const [vesselLogs, setVesselLogs] = useState<VesselLog[]>([]);
   const [popupInfo, setPopupInfo] = useState<VesselLog | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Use SWR to fetch the latest logs
-  const { data, error: fetchError } = useSWR('/api/logs?action=fetchLatestLogs', fetchLatestLogs, {
-    refreshInterval: 2000, // Fetch every second
-    revalidateOnFocus: false, // Optional: Disable revalidation on focus
-  });
-
-  // Handle error state
-  if (fetchError) {
-    setError('Failed to fetch vessel logs');
-  } else {
-    setError(null);
+  // Use SWR for automatic fetching
+  const { data, error: fetchError } = useSWR(
+  'fetchLatestLogs', // Unique cache key
+  fetchLatestLogs, 
+  {
+    refreshInterval: 1000, // Fetch every second
+    revalidateOnFocus: false, // Prevent refetching on tab focus
   }
+);
 
-  // Set vessel logs and popup info when data is successfully fetched
-  const vesselLogs: VesselLog[] = data || [];
+  // Only update state inside useEffect to prevent infinite re-renders
+  useEffect(() => {
+    if (fetchError) {
+      setError('Failed to fetch vessel logs');
+    } else if (data) {
+      setVesselLogs(data);
+      setError(null);
+    }
+  }, [data, fetchError]); // Runs only when data or error changes
 
   const pins = useMemo(
   () =>
