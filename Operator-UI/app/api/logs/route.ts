@@ -4,19 +4,23 @@ import { VesselLog } from '@/app/lib/definitions'; // Assuming your type definit
 
 const DRUID_SQL_API = 'http://druid-router.druid.svc.cluster.local:8888/druid/v2/sql';
 
+// Fetch logs from the database with optional MMSI filtering
 async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPage: number) {
   const offset = (currentPage - 1) * itemsPerPage;
-  const parsedMmsi = parseInt(mmsi, 10);
+  let query = '';
 
-  const query = mmsi
-    ? `SELECT * FROM vessel_logs WHERE MMSI = ${parsedMmsi} ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`
-    : `SELECT * FROM vessel_logs ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
-  console.log(query);
+  // If mmsi is provided, filter logs by MMSI, otherwise get all logs
+  if (mmsi && mmsi.trim() !== '') {
+    const parsedMmsi = parseInt(mmsi, 10);
+    query = `SELECT * FROM vessel_logs WHERE MMSI = ${parsedMmsi} ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
+  } else {
+    query = `SELECT * FROM vessel_logs ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
+  }
+  
+  console.log(query); // Log the query for debugging
 
   try {
-    const response = await axios.post(DRUID_SQL_API, {
-      query,
-    }, {
+    const response = await axios.post(DRUID_SQL_API, { query }, {
       headers: { 'Content-Type': 'application/json' },
     });
 
@@ -27,25 +31,29 @@ async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPag
   }
 }
 
+// Fetch the total number of pages for the logs
 async function fetchTotalLogPages(mmsi: string, itemsPerPage: number) {
-  const parsedMmsi = parseInt(mmsi, 10);
+  let query = '';
 
-  const query = mmsi
-    ? `SELECT COUNT(*) AS total_logs FROM vessel_logs WHERE MMSI = ${parsedMmsi}`
-    : `SELECT COUNT(*) AS total_logs FROM vessel_logs`;
-  console.log(query);
+  // If mmsi is provided, count logs by MMSI, otherwise count all logs
+  if (mmsi && mmsi.trim() !== '') {
+    const parsedMmsi = parseInt(mmsi, 10);
+    query = `SELECT COUNT(*) AS total_logs FROM vessel_logs WHERE MMSI = ${parsedMmsi}`;
+  } else {
+    query = `SELECT COUNT(*) AS total_logs FROM vessel_logs`;
+  }
+
+  console.log(query); // Log the query for debugging
 
   try {
-    const response = await axios.post(DRUID_SQL_API, {
-      query,
-    }, {
+    const response = await axios.post(DRUID_SQL_API, { query }, {
       headers: { 'Content-Type': 'application/json' },
     });
-    const totalLogs = response.data[0]?.total_logs || 0; // Extract total logs count
+    const totalLogs = response.data[0]?.total_logs || 0;
     return Math.ceil(totalLogs / itemsPerPage);
   } catch (error) {
     console.error('Error fetching total pages from Druid:', error);
-    return null; // Return null to indicate failure
+    return null;
   }
 }
 
@@ -83,20 +91,20 @@ interface ApiResponse<T> {
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
-  const mmsi = searchParams.get('mmsi');
+  const mmsi = searchParams.get('mmsi') || ''; // Default to empty string if not provided
   const currentPage = parseInt(searchParams.get('currentPage') || '1', 10);
   const itemsPerPage = parseInt(searchParams.get('itemsPerPage') || '10', 10);
-  const action = searchParams.get('action') || 'fetchLogs'; // Action can determine which function to run
-  
+  const action = searchParams.get('action') || 'fetchLogs';
+
   let response: ApiResponse<any> = { data: null }; // Initialize response object
   let status = 200;
 
   try {
     if (action === 'fetchLogs') {
-      const logs = await fetchVesselLogPage(mmsi || '', currentPage, itemsPerPage);
+      const logs = await fetchVesselLogPage(mmsi, currentPage, itemsPerPage);
       response.data = logs;
     } else if (action === 'fetchTotalPages') {
-      const totalPages = await fetchTotalLogPages(mmsi || '', itemsPerPage);
+      const totalPages = await fetchTotalLogPages(mmsi, itemsPerPage);
       response.data = totalPages;
     } else if (action === 'fetchLatestLogs') {
       const latestLogs = await fetchLatestLogs();
@@ -112,3 +120,4 @@ export async function GET(req: Request) {
 
   return NextResponse.json(response, { status });
 }
+
