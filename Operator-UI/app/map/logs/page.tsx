@@ -23,10 +23,8 @@ export default function Page() {
       <Suspense key={query + currentPage} fallback={<LogsTableSkeleton />}>
         <LogsTable query={query} currentPage={currentPage} />
       </Suspense>
-      <div className="mt-5 flex w-full justify-center">
-        <Suspense fallback={<div>Loading total pages...</div>}>
-          <TotalPages query={query} />
-        </Suspense>
+      <div className="mt-5 flex w-full justify-center">ù
+        <TotalPages query={query} />
       </div>
     </div>
   );
