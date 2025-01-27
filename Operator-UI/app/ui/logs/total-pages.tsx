@@ -12,6 +12,7 @@ export default async function TotalPages({ query }: { query: string }) {
 
   try {
     const totalPages = await fetchTotalPages(query);
+    console.log(totalPages)
     return <Pagination totalPages={totalPages} />;
   } catch (error) {
     console.error('Error fetching total pages:', error);
