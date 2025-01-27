@@ -4,7 +4,7 @@ import Pagination from '@/app/ui/shared/pagination';
 export default async function TotalPages({ query }: { query: string }) {
   const regex = /^[0-9]+$/;
 
-  // If the query is not empty, check if it's a valid number
+  // Validate query
   if (query !== "" && !regex.test(query)) {
     console.error('Invalid MMSI value:', query);
     return <div>Invalid MMSI value. Please enter a number.</div>;
