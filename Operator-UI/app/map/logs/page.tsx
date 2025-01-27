@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Search from '@/app/ui/shared/search';
 import TotalPages from '@/app/ui/logs/total-pages';
@@ -8,29 +7,11 @@ import LogsTable from '@/app/ui/logs/table';
 import { LogsTableSkeleton } from '@/app/ui/logs/skeleton';
 import { Suspense } from 'react';
 
-import { fetchTotalPages } from '@/app/lib/druid/logs';
-
 export default function Page(){
   const searchParams = useSearchParams();  // Use the hook to access search params
 
   const query = searchParams?.get('query') || ''; 
   const currentPage = Number(searchParams?.get('page')) || 1;
-
-  const [totalPages, setTotalPages] = useState<number>(0); // State for total pages
-
-  useEffect(() => {
-    const fetchPages = async () => {
-      try {
-        const pages = await fetchTotalPages(query); // Fetch total pages using the query
-        setTotalPages(pages);
-      } catch (error) {
-        console.error('Failed to fetch total pages:', error);
-        setTotalPages(0); // Fallback in case of error
-      }
-    };
-
-    fetchPages();
-  }, [query]); // Re-run when query changes
 
   return (
     <div className="w-full">
@@ -44,7 +25,9 @@ export default function Page(){
         <LogsTable query={query} currentPage={currentPage} /> {/* Render LogsTable component */}
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
-        <TotalPages query={query} />
+        <Suspense fallback={<div>Loading total pages...</div>}>
+          <TotalPages query={query} />
+        </Suspense>
       </div>
     </div>
   );
