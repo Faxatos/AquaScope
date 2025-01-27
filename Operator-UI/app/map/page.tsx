@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import {useState, useEffect, useMemo} from 'react';
-import useSWR from 'swr';
 import Map, {
   Marker,
   Popup,
@@ -25,25 +24,25 @@ export default function Page() {
   const [popupInfo, setPopupInfo] = useState<VesselLog | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Use SWR for automatic fetching
-  const { data, error: fetchError } = useSWR(
-  'fetchLatestLogs', // Unique cache key
-  fetchLatestLogs, 
-  {
-    refreshInterval: 1000, // Fetch every second
-    revalidateOnFocus: false, // Prevent refetching on tab focus
-  }
-);
-
-  // Only update state inside useEffect to prevent infinite re-renders
-  useEffect(() => {
-    if (fetchError) {
+  // Function to fetch latest logs and update state
+  const fetchLogs = async () => {
+    const logs = await fetchLatestLogs();
+    if (logs === null) {
       setError('Failed to fetch vessel logs');
-    } else if (data) {
-      setVesselLogs(data);
-      setError(null);
+    } else {
+      setVesselLogs(logs);
+      console.log('fetched vessel logs:', logs);
+      setError(null); // Clear any previous errors
     }
-  }, [data, fetchError]); // Runs only when data or error changes
+  };
+
+  // Fetch the logs every second
+  useEffect(() => {
+    fetchLogs(); // Initial fetch
+    const intervalId = setInterval(fetchLogs, 1000); // Fetch every second
+        // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
+  }, []);
 
   const pins = useMemo(
   () =>

@@ -1,4 +1,4 @@
-import useSWR from "swr";
+import { useEffect, useState } from 'react';
 import { fetchPageLogs } from '@/app/lib/druid/logs';
 import { VesselLog } from '@/app/lib/definitions';
 import { LogCardDesktop, LogCardMobile } from '@/app/ui/logs/log-card'
@@ -10,6 +10,8 @@ export default async function LogsTable({
   query: string;
   currentPage: number;
 }) {
+  const [logs, setLogs] = useState<VesselLog[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
   // Regex to check if the query is a valid number (positive integers)
   const regex = /^[0-9]+$/;
 
@@ -23,15 +25,25 @@ export default async function LogsTable({
   // If the query is valid, assign it directly (as a string) or use an empty string
   const mmsi = query === "" ? "" : query;
 
-  // Use SWR to fetch logs from the client side
-  const { data, error, isLoading } = useSWR([mmsi, currentPage], () => fetchPageLogs(mmsi, currentPage), {
-    refreshInterval: 60000, // Auto-refresh every 60 seconds
-  });
+  // Function to fetch logs every 5 seconds
+  const fetchLogs = async () => {
+    try {
+      const logs = await fetchPageLogs(mmsi, currentPage);
+      setLogs(logs);
+      console.log('Fetched page logs:', logs);
+    } catch (error) {
+      setError('Failed to fetch logs');
+      console.error('Error fetching logs:', error);
+    }
+  };
 
-  if (error) return <div>Error loading logs.</div>;
-  if (isLoading) return <div>Loading...</div>;
+  useEffect(() => {
+    fetchLogs(); // Initial fetch
+    const intervalId = setInterval(fetchLogs, 5000); // Fetch every 5 seconds
 
-  const logs: VesselLog[] = data || [];
+    // Cleanup interval on unmount
+    return () => clearInterval(intervalId);
+  }, [mmsi, currentPage]);
 
   return (
     <div className="mt-6 flow-root">
@@ -40,7 +52,7 @@ export default async function LogsTable({
           {/* Mobile View */}
           <div className="md:hidden">
             {logs?.map((log: VesselLog) => (
-              <LogCardMobile key={`${log.timestamp}-${log.mmsi}`} log={log} />
+              <LogCardMobile key={`${log.timestamp}-${log.MMSI}`} log={log} />
             ))}
           </div>
 
@@ -66,7 +78,7 @@ export default async function LogsTable({
             </thead>
             <tbody className="bg-white">
               {logs?.map((log: VesselLog) => (
-                <LogCardDesktop key={`${log.timestamp}-${log.mmsi}`} log={log} />
+                <LogCardDesktop key={`${log.timestamp}-${log.MMSI}`} log={log} />
               ))}
             </tbody>
           </table>
