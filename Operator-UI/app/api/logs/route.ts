@@ -11,6 +11,7 @@ async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPag
   const query = mmsi
     ? `SELECT * FROM vessel_logs WHERE MMSI = ${parsedMmsi} ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`
     : `SELECT * FROM vessel_logs ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
+  console.log(query);
 
   try {
     const response = await axios.post(DRUID_SQL_API, {
@@ -32,6 +33,7 @@ async function fetchTotalLogPages(mmsi: string, itemsPerPage: number) {
   const query = mmsi
     ? `SELECT COUNT(*) AS total_logs FROM vessel_logs WHERE MMSI = ${parsedMmsi}`
     : `SELECT COUNT(*) AS total_logs FROM vessel_logs`;
+  console.log(query);
 
   try {
     const response = await axios.post(DRUID_SQL_API, {
@@ -59,6 +61,7 @@ async function fetchLatestLogs() {
     ON l.MMSI = latest.MMSI AND l.__time = latest.max_timestamp
     WHERE l.__time >= CURRENT_TIMESTAMP - INTERVAL '2' HOUR
   `;
+  console.log(query);
   try {
     const response = await axios.post(DRUID_SQL_API, {
       query,

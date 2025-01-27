@@ -23,7 +23,7 @@ export default function Page() {
       <Suspense key={query + currentPage} fallback={<LogsTableSkeleton />}>
         <LogsTable query={query} currentPage={currentPage} />
       </Suspense>
-      <div className="mt-5 flex w-full justify-center">ù
+      <div className="mt-5 flex w-full justify-center">
         <TotalPages query={query} />
       </div>
     </div>
