@@ -1,5 +1,3 @@
-"use client";
-
 import { fetchTotalPages } from '@/app/lib/druid/logs';
 
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
