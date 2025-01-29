@@ -26,6 +26,7 @@ export default async function TotalPages({ query }: { query: string }) {
   const { data: totalPages } = useSuspenseQuery({
     queryKey: ["totalPages", query],
     queryFn: () => fetchTotalPages(query),
+    refetchInterval: 5000, // Auto-refresh logs every 5 seconds
   });
 
   const createPageURL = (pageNumber: number | string) => {

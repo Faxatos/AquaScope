@@ -1,3 +1,5 @@
+"use server";
+
 import { VesselLog } from '@/app/lib/definitions'; // Shared type definition
 
 // Fetch logs from the API
