@@ -51,19 +51,29 @@ export const fetchTotalPages = async (searchQuery: string): Promise<number> => {
     console.log(url)
 
     const response = await fetch(url);
+
+    if (!response.ok) {
+      console.error('Error fetching logs:', response.statusText);
+      return 1;
+    }
+
+    console.log("response:" + response)
+
     const data = await response.json();
+
+    console.log("data:" + data)
 
     if (data.error) {
       console.error('Error fetching total pages:', data.error);
-      return 0; // Default to 0 pages if there's an error
+      return 1; // Default to 1 page if there's an error
     }
 
     console.log("total pages:" + data.totalPages)
 
-    return data.totalPages || 0;
+    return data.totalPages || 1;
   } catch (error) {
     console.error('Error fetching total pages:', error);
-    return 0; // Default to 0 pages in case of network error
+    return 1; // Default to 1 pages in case of network error
   }
 };
 
