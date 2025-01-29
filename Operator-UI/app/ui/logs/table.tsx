@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from 'react';
 import { fetchPageLogs } from '@/app/lib/druid/logs';
 import { VesselLog } from '@/app/lib/definitions';
