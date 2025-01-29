@@ -8,8 +8,6 @@ export const fetchPageLogs = async (mmsi: string, currentPage: number) => {
       ? `/api/logs?action=fetchLogs&mmsi=${mmsi}&currentPage=${currentPage}&itemsPerPage=10`
       : `/api/logs?action=fetchLogs&currentPage=${currentPage}&itemsPerPage=10`; // No MMSI in the URL
 
-    console.log("mmsi1:" + mmsi);
-    console.log(url)
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -47,9 +45,6 @@ export const fetchTotalPages = async (searchQuery: string): Promise<number> => {
       ? `/api/logs?action=fetchTotalPages&mmsi=${searchQuery}`
       : `/api/logs?action=fetchTotalPages`;
 
-    console.log("mmsi2:" + searchQuery);
-    console.log(url)
-
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -57,18 +52,12 @@ export const fetchTotalPages = async (searchQuery: string): Promise<number> => {
       return 1;
     }
 
-    console.log("Response: " + JSON.stringify(response, null, 2));
-
     const data = await response.json();
-
-    console.log("Response: " + JSON.stringify(data, null, 2));
 
     if (data.error) {
       console.error('Error fetching total pages:', data.error);
       return 1; // Default to 1 page if there's an error
     }
-
-    console.log("total pages:" + data.data)
 
     return data.data || 1;
   } catch (error) {
