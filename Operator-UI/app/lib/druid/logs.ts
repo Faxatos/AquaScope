@@ -68,9 +68,9 @@ export const fetchTotalPages = async (searchQuery: string): Promise<number> => {
       return 1; // Default to 1 page if there's an error
     }
 
-    console.log("total pages:" + data.totalPages)
+    console.log("total pages:" + data.data)
 
-    return data.totalPages || 1;
+    return data.data || 1;
   } catch (error) {
     console.error('Error fetching total pages:', error);
     return 1; // Default to 1 pages in case of network error
