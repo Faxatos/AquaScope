@@ -57,11 +57,11 @@ export const fetchTotalPages = async (searchQuery: string): Promise<number> => {
       return 1;
     }
 
-    console.log("response:" + response)
+    console.log("Response: " + JSON.stringify(response, null, 2));
 
     const data = await response.json();
 
-    console.log("data:" + data)
+    console.log("Response: " + JSON.stringify(data, null, 2));
 
     if (data.error) {
       console.error('Error fetching total pages:', data.error);
