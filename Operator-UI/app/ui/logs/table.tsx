@@ -14,6 +14,7 @@ export default async function LogsTable({
   const [error, setError] = useState<string | null>(null);
   // Regex to check if the query is a valid number (positive integers)
   const regex = /^[0-9]+$/;
+  console.log("i'm in ui/logs/table.tsx")
 
   // If the query is not empty, check if it's a valid number
   if (query !== "" && !regex.test(query)) {

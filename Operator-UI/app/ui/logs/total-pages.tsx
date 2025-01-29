@@ -15,6 +15,7 @@ export default async function TotalPages({ query }: { query: string }) {
   const [totalPages, setTotalPages] = useState(Number)
 
   const regex = /^[0-9]+$/;
+  console.log("i'm in ui/logs/total-pages.tsx")
 
   // Validate query
   if (query !== "" && !regex.test(query)) {

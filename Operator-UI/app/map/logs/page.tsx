@@ -11,6 +11,7 @@ export default function Page() {
   const searchParams = useSearchParams();
   const query = searchParams?.get('query') || '';
   const currentPage = Number(searchParams?.get('page')) || 1;
+  console.log("i'm in logs/page.tsx")
 
   return (
     <div className="w-full">
