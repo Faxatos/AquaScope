@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { fetchPageLogs } from '@/app/lib/druid/logs';
 import { VesselLog } from '@/app/lib/definitions';
 import { LogCardDesktop, LogCardMobile } from '@/app/ui/logs/log-card'
@@ -12,8 +12,6 @@ export default async function LogsTable({
   query: string;
   currentPage: number;
 }) {
-  const [logs, setLogs] = useState<VesselLog[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
   // Regex to check if the query is a valid number (positive integers)
   const regex = /^[0-9]+$/;
   console.log("i'm in ui/logs/table.tsx")
@@ -28,25 +26,11 @@ export default async function LogsTable({
   // If the query is valid, assign it directly (as a string) or use an empty string
   const mmsi = query === "" ? "" : query;
 
-  // Function to fetch logs every 5 seconds
-  const fetchLogs = async () => {
-    try {
-      const logs = await fetchPageLogs(mmsi, currentPage);
-      setLogs(logs);
-      console.log('Fetched page logs:', logs);
-    } catch (error) {
-      setError('Failed to fetch logs');
-      console.error('Error fetching logs:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchLogs(); // Initial fetch
-    const intervalId = setInterval(fetchLogs, 5000); // Fetch every 5 seconds
-
-    // Cleanup interval on unmount
-    return () => clearInterval(intervalId);
-  }, [mmsi, currentPage]);
+  const { data: logs } = useSuspenseQuery({
+    queryKey: ["logs", query, currentPage],
+    queryFn: () => fetchPageLogs(query, currentPage),
+    refetchInterval: 5000, // Auto-refresh logs every 5 seconds
+  });
 
   return (
     <div className="mt-6 flow-root">

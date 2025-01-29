@@ -25,7 +25,9 @@ export default function Page() {
         <LogsTable query={query} currentPage={currentPage} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
+      <Suspense key={query + currentPage} fallback={<div>Number of pages are loading...</div>}>
         <TotalPages query={query} />
+      </Suspense>
       </div>
     </div>
   );

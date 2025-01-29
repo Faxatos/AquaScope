@@ -3,10 +3,9 @@
 import { fetchTotalPages } from '@/app/lib/druid/logs';
 
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
-import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { generatePagination } from '@/app/lib/utils';
 import { usePathname, useSearchParams } from 'next/navigation';
 
@@ -24,16 +23,10 @@ export default async function TotalPages({ query }: { query: string }) {
     return <div>Invalid MMSI value. Please enter a number.</div>;
   }
 
-  const { data: totalPages = 1, isLoading, isError } = useQuery({
-    queryKey: ["totalPages", query], // Ensures caching works correctly
+  const { data: totalPages } = useSuspenseQuery({
+    queryKey: ["totalPages", query],
     queryFn: () => fetchTotalPages(query),
-    staleTime: 10000, // Data remains fresh for 10s (prevents excessive refetching)
-    refetchInterval: 10000, // Auto-refresh every 10s
-    retry: 2, // Retry if request fails
   });
-
-  if (isLoading) return <div>Loading total pages...</div>;
-  if (isError) return <div>Error loading total pages.</div>;
 
   const createPageURL = (pageNumber: number | string) => {
     const params = new URLSearchParams(searchParams);
