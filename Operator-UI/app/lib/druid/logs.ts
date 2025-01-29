@@ -58,6 +58,8 @@ export const fetchTotalPages = async (searchQuery: string): Promise<number> => {
       return 0; // Default to 0 pages if there's an error
     }
 
+    console.log("total pages:" + data.totalPages)
+
     return data.totalPages || 0;
   } catch (error) {
     console.error('Error fetching total pages:', error);

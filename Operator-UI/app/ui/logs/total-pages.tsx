@@ -22,15 +22,16 @@ export default async function TotalPages({ query }: { query: string }) {
     return <div>Invalid MMSI value. Please enter a number.</div>;
   }
 
-  const { data: totalPages = 1, error, isLoading } = useQuery({
-    queryKey: ['totalPages', query],
+  const { data: totalPages = 1, isLoading, isError } = useQuery({
+    queryKey: ["totalPages", query], // Ensures caching works correctly
     queryFn: () => fetchTotalPages(query),
-    staleTime: 5000, // Keep fresh for 5 seconds
-    refetchInterval: 5000, // Auto-refetch every 5 seconds
+    staleTime: 10000, // Data remains fresh for 10s (prevents excessive refetching)
+    refetchInterval: 10000, // Auto-refresh every 10s
+    retry: 2, // Retry if request fails
   });
 
   if (isLoading) return <div>Loading total pages...</div>;
-  if (error) return <div>Error loading total pages.</div>;
+  if (isError) return <div>Error loading total pages.</div>;
 
   const createPageURL = (pageNumber: number | string) => {
     const params = new URLSearchParams(searchParams);

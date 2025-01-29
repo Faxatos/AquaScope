@@ -50,6 +50,9 @@ async function fetchTotalLogPages(mmsi: string, itemsPerPage: number) {
       headers: { 'Content-Type': 'application/json' },
     });
     const totalLogs = response.data[0]?.total_logs || 0;
+    console.log(response.data[0]);
+    console.log(response.data[0]?.total_logs);
+    console.log(Math.ceil(totalLogs / itemsPerPage));
     return Math.ceil(totalLogs / itemsPerPage);
   } catch (error) {
     console.error('Error fetching total pages from Druid:', error);
