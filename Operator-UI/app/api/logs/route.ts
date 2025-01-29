@@ -69,7 +69,7 @@ async function fetchLatestLogs() {
     ON l.MMSI = latest.MMSI AND l.__time = latest.max_timestamp
     WHERE l.__time >= CURRENT_TIMESTAMP - INTERVAL '2' HOUR
   `;
-  console.log(query);
+  
   try {
     const response = await axios.post(DRUID_SQL_API, {
       query,

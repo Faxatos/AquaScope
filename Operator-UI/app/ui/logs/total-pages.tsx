@@ -4,15 +4,14 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
 import { generatePagination } from '@/app/lib/utils';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { number } from 'zod';
 
 export default async function TotalPages({ query }: { query: string }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get('page')) || 1;
-  const [totalPages, setTotalPages] = useState(Number)
 
   const regex = /^[0-9]+$/;
   console.log("i'm in ui/logs/total-pages.tsx")
@@ -23,30 +22,21 @@ export default async function TotalPages({ query }: { query: string }) {
     return <div>Invalid MMSI value. Please enter a number.</div>;
   }
 
+  const { data: totalPages = 1, error, isLoading } = useQuery({
+    queryKey: ['totalPages', query],
+    queryFn: () => fetchTotalPages(query),
+    staleTime: 5000, // Keep fresh for 5 seconds
+    refetchInterval: 5000, // Auto-refetch every 5 seconds
+  });
+
+  if (isLoading) return <div>Loading total pages...</div>;
+  if (error) return <div>Error loading total pages.</div>;
+
   const createPageURL = (pageNumber: number | string) => {
     const params = new URLSearchParams(searchParams);
     params.set('page', pageNumber.toString());
     return `${pathname}?${params.toString()}`;
   };
-
-  // Function to fetch logs every 5 seconds
-    const fetchNumberOfPages = async () => {
-      try {
-        const logs = await fetchTotalPages(query);
-        setTotalPages(logs);
-        console.log('Fetched page logs:', logs);
-      } catch (error) {
-        console.error('Error fetching logs:', error);
-      }
-    };
-  
-    useEffect(() => {
-      fetchNumberOfPages(); // Initial fetch
-      const intervalId = setInterval(fetchNumberOfPages, 5000); // Fetch every 5 seconds
-  
-      // Cleanup interval on unmount
-      return () => clearInterval(intervalId);
-    }, [currentPage]);
 
   const allPages = generatePagination(currentPage, totalPages);
 
