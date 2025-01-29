@@ -1,15 +1,15 @@
-import '@/app/styles/global.css';
+import "@/app/styles/global.css";
+import { inter } from "@/app/styles/fonts";
+import { ReactQueryProvider } from "@/app/providers"; // Import the provider
 
-import { inter } from '@/app/styles/fonts';
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>{children}</body>
+      <body className={`${inter.className} antialiased`}>
+        <ReactQueryProvider>
+          {children}
+        </ReactQueryProvider>
+      </body>
     </html>
   );
 }
