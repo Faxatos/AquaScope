@@ -1,7 +1,9 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Alarm } from "@/app/lib/definitions";
 import { AlarmCardMobile, AlarmCardDesktop } from '@/app/ui/alarms/alarm-card';
 import { fetchAlarmPage } from '@/app/lib/cassandra/alarms';
 
-export default async function Table({
+export default async function AlarmsTable({
   query,
   currentPage,
   }: {
@@ -17,7 +19,12 @@ export default async function Table({
   }
 
   const mmsi = query === "" ? "" : query;
-  const alarms = await fetchAlarmPage(mmsi, currentPage);
+  
+  const { data: alarms } = useSuspenseQuery({
+      queryKey: ["logs", query, currentPage],
+      queryFn: () => fetchAlarmPage(query, currentPage),
+      refetchInterval: 5000, // Auto-refresh logs every 5 seconds
+    });
 
   return (
     <div className="mt-6 flow-root">
