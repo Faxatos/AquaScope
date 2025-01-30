@@ -3,9 +3,12 @@ import { Alarm } from '@/app/lib/definitions'; // Shared type definition for Ala
 // Fetch paginated alarm information from the API
 export const fetchAlarmPage = async (mmsi: string, currentPage: number): Promise<Alarm[]> => {
   try {
-    const response = await fetch(
-      `/api/alarms?action=fetchLogs&mmsi=${mmsi}&currentPage=${currentPage}&itemsPerPage=10`
-    );
+    // Remove the mmsi parameter from the URL if it's empty
+    const url = mmsi 
+      ? `/api/alarms?action=fetchAlarms&mmsi=${mmsi}&currentPage=${currentPage}&itemsPerPage=10`
+      : `/api/alarms?action=fetchAlarms&currentPage=${currentPage}&itemsPerPage=10`; // No MMSI in the URL
+
+    const response = await fetch(url);
 
     if (!response.ok) {
       console.error('Error fetching alarm data:', response.statusText);
