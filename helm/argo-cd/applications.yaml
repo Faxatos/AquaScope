@@ -3,6 +3,9 @@ kind: Application
 metadata:
   name: druid
   namespace: argocd
+#  annotations:
+#    argocd-image-updater.argoproj.io/image-list: druid=apache/druid:30.0.1
+#    argocd-image-updater.argoproj.io/fooalias.update-strategy: digest
 spec:
   destination:
     server: https://kubernetes.default.svc
@@ -105,6 +108,9 @@ kind: Application
 metadata:
   name: ais-data-simulator-satellite
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: sat=ghcr.io/faxatos/aquascope/ais-data-simulator-satellite:latest
+    argocd-image-updater.argoproj.io/sat.update-strategy: digest
 spec:
   destination:
     server: https://kubernetes.default.svc
@@ -128,6 +134,9 @@ kind: Application
 metadata:
   name: ais-data-simulator-vts
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: vts=ghcr.io/faxatos/aquascope/ais-data-simulator-vts:latest
+    argocd-image-updater.argoproj.io/vts.update-strategy: digest
 spec:
   destination:
     server: https://kubernetes.default.svc
@@ -151,6 +160,9 @@ kind: Application
 metadata:
   name: operator-ui
   namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: operatorui=ghcr.io/faxatos/aquascope/operator-ui:latest
+    argocd-image-updater.argoproj.io/operatorui.update-strategy: digest
 spec:
   destination:
     server: https://kubernetes.default.svc
