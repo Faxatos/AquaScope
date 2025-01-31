@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cloudnative-pg
+  name: cloudnative-cluster
   namespace: argocd
 spec:
   project: default
   sources:
     - repoURL: https://cloudnative-pg.github.io/charts
       chart: cluster
-      targetRevision: latest  # Usa una versione specifica per produzione
+      targetRevision: 0.2.0  # Usa una versione specifica per produzione
       helm:
         releaseName: cnpg
         valueFiles:
           - $values/helm/cloudnativepg/cloudnativepg-cluster/values.yaml
-    - repoURL: https://github.com/your-username/your-repo.git  # Modifica con il tuo repository
+    - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values
   destination:
@@ -23,6 +23,4 @@ spec:
     syncOptions:
     - CreateNamespace=true
     automated:
-      selfHeal: true
       prune: true
-      allowEmpty: false
