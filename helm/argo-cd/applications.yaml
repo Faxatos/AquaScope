@@ -192,9 +192,9 @@ spec:
     namespace: hdfs
   project: default
   sources:
-    - repoURL: https://gradiant.github.io/charts/
+    - repoURL: https://mehrwertmacher.github.io/bigdata-charts
       chart: hdfs
-      targetRevision: 0.1.10
+      targetRevision: 1.0.1
       helm:
         valueFiles:
         - $values/helm/hdfs/values.yaml
