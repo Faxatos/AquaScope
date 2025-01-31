@@ -38,7 +38,7 @@ namenode:
   dataVolumes:
     count: 1
     pvcTemplateSpec:
-      storageClassName: null
+      storageClassName: local-path
       accessModes:
         - ReadWriteOnce
       resources:
@@ -71,7 +71,7 @@ datanode:
   dataVolumes:
     count: 1
     pvcTemplateSpec:
-      storageClassName: null
+      storageClassName: local-path
       accessModes:
         - ReadWriteOnce
       resources:
