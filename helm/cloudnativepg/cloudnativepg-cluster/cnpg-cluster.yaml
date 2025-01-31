@@ -12,7 +12,7 @@ spec:
       helm:
         releaseName: cnpg
         valueFiles:
-          - $values/helm/cloudnativepg/values.yaml
+          - $values/helm/cloudnativepg/cloudnativepg-cluster/values.yaml
     - repoURL: https://github.com/your-username/your-repo.git  # Modifica con il tuo repository
       targetRevision: main
       ref: values
