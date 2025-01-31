@@ -7,42 +7,16 @@ spec:
   project: default
   source:
     repoURL: https://cloudnative-pg.github.io/charts
-    chart: cloudnative-pg
-    targetRevision: latest  # Specificare una versione specifica per ambienti produttivi
+    chart: cloudnative-pg/cloudnative-pg
+    targetRevision: 0.23.0  # Specificare una versione specifica per ambienti produttivi
     helm:
       releaseName: cnpg
   destination:
     server: https://kubernetes.default.svc
-    namespace: cnpg-system
+    namespace: cloudnative-pg
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
     automated:
       prune: true
 ---
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: cloudnative-pg
-  namespace: argocd
-spec:
-  project: default
-  sources:
-    - repoURL: https://cloudnative-pg.github.io/charts
-      chart: cluster
-      targetRevision: latest  # Usa una versione specifica per produzione
-      helm:
-        releaseName: cnpg
-        valueFiles:
-          - $values/helm/cloudnativepg/values.yaml
-    - repoURL: https://github.com/Faxatos/AquaScope.git
-      targetRevision: main
-      ref: values
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: cnpg-database
-  syncPolicy:
-    syncOptions:
-    - CreateNamespace=true
-    automated:
-      prune: true
