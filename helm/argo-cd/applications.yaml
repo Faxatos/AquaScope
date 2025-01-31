@@ -192,9 +192,9 @@ spec:
     namespace: hdfs
   project: default
   sources:
-    - repoURL: https://gchq.github.io/gaffer-docker
+    - repoURL: https://gradiant.github.io/charts/
       chart: hdfs
-      targetRevision: 2.2.1
+      targetRevision: 0.1.10
       helm:
         valueFiles:
         - $values/helm/hdfs/values.yaml
