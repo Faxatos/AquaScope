@@ -11,8 +11,8 @@ spec:
       targetRevision: 0.0.32
       helm:
         releaseName: local-path-provisioner
-      valueFiles:
-        - $values/helm/local-path-provisioner/values.yaml
+        valueFiles:
+          - $values/helm/local-path-provisioner/values.yaml
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values
