@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 spec:
   project: default
-  source:
+  sources:
     - repoURL: https://charts.containeroo.ch
       chart: local-path-provisioner
       targetRevision: 0.0.32
