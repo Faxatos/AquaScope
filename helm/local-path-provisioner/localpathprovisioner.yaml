@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: local-path-provisioner
+  namespace: argocd
+spec:
+  project: default
+  source:
+    - repoURL: https://charts.containeroo.ch
+      chart: local-path-provisioner
+      targetRevision: 0.0.32
+      helm:
+        releaseName: local-path-provisioner
+      valueFiles:
+        - $values/helm/local-path-provisioner/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: local-path-provisioner
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      prune: true
