@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://cloudnative-pg.github.io/charts
-    chart: cloudnative-pg/cloudnative-pg
+    chart: cloudnative-pg
     targetRevision: 0.23.0  # Specificare una versione specifica per ambienti produttivi
     helm:
       releaseName: cnpg
@@ -17,6 +17,7 @@ spec:
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
+    - ServerSideApply=true
     automated:
       prune: true
 ---
