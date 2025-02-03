@@ -134,7 +134,7 @@ tenant:
       name: pool-0
       ###
       # The number of volumes attached per MinIO Tenant Pod / Server.
-      volumesPerServer: 4
+      volumesPerServer: 1
       ###
       # The capacity per volume requested per MinIO Tenant Pod.
       size: 10Gi
@@ -144,7 +144,7 @@ tenant:
       # If using Amazon Elastic Block Store (EBS) CSI driver
       # Please make sure to set xfs for "csi.storage.k8s.io/fstype" parameter under StorageClass.parameters.
       # Docs: https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/docs/parameters.md
-      # storageClassName: standard
+      storageClassName: longhorn-no-replication
       ###
       # Specify `storageAnnotations <https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/>`__ to associate to PVCs.
       storageAnnotations: { }
@@ -294,7 +294,12 @@ tenant:
   #    - name: my-minio-bucket
   #         objectLock: false        # optional
   #         region: us-east-1        # optional
-  buckets: [ ]
+  buckets:
+    - name: druid-segments
+      objectLock: false
+    - name: flink-checkpoints
+      objectLock: false
+  
   ###
   # Array of Kubernetes secrets from which the Operator generates MinIO users during tenant provisioning.
   #

@@ -188,7 +188,8 @@ metadata:
   namespace: argocd
 spec:
   syncPolicy:
-    automated: {}
+    automated:
+      prune: true
     syncOptions:
       - CreateNamespace=true
   project: default
@@ -209,3 +210,29 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio-tenant
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: minio
+  project: default
+  sources:
+    - repoURL: https://operator.min.io
+      chart: tenant
+      targetRevision: latest
+      helm:
+        valueFiles:
+        - $values/helm/minio/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
