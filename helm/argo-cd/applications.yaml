@@ -222,7 +222,7 @@ spec:
     namespace: minio
   project: default
   sources:
-    - repoURL: oci://registry-1.docker.io/bitnamicharts/minio
+    - repoURL: registry-1.docker.io/bitnamicharts
       chart: minio
       targetRevision: 15.0.0
       helm:
