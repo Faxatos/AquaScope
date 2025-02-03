@@ -58,7 +58,9 @@ configVars:
   druid_s3_accessKey: admin
   druid_s3_secretKey: password
   druid_s3_endpoint_url: 'http://minio-tenant.minio.svc.cluster.local:9000/'
-  druid_indexer_logs_type: file
+  druid_indexer_logs_type: s3
+  druid_indexer_logs_s3Bucket: druid-segments
+  druid_indexer_logs_s3Prefix: indexing-logs
   druid_indexer_logs_directory: /opt/shared/indexing-logs
   druid_processing_numThreads: "2"
   druid_processing_numMergeBuffers: "2"
