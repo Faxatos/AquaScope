@@ -130,7 +130,8 @@ extraConfig: ""
 ## extraConfigYaml:
 ##   default.replication.factor: 3
 ##
-extraConfigYaml: {}
+extraConfigYaml:
+  log.retention.hours: 72
 ## @param secretConfig Additional configuration to be appended at the end of the generated Kafka configuration file.
 ## This value will be stored in a secret.
 ##
