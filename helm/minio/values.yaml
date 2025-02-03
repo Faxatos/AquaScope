@@ -239,7 +239,7 @@ statefulset:
 provisioning:
   ## @param provisioning.enabled Enable MinIO&reg; provisioning Job
   ##
-  enabled: false
+  enabled: true
   ## @param provisioning.sleepTime Sleep time before checking Minio availability
   ##
   sleepTime: 5
@@ -413,11 +413,9 @@ provisioning:
   ##       size: 10GiB
   ##     tags:
   ##       key1: value1
-  buckets: 
+  buckets:
     - name: druid-segments
-      region: us-east-1
     - name: flink-checkpoints
-      region: us-east-1
   ## @param provisioning.config MinIO&reg; config provisioning
   ## https://docs.min.io/docs/minio-server-configuration-guide.html
   ## e.g.
