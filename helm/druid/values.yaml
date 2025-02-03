@@ -51,12 +51,13 @@ configVars:
   druid_indexer_runner_javaOptsArray: '["-server", "-Xmx1g", "-Xms1g", "-XX:MaxDirectMemorySize=3g", "-Duser.timezone=UTC", "-Dfile.encoding=UTF-8", "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"]'
   druid_indexer_fork_property_druid_processing_buffer_sizeBytes: 256MiB
   druid_storage_type: s3
-  druid_storage_storageDirectory: /opt/shared/segments
   druid_storage_bucket: druid-segments
   druid_storage_baseKey: segment
+  druid_s3_protocol: http
+  druid_s3_enablePathStyleAccess: true
   druid_s3_accessKey: admin
   druid_s3_secretKey: password
-  druid_s3_endpoint_url: http://minio-tenant.minio.svc.cluster.local:9000
+  druid_s3_endpoint_url: http://minio-tenant.minio.svc.cluster.local:9000/
   druid_indexer_logs_type: file
   druid_indexer_logs_directory: /opt/shared/indexing-logs
   druid_processing_numThreads: "2"
