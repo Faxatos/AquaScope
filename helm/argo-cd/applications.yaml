@@ -204,9 +204,7 @@ spec:
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       path: helm/longhorn
-      helm:
-        valueFiles:
-          - values.yaml
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
