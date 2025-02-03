@@ -57,7 +57,7 @@ configVars:
   druid_s3_enablePathStyleAccess: 'true'
   druid_s3_accessKey: admin
   druid_s3_secretKey: password
-  druid_s3_endpoint_url: http://minio-tenant.minio.svc.cluster.local:9000/
+  druid_s3_endpoint_url: http://minio-tenant-headless.minio.svc.cluster.local:9000/
   druid_indexer_logs_type: s3
   druid_indexer_logs_s3Bucket: druid-segments
   druid_indexer_logs_s3Prefix: indexing-logs
