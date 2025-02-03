@@ -415,7 +415,9 @@ provisioning:
   ##       key1: value1
   buckets: 
     - name: druid-segments
+      region: us-east-1
     - name: flink-checkpoints
+      region: us-east-1
   ## @param provisioning.config MinIO&reg; config provisioning
   ## https://docs.min.io/docs/minio-server-configuration-guide.html
   ## e.g.
