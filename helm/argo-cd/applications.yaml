@@ -222,9 +222,9 @@ spec:
     namespace: minio
   project: default
   sources:
-    - repoURL: https://operator.min.io
-      chart: tenant
-      targetRevision: latest
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: minio
+      targetRevision: 15.0.0
       helm:
         valueFiles:
         - $values/helm/minio/values.yaml
