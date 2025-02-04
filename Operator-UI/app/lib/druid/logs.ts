@@ -8,7 +8,9 @@ export const fetchPageLogs = async (mmsi: string, currentPage: number) => {
       ? `/api/logs?action=fetchLogs&mmsi=${mmsi}&currentPage=${currentPage}&itemsPerPage=10`
       : `/api/logs?action=fetchLogs&currentPage=${currentPage}&itemsPerPage=10`; // No MMSI in the URL
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       console.error('Error fetching logs:', response.statusText);
@@ -45,7 +47,9 @@ export const fetchTotalPages = async (searchQuery: string): Promise<number> => {
       ? `/api/logs?action=fetchTotalPages&mmsi=${searchQuery}`
       : `/api/logs?action=fetchTotalPages`;
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      cache: "no-store",
+    });
 
     if (!response.ok) {
       console.error('Error fetching logs:', response.statusText);
@@ -69,7 +73,9 @@ export const fetchTotalPages = async (searchQuery: string): Promise<number> => {
 // Function to fetch the latest vessel logs from the API
 export const fetchLatestLogs = async (): Promise<VesselLog[] | null> => {
   try {
-    const response = await fetch('/api/logs?action=fetchLatestLogs'); // Adjust the endpoint if necessary
+    const response = await fetch('/api/logs?action=fetchLatestLogs', {
+      cache: "no-store",
+    });
     const data = await response.json();
 
     if (data.error) {
