@@ -1,3 +1,5 @@
+'use client';
+
 import { fetchTotalPages } from '@/app/lib/druid/logs';
 
 import { useSuspenseQuery } from "@tanstack/react-query";
