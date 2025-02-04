@@ -3,7 +3,7 @@ import { Client } from 'cassandra-driver';
 
 // Initialize the Cassandra client
 const client = new Client({
-  contactPoints: ['http://cassandra.cassandra.svc.cluster.local:9042'], //Cassandra host
+  contactPoints: ['cassandra.cassandra.svc.cluster.local:9042'], //Cassandra host
   localDataCenter: 'datacenter1', //Cassandra datacenter
   keyspace: 'vessel_management', //keyspace
   credentials: { 
@@ -15,7 +15,17 @@ const client = new Client({
 // Attach event listeners for logging
 client.on('log', (level, className, message) => {
   console.log(`[CASSANDRA ${level}] ${className}: ${message}`);
-})
+});
+
+// Test connection
+(async () => {
+  try {
+    await client.connect();
+    console.log("Cassandra connected successfully");
+  } catch (error) {
+    console.error("Cassandra connection failed:", error);
+  }
+})();
 
 async function fetchAlarmPage(mmsi: string, currentPage: number, itemsPerPage: number) {
   const fetchLimit = currentPage * itemsPerPage; // Fetch more than needed
