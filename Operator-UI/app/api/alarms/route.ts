@@ -3,7 +3,7 @@ import { Client } from 'cassandra-driver';
 
 // Initialize the Cassandra client
 const client = new Client({
-  contactPoints: ['cassandra.cassandra.svc.cluster.local:9042'], //Cassandra host
+  contactPoints: ['http://cassandra.cassandra.svc.cluster.local:9042'], //Cassandra host
   localDataCenter: 'datacenter1', //Cassandra datacenter
   keyspace: 'vessel_management', //keyspace
   credentials: { 
@@ -80,6 +80,7 @@ interface ApiResponse<T> {
 // Handle API requests
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+  console.log("url: " + req.url)
   const mmsi = searchParams.get('mmsi') || '';
   const currentPage = parseInt(searchParams.get('currentPage') || '1', 10);
   const itemsPerPage = parseInt(searchParams.get('itemsPerPage') || '10', 10);
