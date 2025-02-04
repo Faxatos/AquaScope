@@ -12,6 +12,11 @@ const client = new Client({
   }, 
 });
 
+// Attach event listeners for logging
+client.on('log', (level, className, message) => {
+  console.log(`[CASSANDRA ${level}] ${className}: ${message}`);
+})
+
 async function fetchAlarmPage(mmsi: string, currentPage: number, itemsPerPage: number) {
   const fetchLimit = currentPage * itemsPerPage; // Fetch more than needed
   let query = '';
@@ -27,7 +32,9 @@ async function fetchAlarmPage(mmsi: string, currentPage: number, itemsPerPage: n
   }
 
   try {
+    console.log(`Executing query: ${query} with params: ${params}`);
     const result = await client.execute(query, params, { prepare: true });
+    console.log("result: " + JSON.stringify(result, null, 2))
     
     // Manually slice results to get only the correct page
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -52,6 +59,7 @@ async function fetchTotalAlarmPages(mmsi: string, itemsPerPage: number): Promise
   }
 
   try {
+    console.log(`Executing query: ${query} with params: ${params}`);
     const result = await client.execute(query, params, { prepare: true });
 
     // Extract the total count from Cassandra response
