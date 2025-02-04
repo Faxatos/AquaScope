@@ -1,8 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // Enabling React Strict Mode (recommended for development)
-  reactStrictMode: true,
+  reactStrictMode: false,
 
   // Adding custom webpack configuration
   webpack: (config) => {
