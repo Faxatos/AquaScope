@@ -802,7 +802,7 @@ service:
 ingress:
   ## @param ingress.enabled Enable ingress controller resource for MinIO Console
   ##
-  enabled: false
+  enabled: true
   ## @param ingress.apiVersion Force Ingress API version (automatically detected if not set)
   ##
   apiVersion: ""
