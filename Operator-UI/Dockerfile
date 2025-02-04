@@ -1,15 +1,14 @@
-# Stage 1: Base Image
-FROM node:18-alpine AS base
+# Use Node.js with a more compatible OS
+FROM node:18-buster AS base
 
-# Install Python (required by node-gyp) and other build dependencies
-RUN apk add --no-cache python3 py3-pip build-base
-RUN ln -sf /usr/bin/python3 /usr/bin/python
+# Install dependencies required for node-gyp and kerberos
+RUN apt-get update && apt-get install -y python3 build-essential gcc g++ make libkrb5-dev
 
 # Set the working directory
 WORKDIR /app
 
 # Install pnpm globally
-RUN npm install -g pnpm
+RUN npm install -g pnpm node-gyp
 
 # Copy package manager lockfile and package.json
 COPY pnpm-lock.yaml package.json ./
