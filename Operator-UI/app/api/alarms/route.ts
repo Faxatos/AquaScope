@@ -34,23 +34,30 @@ async function fetchAlarmPage(mmsi: string, currentPage: number, itemsPerPage: n
 
   if (mmsi && mmsi.trim() !== '') {
     const parsedMmsi = parseInt(mmsi, 10);
-    query = `SELECT * FROM alarm WHERE mmsi = ? ORDER BY timestamp DESC LIMIT ? ALLOW FILTERING`;
+    query = `SELECT * FROM alarm WHERE mmsi = ? ORDER BY timestamp DESC LIMIT ?`;
     params.push(parsedMmsi, fetchLimit);
-  } else {
-    query = `SELECT * FROM alarm ORDER BY timestamp DESC LIMIT ? ALLOW FILTERING`;
+} else {
+    query = `SELECT * FROM alarm LIMIT ?`;
     params.push(fetchLimit);
-  }
+}
 
   try {
     console.log(`Executing query: ${query} with params: ${params}`);
     const result = await client.execute(query, params, { prepare: true });
     console.log("result: " + JSON.stringify(result, null, 2))
+
+    let sortedRows = result.rows;
+
+    // **Sort only if global query is used (no mmsi filtering)**
+    if (!mmsi) {
+      sortedRows = sortedRows.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+    }
     
     // Manually slice results to get only the correct page
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
-    return result.rows.slice(startIndex, endIndex);
+    return sortedRows.slice(startIndex, endIndex);
   } catch (error) {
     console.error('Error fetching alarm data from Cassandra:', error);
     return [];
@@ -64,7 +71,7 @@ async function fetchTotalAlarmPages(mmsi: string, itemsPerPage: number): Promise
   const params: any[] = [];
 
   if (mmsi && mmsi.trim() !== '') {
-    query += ' WHERE mmsi = ? ALLOW FILTERING';
+    query += ' WHERE mmsi = ?';
     params.push(parseInt(mmsi, 10)); // Ensure MMSI is an integer
   }
 
