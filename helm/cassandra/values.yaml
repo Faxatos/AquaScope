@@ -155,15 +155,16 @@ initDB:
         draught DOUBLE
     );
 
-    -- Table for Alarm
+    -- Table for Alarm (Keeping alarm_id as Primary Key but enabling MMSI & timestamp-based queries)
     CREATE TABLE IF NOT EXISTS alarm (
-        alarm_id TEXT PRIMARY KEY,
-        timestamp TIMESTAMP,
+        alarm_id TEXT,
         mmsi BIGINT,
+        timestamp TIMESTAMP,
         code TEXT,
         description TEXT,
-        status TEXT
-    );
+        status TEXT,
+        PRIMARY KEY ((alarm_id), mmsi, timestamp) -- Partition by alarm_id, Cluster by MMSI & timestamp
+    ) WITH CLUSTERING ORDER BY (mmsi ASC, timestamp DESC);
 
     -- Table for User
     CREATE TABLE IF NOT EXISTS user (
