@@ -166,6 +166,9 @@ initDB:
         PRIMARY KEY ((alarm_id), mmsi, timestamp) -- Partition by alarm_id, Cluster by MMSI & timestamp
     ) WITH CLUSTERING ORDER BY (mmsi ASC, timestamp DESC);
 
+    -- Create Index on MMSI to allow filtering
+    CREATE INDEX IF NOT EXISTS alarm_mmsi_idx ON alarm (mmsi);
+
     -- Table for User
     CREATE TABLE IF NOT EXISTS user (
         id UUID PRIMARY KEY,
