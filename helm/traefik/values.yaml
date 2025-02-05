@@ -647,7 +647,7 @@ ports:
     # The port protocol (TCP/UDP)
     protocol: TCP
     # -- See [upstream documentation](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport)
-    nodePort:  # @schema type:[integer, null]; minimum:0
+    nodePort:  32000 # @schema type:[integer, null]; minimum:0
     redirections:
       # -- Port Redirections
       # Added in 2.2, one can make permanent redirects via entrypoints.
