@@ -15,7 +15,10 @@ spec:
     - host: druid.localhost
       http:
         paths:
-          - backend:
-              serviceName: druid-router
-              servicePort: http
-            path: /
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: druid-router
+                port:
+                  name: http
