@@ -9,11 +9,11 @@ metadata:
 spec:
   destination:
     server: https://kubernetes.default.svc
-    namespace: druid
+    namespace: argocd
   project: default
   sources:
     - repoURL: https://argoproj.github.io/argo-helm
-      chart: argocd
+      chart: argo-cd
       targetRevision: 7.8.0
       helm:
         valueFiles:
