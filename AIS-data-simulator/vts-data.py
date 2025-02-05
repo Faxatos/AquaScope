@@ -9,6 +9,7 @@ import argparse
 from kafka import KafkaProducer
 from kafka.admin import KafkaAdminClient
 from dotenv import load_dotenv
+import math
 
 load_dotenv()
 
@@ -121,8 +122,20 @@ def calculate_new_position(lat, lon, speed, heading, time_interval):
     delta_lon = distance * math.sin(math.radians(heading)) / (111320 * math.cos(math.radians(lat)))
     return round(lat + delta_lat, 6), round(lon + delta_lon, 6)
 
-def random_heading():
-    return random.randint(0, 359)
+def calculate_heading(lat, lon, destination_lat, destination_lon):
+    """
+    Calculates the heading (course) from (lat, lon) to (destination_lat, destination_lon).
+    """
+    delta_lon = math.radians(destination_lon - lon)
+    lat1 = math.radians(lat)
+    lat2 = math.radians(destination_lat)
+
+    x = math.sin(delta_lon) * math.cos(lat2)
+    y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(delta_lon)
+
+    heading = math.degrees(math.atan2(x, y))
+    
+    return (heading + 360) % 360  # Normalize to [0, 360) range
 
 def random_speed():
     """
@@ -136,6 +149,7 @@ def generate_vessel(ocean_gdf, lat_range, lon_range):
     """
     lat, lon = generate_random_coordinates_in_area(ocean_gdf, lat_range, lon_range)
     destination_lat, destination_lon = generate_destination_coordinates(lat, lon)
+    heading = calculate_heading(lat, lon, destination_lat, destination_lon)
 
     # Debugging print statement for coordinates
     print(f"Generated coordinates: {lat}, {lon}")
@@ -160,7 +174,6 @@ def generate_vessel(ocean_gdf, lat_range, lon_range):
 
     # Dynamic data
     speed = random_speed()
-    heading = random_heading()
     eta = calculate_eta(lat, lon, destination_lat, destination_lon, speed)
 
     vessel.update({
