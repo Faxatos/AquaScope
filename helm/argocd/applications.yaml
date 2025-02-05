@@ -52,7 +52,7 @@ spec:
       ref: values
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
-      path: helm/druid/ingress.yaml # Tracking additional ingress file
+      path: helm/druid # Tracking additional ingress file
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
@@ -315,6 +315,9 @@ spec:
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      path: helm/flink # Tracking additional ingress file
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
