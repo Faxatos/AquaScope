@@ -123,5 +123,5 @@ tolerations: []
 affinity: {}
 
 secrets:
-  AUTH_URL: http://localhost:3000/api/auth
+  AUTH_URL: http://ui.localhost:8000/api/auth
   AUTH_SECRET: RmNY/1BR/MwInwAVCRz6gRKumKfP7tRSRr5Kln4FAXI=
