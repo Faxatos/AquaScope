@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: aquascope-applications
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: argocd
+            chartRepo: https://argoproj.github.io/argo-helm
+            chart: argo-cd
+            chartRevision: "7.8.0"
+          - name: druid
+            chartRepo: https://asdf2014.github.io/druid-helm
+            chart: druid
+            chartRevision: "31.0.5"
+          - name: kafka
+            chartRepo: registry-1.docker.io/bitnamicharts
+            chart: kafka
+            chartRevision: "31.2.0"
+          - name: cassandra
+            chartRepo: registry-1.docker.io/bitnamicharts
+            chart: cassandra
+            chartRevision: "12.1.1"
+          - name: longhorn
+            chartRepo: https://charts.longhorn.io/
+            chart: longhorn
+            chartRevision: "v1.8.0"
+          - name: minio-tenant
+            chartRepo: registry-1.docker.io/bitnamicharts
+            chart: minio
+            chartRevision: "15.0.0"
+          - name: traefik
+            chartRepo: https://traefik.github.io/charts
+            chart: traefik
+            chartRevision: "34.2.0"
+          - name: flink
+            chartRepo: registry-1.docker.io/bitnamicharts
+            chart: flink
+            chartRevision: "1.4.2"
+  template:
+    metadata:
+      name: "{{name}}"
+      namespace: argocd
+    spec:
+      project: default
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{name}}"
+      sources:
+        - repoURL: "{{chartRepo}}"
+          chart: "{{chart}}"
+          targetRevision: "{{chartRevision}}"
+          helm:
+            valueFiles:
+              - "$values/helm/{{name}}/values.yaml"
+        - repoURL: https://github.com/Faxatos/AquaScope.git
+          targetRevision: main
+          ref: values
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+        automated:
+          prune: true
