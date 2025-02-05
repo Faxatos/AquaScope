@@ -595,6 +595,7 @@ tracing:  # @schema additionalProperties: false
 globalArguments:
 - "--global.checknewversion"
 - "--global.sendanonymoususage"
+- "--serversTransport.insecureSkipVerify=true"
 
 # -- Additional arguments to be passed at Traefik's binary
 # See [CLI Reference](https://docs.traefik.io/reference/static-configuration/cli/)
