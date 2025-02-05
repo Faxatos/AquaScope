@@ -2276,15 +2276,15 @@ server:
     # @default -- `[]` (See [values.yaml])
     ## Note: Supports use of custom Helm templates
     extraRules:
-     - http:
-         paths:
-         - path: /
-           pathType: Prefix
-           backend:
-             service:
-               name: '{{ include "argo-cd.server.fullname" . }}'
-               port:
-                 name: '{{ .Values.server.service.servicePortHttpName }}'
+    # - http:
+    #     paths:
+    #     - path: /
+    #       pathType: Prefix
+    #       backend:
+    #         service:
+    #           name: '{{ include "argo-cd.server.fullname" . }}'
+    #           port:
+    #             name: '{{ .Values.server.service.servicePortHttpName }}'
     # -- Additional TLS configuration
     # @default -- `[]` (See [values.yaml])
     extraTls: []
