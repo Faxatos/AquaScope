@@ -52,7 +52,7 @@ spec:
       ref: values
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
-      path: druid/ingress.yaml # Tracking additional ingress file
+      path: helm/druid/ingress.yaml # Tracking additional ingress file
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
