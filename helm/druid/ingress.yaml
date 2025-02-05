@@ -1,0 +1,21 @@
+apiVersion: extensions/v1
+kind: Ingress
+metadata:
+  labels:
+    app: druid
+    argocd.argoproj.io/instance: druid
+    chart: druid-31.0.5
+    component: router
+    heritage: Helm
+    release: druid
+  name: druid-router
+  namespace: druid
+spec:
+  rules:
+    - host: druid.localhost
+      http:
+        paths:
+          - backend:
+              serviceName: druid-router
+              servicePort: http
+            path: /
