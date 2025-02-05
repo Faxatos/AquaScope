@@ -25,6 +25,8 @@ export default async function TotalPages({ query }: { query: string }) {
     queryKey: ["totalPages", query],
     queryFn: () => fetchTotalPages(query),
     refetchInterval: 5000, // Auto-refresh logs every 5 seconds
+    keepPreviousData: true,
+    placeholderData: undefined,
   });
 
   const createPageURL = (pageNumber: number | string) => {

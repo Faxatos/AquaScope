@@ -26,6 +26,8 @@ export default async function VesselTable({
     queryKey: ["vessels", query, currentPage],
     queryFn: () => fetchVesselInfosPage(mmsi, currentPage),
     refetchInterval: 5000, // Auto-refresh every 5 seconds
+    keepPreviousData: true,
+    placeholderData: undefined,
   });
   
   return (

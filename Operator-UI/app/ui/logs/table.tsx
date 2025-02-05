@@ -30,6 +30,8 @@ export default async function LogsTable({
     queryKey: ["logs", query, currentPage],
     queryFn: () => fetchPageLogs(query, currentPage),
     refetchInterval: 5000, // Auto-refresh logs every 5 seconds
+    keepPreviousData: true,
+    placeholderData: undefined,
   });
 
   return (

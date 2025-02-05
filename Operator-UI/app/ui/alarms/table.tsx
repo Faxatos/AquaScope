@@ -24,6 +24,8 @@ export default async function AlarmsTable({
       queryKey: ["logs", query, currentPage],
       queryFn: () => fetchAlarmPage(query, currentPage),
       refetchInterval: 5000, // Auto-refresh logs every 5 seconds
+      keepPreviousData: true,
+      placeholderData: undefined,
     });
 
   return (

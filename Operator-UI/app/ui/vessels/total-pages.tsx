@@ -20,6 +20,8 @@ export default function TotalPages({ query }: { query: string }) {
     queryKey: ["totalVesselPages", query],
     queryFn: () => fetchTotalVesselInfosPage(query),
     refetchInterval: 5000, // Auto-refresh every 5 seconds
+    keepPreviousData: true,
+    placeholderData: undefined,
   });
 
   const createPageURL = (pageNumber: number | string) => {
