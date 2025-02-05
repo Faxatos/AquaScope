@@ -3,9 +3,18 @@ import { Client } from 'cassandra-driver';
 
 // Initialize the Cassandra client
 const client = new Client({
-  contactPoints: ['cassandra.cassandra.svc.cluster.local:9042'], // Replace with your Cassandra host
-  localDataCenter: 'datacenter1', // Replace with your Cassandra datacenter
-  keyspace: 'vessel_management', // Replace with your keyspace
+  contactPoints: ['cassandra.cassandra.svc.cluster.local:9042'], //Cassandra host
+  localDataCenter: 'datacenter1', //Cassandra datacenter
+  keyspace: 'vessel_management', //Keyspace
+  credentials: { 
+    username: 'cassandra', 
+    password: 'cassandra' 
+  },
+});
+
+// Attach event listeners for logging
+client.on('log', (level, className, message) => {
+  console.log(`[CASSANDRA ${level}] ${className}: ${message}`);
 });
 
 // Fetch paginated vessel data
@@ -14,21 +23,26 @@ async function fetchVesselInfosPage(
   currentPage: number,
   itemsPerPage: number
 ): Promise<any[]> {
-  const offset = (currentPage - 1) * itemsPerPage;
-  let query = 'SELECT * FROM vessels';
+  const fetchLimit = currentPage * itemsPerPage; // Fetch more than needed
+  let query = 'SELECT * FROM vessel';
   const params: any[] = [];
 
   if (mmsi) {
     query += ' WHERE mmsi = ?';
-    params.push(mmsi);
+    params.push(parseInt(mmsi, 10));
   }
 
-  query += ' LIMIT ? OFFSET ?';
-  params.push(itemsPerPage, offset);
+  query += ' LIMIT ?';
+  params.push(fetchLimit);
 
   try {
     const result = await client.execute(query, params, { prepare: true });
-    return result.rows;
+
+    // **Manually slice results to get only the correct page**
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    return result.rows.slice(startIndex, endIndex);
   } catch (error) {
     console.error('Error fetching vessel info from Cassandra:', error);
     return [];
@@ -45,12 +59,14 @@ async function fetchTotalVesselInfosPage(
 
   if (mmsi) {
     query += ' WHERE mmsi = ?';
-    params.push(mmsi);
+    params.push(parseInt(mmsi, 10));
   }
 
   try {
     const result = await client.execute(query, params, { prepare: true });
-    const totalCount = result.rows[0]['count'];
+
+    // Extract the total count from Cassandra response
+    const totalCount = Number(result.rows[0]['count']);
     return Math.ceil(totalCount / itemsPerPage);
   } catch (error) {
     console.error('Error fetching total vessel info pages from Cassandra:', error);
@@ -70,15 +86,15 @@ export async function GET(req: Request) {
   const mmsi = searchParams.get('mmsi') || '';
   const currentPage = parseInt(searchParams.get('currentPage') || '1', 10);
   const itemsPerPage = parseInt(searchParams.get('itemsPerPage') || '10', 10);
-  const action = searchParams.get('action') || 'fetchLogs';
+  const action = searchParams.get('action') || 'fetchVessels';
 
   let response: ApiResponse<any> = { data: null };
   let status = 200;
 
   try {
-    if (action === 'fetchLogs') {
-      const logs = await fetchVesselInfosPage(mmsi, currentPage, itemsPerPage);
-      response.data = logs;
+    if (action === 'fetchVessels') {
+      const vessels = await fetchVesselInfosPage(mmsi, currentPage, itemsPerPage);
+      response.data = vessels;
     } else if (action === 'fetchTotalPages') {
       const totalPages = await fetchTotalVesselInfosPage(mmsi, itemsPerPage);
       response.data = totalPages;

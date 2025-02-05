@@ -1,3 +1,4 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { VesselCardMobile, VesselCardDesktop } from '@/app/ui/vessels/vessel-card';
 import { fetchVesselInfosPage } from '@/app/lib/cassandra/vessels'; // Assuming a function to fetch vessel data page
 
@@ -21,8 +22,12 @@ export default async function VesselTable({
   // If the query is valid, assign it directly (as a string) or use an empty string
   const mmsi = query === "" ? "" : query;
 
-  const vessels = await fetchVesselInfosPage(mmsi, currentPage);
-
+  const { data: vessels } = useSuspenseQuery({
+    queryKey: ["vessels", query, currentPage],
+    queryFn: () => fetchVesselInfosPage(mmsi, currentPage),
+    refetchInterval: 5000, // Auto-refresh every 5 seconds
+  });
+  
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
