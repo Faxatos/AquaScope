@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: flink
+    argocd.argoproj.io/instance: flink
+    chart: flink-31.0.5
+    component: router
+    heritage: Helm
+    release: flink
+  name: flink-jobmanager
+  namespace: flink
+spec:
+  rules:
+    - host: flink.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: flink-jobmanager
+                port:
+                  name: http
