@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - chart: longhorn
+      repoURL: https://charts.longhorn.io/
+      targetRevision: v1.8.0
+      helm:
+        values: |
+          preUpgradeChecker:
+            jobEnabled: false
+        valueFiles:
+        - $values/helm/longhorn/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      path: helm/longhorn
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
