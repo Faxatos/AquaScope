@@ -18,6 +18,18 @@ spec:
       memory: "2048m"
       cpu: 1
   job:
-    jarURI: local:///home/ubuntu/flink-cassandra-kafka-example-1.0.0.jar
+    jarURI: local:///flink-data/flink-cassandra-kafka-example-1.0.0.jar
     parallelism: 2
     upgradeMode: stateless
+  podTemplate:
+    spec:
+      containers:
+        - name: flink-main-container
+          volumeMounts:
+            - mountPath: /flink-data
+              name: flink-volume
+      volumes:
+        - name: flink-volume
+          hostPath:
+            path: /home/ubuntu
+            type: Directory
