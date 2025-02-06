@@ -14,7 +14,7 @@ spec:
       targetRevision: 15.0.0
       helm:
         valueFiles:
-        - $values/helm/minio/values.yaml
+        - $values/helm/minio-tenant/values.yaml
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values
