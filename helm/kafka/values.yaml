@@ -2133,6 +2133,8 @@ provisioning:
   ##
   topics: 
       - name: vts
+        partitions: 3
+        replicationFactor: 3
         config:
           max.message.bytes: 64000
           flush.messages: 1
