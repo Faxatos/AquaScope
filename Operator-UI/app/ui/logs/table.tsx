@@ -6,7 +6,7 @@ import { VesselLog } from '@/app/lib/definitions';
 import { LogCardDesktop, LogCardMobile } from '@/app/ui/logs/log-card'
 import { LogsTableSkeleton } from '@/app/ui/logs/skeleton';
 
-export default async function LogsTable({
+export default function LogsTable({
   query,
   currentPage,
 }: {
