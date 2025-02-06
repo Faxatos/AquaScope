@@ -2118,10 +2118,10 @@ provisioning:
   automountServiceAccountToken: false
   ## @param provisioning.numPartitions Default number of partitions for topics when unspecified
   ##
-  numPartitions: 1
+  numPartitions: 3
   ## @param provisioning.replicationFactor Default replication factor for topics when unspecified
   ##
-  replicationFactor: 1
+  replicationFactor: 3
   ## @param provisioning.topics Kafka topics to provision
   ## - name: topic-name
   ##   partitions: 1
@@ -2132,18 +2132,16 @@ provisioning:
   ##     flush.messages: 1
   ##
   topics: 
-      - name: sat
-        partitions: 1
-        replicationFactor: 1
-        config:
-          max.message.bytes: 64000
-          flush.messages: 1
       - name: vts
-        partitions: 1
-        replicationFactor: 1
         config:
           max.message.bytes: 64000
           flush.messages: 1
+      #- name: sat
+      #  partitions: 1
+      #  replicationFactor: 1
+      #  config:
+      #    max.message.bytes: 64000
+      #    flush.messages: 1
   
   ## @param provisioning.nodeSelector Node labels for pod assignment
   ## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
