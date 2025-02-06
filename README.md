@@ -14,61 +14,59 @@ Click [here](#map-example) to have a look at a real map containing those element
 This project aims to build a scalable platform to ingest, process, and analyze these diverse data streams, enhancing anomaly detection and decision-making capabilities for maritime operators.
 
 ## Platform Architecture
-The platform is designed around modern, distributed technologies to ensure scalability, fault tolerance, and low latency. 
+The platform ensures scalability, fault tolerance, and low latency using modern distributed technologies.
 
 <p align="center">
-<img src="https://github.com/user-attachments/assets/1d0ef33f-ee1b-4a89-be69-bea8d1d0cdf8" alt="drawing" width="700"/>
+<img src="https://github.com/user-attachments/assets/83cfee06-0c9e-4055-b82a-40e478b8f3b8" alt="drawing" width="700"/>
 </p>
 
 ## Objectives
-1. **Ingest data**: Data streams from AIS antennas, VTS stations, and satellite providers are ingested into Kafka clusters. Kafka acts as a durable buffer, ensuring reliable data delivery to downstream systems.
+1. **Ingest data**: Data streams from AIS antennas, VTS stations, and satellite providers are fetched via provider APIs (for testing purposes logs are generated) ingested into Kafka clusters. Kafka acts as a durable buffer, ensuring reliable data delivery to downstream systems.
 
 2. **Process data streams**: Flink Structured Streaming processes data from Kafka in real-time. This includes:
-  - Aggregations and metrics calculations.
-  - Window-based analysis for trends.
-  - Anomaly detection based on deviations, patterns, and thresholds.
-  - Enrichment with metadata (e.g. distance from the coast).
+    - Identify and track unregistered vessels in Cassandra.
+    - Generate alarms when a vessel stops providing logs before reaching its destination, or when it deviates from its expected route beyond a defined threshold. All alarms are stored in Cassandra.
   
-3. **Store enriched data**: Processed data is stored in Apache Druid. This enables ultra-fast query performance and supports interactive analytics.
+3. **Stores data streams**: Logs are stored in Apache Druid in daily segments for fast querying.
 
-5. **Visualize results**: Dashboards will visualize vessel positions, anomalies, and trends on an interactive map. Operators can execute queries and drill down into data for informed decision-making.
-
-## Key Features
-- **Multi-Site Data Handling:** Each site processes its local data but also integrates with a central system for global insights.
-- **Real-Time Processing:** Immediate processing of sensor data for low-latency analytics.
-- **Anomaly Detection:** Potential to integrate machine learning algorithms for detecting anomalies in vessel movements based on geospatial and temporal data.
-- **Scalability:** Kubernetes orchestration ensures fault tolerance and dynamic scaling based on workload.
+5. **Visualize results**: The Operator UI provides a dynamic map that updates in real time to track vessel movements, along with dedicated pages for alarms and vessel details. Grafana enables monitoring of Kubernetes cluster performance.
 
 ## Technology Stack
-| Component              | Technology                                                                 |
-|------------------------|---------------------------------------------------------------------------|
-| **Ingestion**         | Apache Kafka                                                             |
-| **Stream Processing** | Apache Flink                                                             |
-| **Storage**           | Apache Druid                                                            |
-| **Orchestration**     | Kubernetes (K8s)                                                        |
-| **Infrastructure**    | Terraform for Infrastructure as Code (IaC)                              |
-| **Visualization**     | Operator UI (to be developed) or integration with existing frameworks      |
+| Component                  | Technology                                                 |
+| -------------------------- | ---------------------------------------------------------- |
+| **Ingestion**              | Apache Kafka                                               |
+| **Stream Processing**      | Apache Flink                                               |
+| **Real-time Storage**      | Apache Druid (logs), Cassandra (alarms & vessel info)      |
+| **Block Storage**          | Longhorn (Kafka persistence, Druid metadata in PostgreSQL) |
+| **Object Storage**         | MinIO (Druid segments, Flink checkpoints)                  |
+| **Orchestration**          | Kubernetes (K8s)                                           |
+| **Ingress Controller**     | Traefik                                                    |
+| **Continuous Deployment**  | ArgoCD                                                     |
+| **Infrastructure as Code** | Ansible (with Kubespray)                                   |
+| **Monitoring**             | Grafana (Cluster state and performance)                    
 
-## Deployment and Scalability
-- **Kubernetes (K8s):**
-  - Orchestrates Flink, Kafka, and Druid clusters.
-  - Provides fault tolerance through pod rescheduling and scaling.
-  - Enables auto-scaling based on system load.
+## Deployment & Testing in UniPi Cluster
 
-- **Terraform:**
-  - Simplifies provisioning and management of cloud resources.
-  - Ensures consistency across development, staging, and production environments.
+The platform was deployed and tested on a **UniPi cluster** consisting of four machines:
+
+- **1 control plane node** running only Kubernetes.
+- **3 worker nodes** hosting the distributed application components.
+
+Services were distributed across multiple nodes to ensure fault tolerance. If a node failed, workloads were automatically rescheduled onto healthy nodes. For better understanding of how fault tolerance was achieved through distribution, please refer to the documentation.
+
+### Orchestration & Deployment
+
+- Kubernetes managed the orchestration of Flink, Kafka, and Druid, ensuring scalability and high availability.
+- ArgoCD handled continuous deployment, automating application updates.
+- Traefik was used as the ingress controller for managing external traffic.
+- Ansible with Kubespray automated Kubernetes cluster provisioning and infrastructure setup.
 
 ## Future Work
 1. **Advanced Anomaly Detection:**
    - Explore frameworks for applying machine learning to detect anomalies in vessel trajectories.
    - Integrate methodologies for detecting deviations from expected routes, clustering unusual patterns, etc.
 
-2. **Enhanced Visualization:**
-   - Develop a user-friendly map-based UI for real-time monitoring and querying.
-   - Explore frameworks for geospatial data visualization (e.g., Mapbox, Leaflet).
-
-3. **Multi-Region Support:**
+2. **Multi-Region Support:**
    - Optimize for global deployments with data replication and geo-distributed processing.
 
 ## Map Example
