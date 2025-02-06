@@ -11,7 +11,7 @@ Maritime traffic monitoring is crucial for navigation safety, port management, a
 
 Click [here](#map-example) to have a look at a real map containing those elements.
 
-This project aims to build a scalable platform to ingest, process, and analyze these diverse data streams, enhancing anomaly detection and decision-making capabilities for maritime operators.
+This project aims to build a scalable platform to ingest, process, and analyze these data streams, enhancing anomaly detection and decision-making capabilities for maritime operators.
 
 ## Platform Architecture
 The platform ensures scalability, fault tolerance, and low latency using modern distributed technologies.
