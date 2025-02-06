@@ -8,10 +8,16 @@ spec:
     server: https://kubernetes.default.svc
     namespace: flink
   project: default
-  source:
-    repoURL: https://github.com/apache/flink-kubernetes-operator
-    targetRevision: main
-    path: helm/flink-kubernetes-operator
+  sources:
+    - repoURL: https://github.com/apache/flink-kubernetes-operator
+      targetRevision: main
+      path: helm/flink-kubernetes-operator
+      helm:
+        valueFiles:
+        - $values/helm/flink/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
