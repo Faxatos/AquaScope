@@ -12,7 +12,7 @@ spec:
       helm:
         releaseName: cnpg
         valueFiles:
-          - $values/helm/cloudnativepg/cloudnativepg-cluster/values.yaml
+          - $values/helm/cloudnativepg-cluster/values.yaml
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values

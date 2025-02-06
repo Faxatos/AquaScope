@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flink
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: flink
+  project: default
+  sources:
+    - repoURL: registry-1.docker.io/bitnamicharts
+      chart: flink
+      targetRevision: 1.4.2
+      helm:
+        valueFiles:
+        - $values/helm/flink/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      path: helm/flink # Tracking additional ingress file
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true

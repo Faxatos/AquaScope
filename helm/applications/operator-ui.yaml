@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: operator-ui
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: operatorui=ghcr.io/faxatos/aquascope/operator-ui:latest
+    argocd-image-updater.argoproj.io/operatorui.update-strategy: digest
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: operator-ui
+  project: default
+  sources:
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      path: helm/operator-ui
+      helm:
+        valueFiles:
+        - values.yaml
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      prune: true

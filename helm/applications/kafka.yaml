@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kafka
+  project: default
+  sources:
+    - repoURL: registry-1.docker.io/bitnamicharts
+      chart: kafka
+      targetRevision: 31.3.1
+      helm:
+        valueFiles:
+        - $values/helm/kafka/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      prune: true

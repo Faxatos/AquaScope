@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ais-data-simulator-vts
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: vts=ghcr.io/faxatos/aquascope/ais-data-simulator-vts:latest
+    argocd-image-updater.argoproj.io/vts.update-strategy: digest
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ais-data-simulator
+  project: default
+  sources:
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      path: helm/ais-data-simulator-vts
+      helm:
+        valueFiles:
+        - values.yaml
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      prune: true

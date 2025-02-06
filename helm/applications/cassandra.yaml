@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cassandra
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cassandra
+  project: default
+  sources:
+    - repoURL: registry-1.docker.io/bitnamicharts
+      chart: cassandra
+      targetRevision: 12.1.1
+      helm:
+        valueFiles:
+        - $values/helm/cassandra/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    automated:
+      prune: true
