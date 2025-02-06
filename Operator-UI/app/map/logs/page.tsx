@@ -21,9 +21,7 @@ export default function Page() {
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search with MMSI..." />
       </div>
-      <Suspense key={query + currentPage} fallback={<LogsTableSkeleton />}>
-        <LogsTable query={query} currentPage={currentPage} />
-      </Suspense>
+      <LogsTable query={query} currentPage={currentPage} />
       <div className="mt-5 flex w-full justify-center">
       <Suspense key={query + currentPage} fallback={<div>Number of pages are loading...</div>}>
         <TotalPages query={query} />

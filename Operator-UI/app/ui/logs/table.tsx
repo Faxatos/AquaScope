@@ -1,9 +1,10 @@
 'use client';
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchPageLogs } from '@/app/lib/druid/logs';
 import { VesselLog } from '@/app/lib/definitions';
 import { LogCardDesktop, LogCardMobile } from '@/app/ui/logs/log-card'
+import { LogsTableSkeleton } from '@/app/ui/logs/skeleton';
 
 export default async function LogsTable({
   query,
@@ -14,7 +15,6 @@ export default async function LogsTable({
 }) {
   // Regex to check if the query is a valid number (positive integers)
   const regex = /^[0-9]+$/;
-  console.log("i'm in ui/logs/table.tsx")
 
   // If the query is not empty, check if it's a valid number
   if (query !== "" && !regex.test(query)) {
@@ -23,16 +23,16 @@ export default async function LogsTable({
     return <div>Invalid MMSI value. Please enter a number.</div>;
   }
 
-  // If the query is valid, assign it directly (as a string) or use an empty string
-  const mmsi = query === "" ? "" : query;
-
-  const { data: logs } = useSuspenseQuery({
+  const { data: logs, isLoading } = useQuery({
     queryKey: ["logs", query, currentPage],
     queryFn: () => fetchPageLogs(query, currentPage),
     refetchInterval: 5000, // Auto-refresh logs every 5 seconds
-    keepPreviousData: true,
-    placeholderData: undefined,
+    keepPreviousData: true, // Keeps old data visible while fetching
+    staleTime: 4000, // Helps reduce refetch frequency
   });
+
+  // 🚀 Show skeleton only on first load, not on refetch
+  if (isLoading && !logs) return <LogsTableSkeleton />;
 
   return (
     <div className="mt-6 flow-root">
