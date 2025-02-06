@@ -31,5 +31,5 @@ spec:
       volumes:
         - name: flink-volume
           hostPath:
-            path: /home/ubuntu
+            path: /home/ubuntu/aquascope-flink-jobs
             type: Directory
