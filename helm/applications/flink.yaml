@@ -18,6 +18,9 @@ spec:
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      path: helm/flink
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
