@@ -509,7 +509,7 @@ indexer:
         enabled: true
         minReplicas: 3
         maxReplicas: 6
-        averageCpuUtilization: 80
+        targetMetricValue: "80"
 
 # If using a zookeeper installed outside of this chart you must uncomment and set this line
 # zkHosts: "druid-zookeeper-headless:2181"
