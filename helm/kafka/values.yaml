@@ -2406,7 +2406,7 @@ kraft:
   ## If reusing existing PVCs or migrating from Zookeeper mode, make sure the cluster ID is set matching the stored cluster ID, otherwise new nodes will fail to join the cluster.
   ## In case the cluster ID stored in the secret does not match the value stored in /bitnami/kafka/data/meta.properties, remove the secret and upgrade the chart setting the correct value.
   ##
-  clusterId: "3ygdXYu6RzKrfxpu83Keng"
+  clusterId: "UNAtyvZwhNYkFuWJ8d727B"
   ## @param kraft.controllerQuorumVoters Override the Kafka controller quorum voters of the Kafka Kraft cluster. If not set, it will be automatically configured to use all controller-elegible nodes.
   ##
   controllerQuorumVoters: ""
