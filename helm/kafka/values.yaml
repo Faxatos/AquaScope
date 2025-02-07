@@ -132,8 +132,8 @@ extraConfig: ""
 ##
 extraConfigYaml:
   log.retention.hours: 72
-  default.replication.factor: 3
-  num.partitions: 3
+  default.replication.factor: 6
+  num.partitions: 6
 ## @param secretConfig Additional configuration to be appended at the end of the generated Kafka configuration file.
 ## This value will be stored in a secret.
 ##
@@ -848,19 +848,19 @@ controller:
     hpa:
       ## @param controller.autoscaling.hpa.enabled Enable HPA for Kafka Controller
       ##
-      enabled: false
+      enabled: true
       ## @param controller.autoscaling.hpa.minReplicas Minimum number of Kafka Controller replicas
       ##
-      minReplicas: ""
+      minReplicas: "3"
       ## @param controller.autoscaling.hpa.maxReplicas Maximum number of Kafka Controller replicas
       ##
-      maxReplicas: ""
+      maxReplicas: "6"
       ## @param controller.autoscaling.hpa.targetCPU Target CPU utilization percentage
       ##
-      targetCPU: ""
+      targetCPU: "60"
       ## @param controller.autoscaling.hpa.targetMemory Target Memory utilization percentage
       ##
-      targetMemory: ""
+      targetMemory: "60"
   ## Kafka Pod Disruption Budget
   ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
   ## @param controller.pdb.create Deploy a pdb object for the Kafka pod
@@ -2120,10 +2120,10 @@ provisioning:
   automountServiceAccountToken: false
   ## @param provisioning.numPartitions Default number of partitions for topics when unspecified
   ##
-  numPartitions: 3
+  numPartitions: 6
   ## @param provisioning.replicationFactor Default replication factor for topics when unspecified
   ##
-  replicationFactor: 3
+  replicationFactor: 6
   ## @param provisioning.topics Kafka topics to provision
   ## - name: topic-name
   ##   partitions: 1
@@ -2135,8 +2135,8 @@ provisioning:
   ##
   topics: 
       - name: vts
-        partitions: 3
-        replicationFactor: 3
+        partitions: 6
+        replicationFactor: 6
         config:
           max.message.bytes: 64000
           flush.messages: 1
