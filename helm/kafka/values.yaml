@@ -133,7 +133,7 @@ extraConfig: ""
 extraConfigYaml:
   log.retention.hours: 72
   default.replication.factor: 3
-  num.partitions: 6
+  num.partitions: 9
 ## @param secretConfig Additional configuration to be appended at the end of the generated Kafka configuration file.
 ## This value will be stored in a secret.
 ##
@@ -1321,7 +1321,7 @@ broker:
       minReplicas: "1"
       ## @param broker.autoscaling.hpa.maxReplicas Maximum number of Kafka Broker replicas
       ##
-      maxReplicas: "3"
+      maxReplicas: "6"
       ## @param broker.autoscaling.hpa.targetCPU Target CPU utilization percentage
       ##
       targetCPU: "90"
@@ -2120,7 +2120,7 @@ provisioning:
   automountServiceAccountToken: false
   ## @param provisioning.numPartitions Default number of partitions for topics when unspecified
   ##
-  numPartitions: 6
+  numPartitions: 9
   ## @param provisioning.replicationFactor Default replication factor for topics when unspecified
   ##
   replicationFactor: 3
@@ -2135,7 +2135,7 @@ provisioning:
   ##
   topics: 
       - name: vts
-        partitions: 6
+        partitions: 9
         replicationFactor: 3
         config:
           max.message.bytes: 64000
