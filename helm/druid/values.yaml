@@ -439,7 +439,7 @@ indexer:
   enabled: true
   defaults:
     name: indexer
-    replicaCount: 1
+    replicaCount: 3
     port: 8091
     podManagementPolicy: Parallel
     updateStrategy:
