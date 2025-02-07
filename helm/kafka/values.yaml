@@ -533,7 +533,7 @@ controller:
   existingSecretConfig: ""
   ## @param controller.heapOpts Kafka Java Heap size for controller-eligible nodes
   ##
-  heapOpts: -Xmx1024m -Xms1024m
+  heapOpts: -Xmx512m -Xms512m
   ## @param controller.command Override Kafka container command
   ##
   command: []
@@ -991,7 +991,7 @@ broker:
   existingSecretConfig: ""
   ## @param broker.heapOpts Kafka Java Heap size for broker-only nodes
   ##
-  heapOpts: -Xmx1024m -Xms1024m
+  heapOpts: -Xmx512m -Xms512m
   ## @param broker.command Override Kafka container command
   ##
   command: []
