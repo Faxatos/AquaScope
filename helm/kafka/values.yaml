@@ -1315,7 +1315,7 @@ broker:
     hpa:
       ## @param broker.autoscaling.hpa.enabled Enable HPA for Kafka Broker
       ##
-      enabled: true
+      enabled: false
       ## @param broker.autoscaling.hpa.minReplicas Minimum number of Kafka Broker replicas
       ##
       minReplicas: "1"
