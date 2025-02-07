@@ -176,7 +176,10 @@ initDB:
         email TEXT,
         password TEXT
     );
-    
+
+    -- Create Index on email to allow filtering
+    CREATE INDEX IF NOT EXISTS user_email_idx ON user (email);
+
     -- Insert data into Alarm table
     INSERT INTO alarm (alarm_id, timestamp, mmsi, code, description, status) 
     VALUES ('ALARM001', '2025-01-01 10:00:00', 123456789, 'E001', 'Engine overheating', 'active');

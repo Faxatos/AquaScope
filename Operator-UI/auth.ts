@@ -8,16 +8,21 @@ import bcrypt from 'bcrypt';
 import type { User } from '@/app/lib/definitions';
 import { users } from '@/app/lib/placeholder-data';
 
+// Initialize the Cassandra client
 const client = new Client({
-  contactPoints: ['cassandra.cassandra.svc.cluster.local:9042'], // replace with your Cassandra node IPs
-  localDataCenter: 'datacenter1', // replace with your Cassandra data center name
-  keyspace: 'vessel_management', // replace with your Cassandra keyspace
+  contactPoints: ['cassandra.cassandra.svc.cluster.local:9042'], //Cassandra host
+  localDataCenter: 'datacenter1', //Cassandra datacenter
+  keyspace: 'vessel_management', //keyspace
+  credentials: { 
+    username: 'cassandra', 
+    password: 'cassandra' 
+  }, 
 });
 
 async function getUser(email: string): Promise<User | undefined> {
   try {
     // Query Cassandra for the user with the given email
-    const query = 'SELECT * FROM users WHERE email = ?';
+    const query = 'SELECT id, email, name, password FROM users WHERE email = ?';
     const result = await client.execute(query, [email], { prepare: true });
     
     // If no user is found, return undefined
@@ -25,7 +30,6 @@ async function getUser(email: string): Promise<User | undefined> {
       return undefined;
     }
 
-    // Assuming the first row contains the user data
     const user = result.rows[0];
 
     // Map the Cassandra row to a User object
@@ -33,8 +37,7 @@ async function getUser(email: string): Promise<User | undefined> {
       id: user.id,
       email: user.email,
       name: user.name,
-      password: user.password,  // Adjust column names as necessary
-      // Add any other fields as needed
+      password: user.password,
     };
   } catch (error) {
     console.error('Failed to fetch user:', error);
@@ -57,10 +60,9 @@ export const { auth, signIn, signOut } = NextAuth({
 
                 if (email === "in@in.com") {
                   const specialUser = {
-                    id: "special-user-id",  // This should be the ID of the special user
-                    email: "in@in.com",
-                    name: "Special User",  // You can provide a name if needed
-                    // Add any other user fields here that you want to associate with the "special" user
+                    id: "special-user-id",
+                    email: "in@in.com", //special user for testing
+                    name: "Special User", 
                   };
                   console.log("Special case login for in@in.com");
                   return specialUser;  // Return the "special" user
