@@ -284,7 +284,13 @@ cluster:
   # -- BootstrapInitDB is the configuration of the bootstrap process when initdb is used.
   # See: https://cloudnative-pg.io/documentation/current/bootstrap/
   # See: https://cloudnative-pg.io/documentation/current/cloudnative-pg.v1/#postgresql-cnpg-io-v1-bootstrapinitdb
-  initdb: {}
+  initdb:
+    database: druid
+    owner: druid
+    secret:
+      name: druid-auth 
+    encoding: UTF8
+  
     # database: app
     # owner: "" # Defaults to the database name
     # secret:
