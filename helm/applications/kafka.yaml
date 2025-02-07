@@ -18,9 +18,15 @@ spec:
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values
+  ignoreDifferences:
+  - group: apps
+    kind: StatefulSet
+    jsonPointers:
+    - /spec/replicas
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
+    - RespectIgnoreDifferences=true
     automated:
       prune: true
       selfHeal: true
