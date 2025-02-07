@@ -626,7 +626,7 @@ controller:
   ## @param controller.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if controller.resources is set (controller.resources is recommended for production).
   ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
   ##
-  resourcesPreset: "small"
+  resourcesPreset: "medium"
   ## @param controller.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
@@ -991,7 +991,7 @@ broker:
   existingSecretConfig: ""
   ## @param broker.heapOpts Kafka Java Heap size for broker-only nodes
   ##
-  heapOpts: -Xmx2G -Xms2G
+  heapOpts: -Xmx1024m -Xms1024m
   ## @param broker.command Override Kafka container command
   ##
   command: []
@@ -1084,7 +1084,7 @@ broker:
   ## @param broker.resourcesPreset Set container resources according to one common preset (allowed values: none, nano, micro, small, medium, large, xlarge, 2xlarge). This is ignored if broker.resources is set (broker.resources is recommended for production).
   ## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
   ##
-  resourcesPreset: "large"
+  resourcesPreset: "nano"
   ## @param broker.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
   ## resources:
