@@ -848,7 +848,7 @@ controller:
     hpa:
       ## @param controller.autoscaling.hpa.enabled Enable HPA for Kafka Controller
       ##
-      enabled: true
+      enabled: false
       ## @param controller.autoscaling.hpa.minReplicas Minimum number of Kafka Controller replicas
       ##
       minReplicas: "3"
@@ -1315,19 +1315,19 @@ broker:
     hpa:
       ## @param broker.autoscaling.hpa.enabled Enable HPA for Kafka Broker
       ##
-      enabled: false
+      enabled: true
       ## @param broker.autoscaling.hpa.minReplicas Minimum number of Kafka Broker replicas
       ##
-      minReplicas: ""
+      minReplicas: "1"
       ## @param broker.autoscaling.hpa.maxReplicas Maximum number of Kafka Broker replicas
       ##
-      maxReplicas: ""
+      maxReplicas: "3"
       ## @param broker.autoscaling.hpa.targetCPU Target CPU utilization percentage
       ##
-      targetCPU: ""
+      targetCPU: "60"
       ## @param broker.autoscaling.hpa.targetMemory Target Memory utilization percentage
       ##
-      targetMemory: ""
+      targetMemory: "60"
   ## Enable persistence using Persistent Volume Claims
   ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   ##
