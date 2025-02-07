@@ -22,7 +22,7 @@ const client = new Client({
 async function getUser(email: string): Promise<User | undefined> {
   try {
     // Query Cassandra for the user with the given email
-    const query = 'SELECT id, email, name, password FROM users WHERE email = ?';
+    const query = 'SELECT id, email, name, password FROM user WHERE email = ?';
     const result = await client.execute(query, [email], { prepare: true });
     
     // If no user is found, return undefined
