@@ -1324,10 +1324,10 @@ broker:
       maxReplicas: "3"
       ## @param broker.autoscaling.hpa.targetCPU Target CPU utilization percentage
       ##
-      targetCPU: "80"
+      targetCPU: "90"
       ## @param broker.autoscaling.hpa.targetMemory Target Memory utilization percentage
       ##
-      targetMemory: "80"
+      targetMemory: "90"
   ## Enable persistence using Persistent Volume Claims
   ## ref: https://kubernetes.io/docs/concepts/storage/persistent-volumes/
   ##
