@@ -5,5 +5,5 @@ metadata:
   name: druid-auth
   namespace: cnpg-database
 data:
-  username: druid
-  password: FoolishPassword
+  username: ZHJ1aWQ=
+  password: Rm9vbGlzaFBhc3N3b3Jk
