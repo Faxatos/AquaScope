@@ -3,12 +3,12 @@ import uuid
 from datetime import datetime, timedelta, timezone
 import json
 import os
-import argparse 
 from kafka import KafkaProducer
 from kafka.admin import KafkaAdminClient
 import geopandas as gpd
 from shapely.geometry import Point
 import math
+import time
 
 from dotenv import load_dotenv
 
@@ -18,12 +18,15 @@ load_dotenv()
 WORLD_LAT_RANGE = (-90.0, 90.0)
 WORLD_LON_RANGE = (-180.0, 180.0)
 DEFAULT_SPEED = (5, 20)  # Knots
-ETA_UPDATE_INTERVAL = int(os.getenv('INTERVAL', '5'))  # We assume to get data every INTERVAL seconds
 MAX_DESTINATION_OFFSET = 1  # Max offset for destination in degrees (about 60 nautical miles)
 
 # Kafka Configuration
 KAFKA_SERVER = os.getenv('KAFKA_SERVER')
 TOPIC = os.getenv('TOPIC', 'sat')
+
+# Other env values
+VESS_NUM = int(os.getenv('VESS_NUM', '10'))
+ETA_UPDATE_INTERVAL = int(os.getenv('INTERVAL', '5'))  # We assume to get data every INTERVAL seconds
 
 # Initialize Kafka Producer
 producer = KafkaProducer(
@@ -236,8 +239,8 @@ def update_vessel(vessel):
     vessel["ETA_AIS"] = eta_time.isoformat()
     return True
 
-def simulate_vessels(ocean_gdf, vess_num):
-    vessels = [generate_vessel(ocean_gdf) for _ in range(vess_num)]
+def simulate_vessels(ocean_gdf):
+    vessels = [generate_vessel(ocean_gdf) for _ in range(VESS_NUM)]
 
     while True:
         print(f"=== Current Vessel Data @ {datetime.now(timezone.utc).isoformat()} ===")
@@ -260,15 +263,7 @@ def simulate_vessels(ocean_gdf, vess_num):
         time.sleep(ETA_UPDATE_INTERVAL)  # Wait before the next update
 
 if __name__ == "__main__":
-    import math
-    import time
-
     shapefile_path = "natural_earth_oceans/ne_110m_ocean.shp"
-
-    # Command-line arguments parsing
-    parser = argparse.ArgumentParser(description="Simulate vessels within a specified area.")
-    parser.add_argument('--vess', type=int, required=True, help="Number of vessels to simulate.")
-    args = parser.parse_args()
     
     print("Checking Kafka connectivity...")
     check_kafka_connection_until_ready(KAFKA_SERVER, delay=3)
@@ -276,6 +271,4 @@ if __name__ == "__main__":
     # Load the land GeoDataFrame
     ocean_gdf = load_ocean_shapefile(shapefile_path)
     
-    # Start the vessel simulation
-    vess_num = args.vess
-    simulate_vessels(ocean_gdf, vess_num)
+    simulate_vessels(ocean_gdf)

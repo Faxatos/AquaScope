@@ -5,11 +5,11 @@ import json
 import geopandas as gpd
 from shapely.geometry import Point
 import os
-import argparse 
 from kafka import KafkaProducer
 from kafka.admin import KafkaAdminClient
 from dotenv import load_dotenv
 import math
+import time
 
 load_dotenv()
 
@@ -21,6 +21,14 @@ MAX_DESTINATION_OFFSET = 1  # Max offset for destination in degrees (about 60 na
 # Kafka Configuration
 KAFKA_SERVER = os.getenv('KAFKA_SERVER')
 TOPIC = os.getenv('TOPIC', 'sat')
+
+# Other env values
+VESS_NUM = int(os.getenv('VESS_NUM', '10'))
+ETA_UPDATE_INTERVAL = int(os.getenv('INTERVAL', '5'))  # We assume to get data every INTERVAL seconds
+LAT_MIN = float(os.getenv("LAT_MIN", "30"))
+LAT_MAX = float(os.getenv("LAT_MAX", "60"))
+LON_MIN = float(os.getenv("LON_MIN", "-120"))
+LON_MAX = float(os.getenv("LON_MAX", "-60"))
 
 # Initialize Kafka Producer
 producer = KafkaProducer(
@@ -234,8 +242,8 @@ def update_vessel(vessel):
     vessel["ETA_AIS"] = eta_time.isoformat()
     return True
 
-def simulate_vessels(ocean_gdf, lat_range, lon_range, vess_num):
-    vessels = [generate_vessel(ocean_gdf, lat_range, lon_range) for _ in range(vess_num)]
+def simulate_vessels(ocean_gdf, lat_range, lon_range):
+    vessels = [generate_vessel(ocean_gdf, lat_range, lon_range) for _ in range(VESS_NUM)]
 
     while True:
         print(f"=== Current Vessel Data @ {datetime.now(timezone.utc).isoformat()} ===")
@@ -257,19 +265,7 @@ def simulate_vessels(ocean_gdf, lat_range, lon_range, vess_num):
         time.sleep(ETA_UPDATE_INTERVAL)  # Wait before the next update
 
 if __name__ == "__main__":
-    import math
-    import time
-
     shapefile_path = "natural_earth_oceans/ne_110m_ocean.shp"
-
-    # Command-line arguments parsing
-    parser = argparse.ArgumentParser(description="Simulate vessels within a specified area.")
-    parser.add_argument('--vess', type=int, required=True, help="Number of vessels to simulate.")
-    parser.add_argument('--lat_min', type=float, required=True, help="Minimum latitude of the area.")
-    parser.add_argument('--lat_max', type=float, required=True, help="Maximum latitude of the area.")
-    parser.add_argument('--lon_min', type=float, required=True, help="Minimum longitude of the area.")
-    parser.add_argument('--lon_max', type=float, required=True, help="Maximum longitude of the area.")
-    args = parser.parse_args()
 
     print("Checking Kafka connectivity...")
     check_kafka_connection_until_ready(KAFKA_SERVER, delay=3)
@@ -278,9 +274,8 @@ if __name__ == "__main__":
     ocean_gdf = load_ocean_shapefile(shapefile_path)
     
     # Define the area (latitude and longitude ranges) where you want to generate coordinates
-    lat_range = (args.lat_min, args.lat_max)
-    lon_range = (args.lon_min, args.lon_max)
-    vess_num = args.vess
+    lat_range = (LAT_MIN, LAT_MAX)
+    lon_range = (LON_MIN, LON_MAX)
     
     # Start the vessel simulation
-    simulate_vessels(ocean_gdf, lat_range, lon_range, vess_num)
+    simulate_vessels(ocean_gdf, lat_range, lon_range)
