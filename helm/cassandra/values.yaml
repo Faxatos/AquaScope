@@ -189,7 +189,7 @@ initDB:
 
     -- Insert data into User table
     INSERT INTO user (id, name, email, password) 
-    VALUES (uuid(), 'test', 'test@test.com', 'test');
+    VALUES (uuid(), 'test', 'test@test.com', 'test123');
 
     INSERT INTO user (id, name, email, password) 
     VALUES (uuid(), 'Jane Smith', 'jane.smith@example.com', 'hashed_password_2');
