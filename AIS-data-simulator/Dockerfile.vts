@@ -22,4 +22,4 @@ RUN touch /tmp/healthy
 ENTRYPOINT ["python3", "vts-data.py"]
 
 # Command for running the script with default values (e.g., 10 vessels, default lat/lon range)
-CMD ["--vess", "10", "--lat_min", "30", "--lat_max", "60", "--lon_min", "-120", "--lon_max", "-60"]
+CMD ["--vess", "30", "--lat_min", "30", "--lat_max", "60", "--lon_min", "-120", "--lon_max", "-60"]

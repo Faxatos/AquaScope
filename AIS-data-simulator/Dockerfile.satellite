@@ -22,4 +22,4 @@ RUN touch /tmp/healthy
 ENTRYPOINT ["python3", "satellite-data.py"]
 
 # Command for running the script with the default number of vessels (10)
-CMD ["--vess", "10"]
+CMD ["--vess", "30"]
