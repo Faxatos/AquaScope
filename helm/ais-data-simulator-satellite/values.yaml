@@ -132,3 +132,4 @@ config:
   KAFKA_SERVER: kafka.kafka.svc.cluster.local:9092
   TOPIC: vts
   INTERVAL: 1
+  VESS_NUM: 30
