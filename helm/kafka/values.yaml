@@ -2140,12 +2140,12 @@ provisioning:
         config:
           max.message.bytes: 64000
           flush.messages: 1
-      #- name: sat
-      #  partitions: 1
-      #  replicationFactor: 1
-      #  config:
-      #    max.message.bytes: 64000
-      #    flush.messages: 1
+      - name: sat
+        partitions: 9
+        replicationFactor: 3
+        config:
+          max.message.bytes: 64000
+          flush.messages: 1
   
   ## @param provisioning.nodeSelector Node labels for pod assignment
   ## Ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/
