@@ -12,9 +12,25 @@ async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPag
   // If mmsi is provided, filter logs by MMSI, otherwise get all logs
   if (mmsi && mmsi.trim() !== '') {
     const parsedMmsi = parseInt(mmsi, 10);
-    query = `SELECT * FROM vessel_logs WHERE MMSI = ${parsedMmsi} ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
+    query = `
+      SELECT * FROM (
+        SELECT * FROM vessel_logs_vts WHERE MMSI = ${parsedMmsi} ORDER BY __time DESC LIMIT ${itemsPerPage}
+        UNION ALL
+        SELECT * FROM vessel_logs_sat WHERE MMSI = ${parsedMmsi} ORDER BY __time DESC LIMIT ${itemsPerPage}
+      ) combined
+      ORDER BY __time DESC
+      LIMIT ${itemsPerPage}
+    `;
   } else {
-    query = `SELECT * FROM vessel_logs ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
+    query = `
+      SELECT * FROM (
+        SELECT * FROM vessel_logs_vts ORDER BY __time DESC LIMIT ${itemsPerPage}
+        UNION ALL
+        SELECT * FROM vessel_logs_sat ORDER BY __time DESC LIMIT ${itemsPerPage}
+      ) combined
+      ORDER BY __time DESC
+      LIMIT ${itemsPerPage}
+    `;
   }
   
   console.log(query); // Log the query for debugging
@@ -38,9 +54,21 @@ async function fetchTotalLogPages(mmsi: string, itemsPerPage: number) {
   // If mmsi is provided, count logs by MMSI, otherwise count all logs
   if (mmsi && mmsi.trim() !== '') {
     const parsedMmsi = parseInt(mmsi, 10);
-    query = `SELECT COUNT(*) AS total_logs FROM vessel_logs WHERE MMSI = ${parsedMmsi}`;
+    query = `
+      SELECT SUM(total_logs) AS total_logs FROM (
+        SELECT COUNT(*) AS total_logs FROM vessel_logs_vts WHERE MMSI = ${parsedMmsi}
+        UNION ALL
+        SELECT COUNT(*) AS total_logs FROM vessel_logs_sat WHERE MMSI = ${parsedMmsi}
+      ) combined
+    `;
   } else {
-    query = `SELECT COUNT(*) AS total_logs FROM vessel_logs`;
+    query = `
+      SELECT SUM(total_logs) AS total_logs FROM (
+        SELECT COUNT(*) AS total_logs FROM vessel_logs_vts
+        UNION ALL
+        SELECT COUNT(*) AS total_logs FROM vessel_logs_sat
+      ) combined
+    `;
   }
 
   console.log(query); // Log the query for debugging
@@ -59,11 +87,18 @@ async function fetchTotalLogPages(mmsi: string, itemsPerPage: number) {
 
 async function fetchLatestLogs() {
   const query = `
-    SELECT l.* 
-    FROM vessel_logs l
+    SELECT l.* FROM (
+      SELECT * FROM vessel_logs_vts
+      UNION ALL
+      SELECT * FROM vessel_logs_sat
+    ) l
     INNER JOIN (
       SELECT MMSI, MAX(CAST(__time AS TIMESTAMP)) AS max_timestamp
-      FROM vessel_logs
+      FROM (
+        SELECT MMSI, __time FROM vessel_logs_vts
+        UNION ALL
+        SELECT MMSI, __time FROM vessel_logs_sat
+      ) grouped
       GROUP BY MMSI
     ) latest
     ON l.MMSI = latest.MMSI AND l.__time = latest.max_timestamp
