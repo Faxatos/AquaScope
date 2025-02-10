@@ -12,9 +12,9 @@ spec:
     namespace: druid
   project: default
   sources:
-    - repoURL: https://wiremind.github.io/wiremind-helm-charts
+    - repoURL: https://asdf2014.github.io/druid-helm/
       chart: druid
-      targetRevision: 1.20.0
+      targetRevision: 31.0.5
       helm:
         valueFiles:
         - $values/helm/druid/values.yaml

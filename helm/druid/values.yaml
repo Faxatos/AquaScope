@@ -1,120 +1,51 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Default values for druid.
+
 image:
   repository: apache/druid
-  tag: ""
+  tag: 30.0.1
   pullPolicy: IfNotPresent
-
-metrics:
-  enabled: false
-  service:
-    port: 9876
-  podMonitor:
-    enabled: true
-
-service:
-  # Override druid_host on statefulsets to resolve components IP with DNS
-  resolveWithDNS: true
-
-extensions:
-  loadList:
-    - druid-basic-security
-    - druid-bloom-filter
-    - druid-datasketches
-    - druid-histogram
-    - druid-kafka-indexing-service
-    - druid-kubernetes-extensions
-    - druid-lookups-cached-global
-    - druid-lookups-cached-single
-    - druid-pac4j
-    - druid-parquet-extensions
-    - druid-s3-extensions
-    - druid-stats
-    - postgresql-metadata-storage
-    - prometheus-emitter
-    - druid-multi-stage-query
-
-
-secretEnvVars: {}
+  pullSecrets: []
 
 configMap:
+  ## If false, configMap will not be applied
+  ##
   enabled: true
 
 # Required if using kubernetes extensions which modify resources like 'druid-kubernetes-extensions' or 'druid-kubernetes-overlord-extensions'
 rbac:
   create: true
 
+## Define the key value pairs in the configmap
 configVars:
   ## DRUID env vars. ref: https://github.com/apache/druid/blob/master/distribution/docker/druid.sh#L29
-  DRUID_LOG4J: |
-    <?xml version="1.0" encoding="UTF-8" ?>
-    <Configuration status="WARN">
-      <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
-          <PatternLayout pattern="%d{ISO8601} %p [%t] %c -%notEmpty{ [%markerSimpleName]} %m%n"/>
-        </Console>
-      </Appenders>
-
-      <Loggers>
-        <Root level="info">
-          <AppenderRef ref="Console"/>
-        </Root>
-
-        <!-- Set level="debug" to see stack traces for query errors -->
-        <Logger name="org.apache.druid.server.QueryResource" level="info" additivity="false">
-          <Appender-ref ref="Console"/>
-        </Logger>
-        <Logger name="org.apache.druid.server.QueryLifecycle" level="info" additivity="false">
-          <Appender-ref ref="Console"/>
-        </Logger>
-
-        <!-- Set level="debug" or "trace" to see more Coordinator details (segment balancing, load/drop rules, etc) -->
-        <Logger name="org.apache.druid.server.coordinator" level="info" additivity="false">
-          <Appender-ref ref="Console"/>
-        </Logger>
-
-        <!-- Set level="debug" to see low-level details about segments and ingestion -->
-        <Logger name="org.apache.druid.segment" level="info" additivity="false">
-          <Appender-ref ref="Console"/>
-        </Logger>
-
-        <!-- Set level="debug" to see more information about extension initialization -->
-        <Logger name="org.apache.druid.initialization" level="info" additivity="false">
-          <Appender-ref ref="Console"/>
-        </Logger>
-
-        <!-- Quieter logging at startup -->
-        <Logger name="org.skife.config" level="warn" additivity="false">
-          <Appender-ref ref="Console"/>
-        </Logger>
-        <Logger name="com.sun.jersey.guice" level="warn" additivity="false">
-          <Appender-ref ref="Console"/>
-        </Logger>
-      </Loggers>
-    </Configuration>
-
-  # Monitoring
-  # See https://druid.apache.org/docs/latest/development/extensions-contrib/prometheus.html to configure
-  # TODO: Use pushgateway for indexers (avoid losing scale_interval amount of metrics + they may )
-  # https://druid.apache.org/docs/latest/configuration/index.html#emitting-metrics
-  druid_emitter: noop
-  druid_emitter_logging_logLevel: debug
-
-  # Storage
-  # https://druid.apache.org/docs/latest/configuration/index.html#common-configurations
-  druid_indexer_logs_directory: /opt/data/indexing-logs
-
-  # Kubernetes discovery
-  druid_zk_service_enabled: "false"
-  druid_serverview_type: http
-  druid_coordinator_loadqueuepeon_type: http
-  druid_indexer_runner_type: httpRemote
-  druid_discovery_type: k8s
-
-  druid_discovery_k8s_clusterIdentifier: "druid-default"
-
+  # DRUID_LOG_LEVEL: "warn"
+  # DRUID_LOG4J: <?xml version="1.0" encoding="UTF-8" ?><Configuration status="WARN"><Appenders><Console name="Console" target="SYSTEM_OUT"><PatternLayout pattern="%d{ISO8601} %p [%t] %c - %m%n"/></Console></Appenders><Loggers><Root level="info"><AppenderRef ref="Console"/></Root><Logger name="org.apache.druid.jetty.RequestLog" additivity="false" level="DEBUG"><AppenderRef ref="Console"/></Logger></Loggers></Configuration>
   DRUID_USE_CONTAINER_IP: "true"
 
   ## Druid Common Configurations. ref: https://druid.apache.org/docs/latest/configuration/index.html#common-configurations
-  DRUID_SINGLE_NODE_CONF: micro-quickstart
+  druid_extensions_loadList: '["druid-histogram", "druid-datasketches", "druid-lookups-cached-global", "postgresql-metadata-storage", "druid-kafka-indexing-service", "druid-s3-extensions"]'
+  druid_indexer_logs_directory: /opt/data/indexing-logs
+
+  ## Druid Emitting Metrics. ref: https://druid.apache.org/docs/latest/configuration/index.html#emitting-metrics
+  druid_emitter: noop
+  druid_emitter_logging_logLevel: debug
+  druid_emitter_http_recipientBaseUrl: http://druid_exporter_url:druid_exporter_port/druid
+
   druid_zk_service_host: zookeeper
   druid_metadata_storage_host: ""
   druid_metadata_storage_type: postgresql
@@ -138,143 +69,68 @@ configVars:
   druid_processing_numThreads: "2"
   druid_processing_numMergeBuffers: "2"
 
-router:
-  enabled: true
-  replicaCount: 1
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 2
-    scaleDownStabilizationWindowSeconds: 300
-    # targetCPU: 80
-    # targetMemory: 80
-    # targetMetric:
-    #   name: druid_remaining_maintainer_tasks_instantaneous
-    #   service:
-    #   value: 7
-  name: router
-  port: 8888
-  serviceType: ClusterIP
-  serviceExtraPorts: []
-  podManagementPolicy: Parallel
-  updateStrategy:
-    type: RollingUpdate
-  service: {}
-    # resolveWithDNS: false
-  podSecurityContext:
-    fsGroup: 1000
-  containerSecurityContext:
-    enabled: false
-  livenessProbe:
-    enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 15
-    successThreshold: 1
-  readinessProbe:
-    enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 10
-    timeoutSeconds: 1
-    failureThreshold: 5
-    successThreshold: 1
-  ingress:
-    enabled: false
-    annotations:
-      nginx.ingress.kubernetes.io/auth-realm: Authentication Required
-      nginx.ingress.kubernetes.io/auth-secret: basic-auth
-      nginx.ingress.kubernetes.io/auth-type: basic
-      kubernetes.io/tls-acme: "false"
-    path: /
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-    requests:
-      cpu: 200m
-      memory: 512Mi
-  priorityClassName: ""
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
-  annotations: {}
-  podAnnotations: {}
-  podLabels: {}
-  podDisruptionBudget: {}
-  envVars:
-    druid_router_managementProxy_enabled: "true"
-  secretEnvVars: {}
-  serviceAccount:
-    # -- Create a service account for the broker
-    create: true
-    # -- Service Account name
-    name:
-    # -- Annotations applied to created service account
-    annotations: {}
-    # -- Labels applied to created service account
-    labels: {}
-    # -- Automount API credentials for the service account
-    automountServiceAccountToken: true
+  DRUID_LOG4J: |
+    <?xml version="1.0" encoding="UTF-8" ?>
+    <Configuration status="WARN">
+      <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+          <PatternLayout pattern="%d{ISO8601} %p [%t] %c - %m%n"/>
+        </Console>
+      </Appenders>
+      <Loggers>
+        <Root level="info">
+          <AppenderRef ref="Console"/>
+        </Root>
+        <Logger name="org.apache.druid.jetty.RequestLog" additivity="false" level="DEBUG">
+          <AppenderRef ref="Console"/>
+        </Logger>
+      </Loggers>
+    </Configuration>
+
+
+gCloudStorage:
+  enabled: false
+  secretName: google-cloud-key
 
 broker:
+  ## If false, broker will not be installed
+  ##
   enabled: true
-  replicaCount: 1
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 2
-    averageCpuUtilization: 80
   name: broker
+  replicaCount: 1
   port: 8082
   serviceType: ClusterIP
-  serviceExtraPorts: []
-  podManagementPolicy: Parallel
-  updateStrategy:
-    type: RollingUpdate
-  service: {}
-    # resolveWithDNS: false
-  podSecurityContext:
-    fsGroup: 1000
-  containerSecurityContext:
-    enabled: false
-  livenessProbe:
-    enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 60
-    timeoutSeconds: 10
-    failureThreshold: 60
-    successThreshold: 1
-  readinessProbe:
-    enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 60
-    timeoutSeconds: 10
-    failureThreshold: 30
-    successThreshold: 1
+
+  config:
+    DRUID_XMX: 512m
+    DRUID_XMS: 512m
+    DRUID_MAXDIRECTMEMORYSIZE: 400m
+    druid_processing_buffer_sizeBytes: '50000000'
+    druid_processing_numMergeBuffers: 2
+    druid_processing_numThreads: 1
+    # druid_monitoring_monitors: '["org.apache.druid.client.cache.CacheMonitor", "org.apache.druid.server.metrics.QueryCountStatsMonitor"]'
+
   ingress:
     enabled: false
     annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
     path: /
+    hosts:
+      - chart-example.local
     tls: []
-  terminationGracePeriodSeconds: 10
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
   resources:
-    limits:
-      cpu: 1000m
-      memory: 2Gi
-    requests:
-      cpu: 200m
-      memory: 512Mi
-  priorityClassName: ""
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
-  annotations: {}
-  podAnnotations: {}
-  podLabels: {}
-  podDisruptionBudget: {}
-  envVars: {}
-  secretEnvVars: {}
+     limits:
+       cpu: 1
+       memory: 1Gi
+     requests:
+       cpu: 250m
+       memory: 512Mi
+
   serviceAccount:
     # -- Create a service account for the broker
     create: true
@@ -287,58 +143,49 @@ broker:
     # -- Automount API credentials for the service account
     automountServiceAccountToken: true
 
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
 coordinator:
+  ## If false, coordinator will not be installed
+  ##
   enabled: true
-  replicaCount: 3
   name: coordinator
+  replicaCount: 3
   port: 8081
   serviceType: ClusterIP
-  serviceExtraPorts: []
-  podManagementPolicy: Parallel
-  updateStrategy:
-    type: RollingUpdate
-  service: {}
-    # resolveWithDNS: false
-  podSecurityContext:
-    fsGroup: 1000
-  containerSecurityContext:
-    enabled: false
+
+  config:
+    DRUID_XMX: 256m
+    DRUID_XMS: 256m
+    # druid_monitoring_monitors: '["org.apache.druid.server.metrics.TaskCountStatsMonitor"]'
+
   ingress:
     enabled: false
     annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
     path: /
+    hosts:
+      - chart-example.local
     tls: []
-  livenessProbe:
-    enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 15
-    timeoutSeconds: 60
-    failureThreshold: 15
-    successThreshold: 1
-  readinessProbe:
-    enabled: true
-    initialDelaySeconds: 60
-    periodSeconds: 15
-    timeoutSeconds: 60
-    failureThreshold: 5
-    successThreshold: 1
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 3Gi
-    requests:
-      cpu: 200m
-      memory: 512Mi
-  priorityClassName: ""
-  nodeSelector: {}
-  tolerations: []
-  affinity: {}
-  annotations: {}
-  podAnnotations: {}
-  podLabels: {}
-  podDisruptionBudget: {}
-  envVars: {}
-  secretEnvVars: {}
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 1Gi
+    # requests:
+    #   cpu: 250m
+    #   memory: 512Mi
+
   serviceAccount:
     # -- Create a service account for the coordinator
     create: true
@@ -351,304 +198,394 @@ coordinator:
     # -- Automount API credentials for the service account
     automountServiceAccountToken: true
 
-historical:
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+overlord:
+  ## If true, the separate overlord will be installed
+  ##
   enabled: true
-  defaults:
-    name: historical
-    replicaCount: 1
-    autoscaling:
-      enabled: false
-      hpa: true
-      minReplicas: 1
-      maxReplicas: 5
-      scaleDownStabilizationWindowSeconds: 300
-      # targetCPU: 80
-      # targetMemory: 80
-      # targetMetric:
-      #   name: druid_remaining_maintainer_tasks_instantaneous
-      #   service:
-      #   value: 7
-    port: 8083
-    podManagementPolicy: Parallel
-    envVars:
-      # Processing
-      # 50Mo
-      druid_processing_buffer_sizeBytes: '50000000'
-      druid_processing_numMergeBuffers: "2"
-      druid_processing_numThreads: "1"
-    secretEnvVars: {}
-    podSecurityContext:
-      fsGroup: 1000
-    containerSecurityContext:
-      enabled: false
-    persistence:
-      enabled: true
-    priorityClassName: ""
-    affinity: {}
-    nodeSelector: {}
-    tolerations: []
-    resources:
-      limits:
-        cpu: 1000m
-        memory: 2Gi
-      requests:
-        cpu: 200m
-        memory: 512Mi
-    updateStrategy:
-      type: RollingUpdate
-    # Startup may be slow if a lot of segments.
-    startupProbe:
-      enabled: true
-      initialDelaySeconds: 60
-      periodSeconds: 60
-      timeoutSeconds: 10
-      failureThreshold: 400
-      successThreshold: 1
-    livenessProbe:
-      enabled: true
-      # We do not want to restart a historical pod too soon
-      initialDelaySeconds: 60
-      periodSeconds: 60
-      timeoutSeconds: 10
-      failureThreshold: 60
-      successThreshold: 1
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 60
-      periodSeconds: 60
-      timeoutSeconds: 10
-      failureThreshold: 30
-      successThreshold: 1
-    podAnnotations: {}
-    podLabels: {}
-    serviceAccount:
-      # -- Create a service account for the coordinator
-      create: true
-      # -- Service Account name
-      name:
-      # -- Annotations applied to created service account
-      annotations: {}
-      # -- Labels applied to created service account
-      labels: {}
-      # -- Automount API credentials for the service account
-      automountServiceAccountToken: true
-  tiers:
-    default:
-      # enabled: false
-      envVars:
+  name: overlord
+  replicaCount: 1
+  port: 8081
+  serviceType: ClusterIP
+
+  javaOpts: "-Xms1G -Xmx1G"
+
+  ingress:
+    enabled: false
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    path: /
+    hosts:
+      - chart-example.local
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources: {}
+
+  serviceAccount:
+    # -- Create a service account for the overlord
+    create: true
+    # -- Service Account name
+    name:
+    # -- Annotations applied to created service account
+    annotations: {}
+    # -- Labels applied to created service account
+    labels: {}
+    # -- Automount API credentials for the service account
+    automountServiceAccountToken: true
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+historical:
+  ## If false, historical will not be installed
+  ##
+  enabled: true
+  name: historical
+  replicaCount: 1
+  port: 8083
+  serviceType: ClusterIP
+
+  config:
+    DRUID_XMX: 512m
+    DRUID_XMS: 512m
+    DRUID_MAXDIRECTMEMORYSIZE: 400m
+    druid_processing_buffer_sizeBytes: '50000000'
+    druid_processing_numMergeBuffers: 2
+    druid_processing_numThreads: 1
+    # druid_monitoring_monitors: '["org.apache.druid.client.cache.CacheMonitor", "org.apache.druid.server.metrics.HistoricalMetricsMonitor", "org.apache.druid.server.metrics.QueryCountStatsMonitor"]'
+    # druid_segmentCache_locations: '[{"path":"/opt/druid/var/druid/segment-cache","maxSize":300000000000}]'
+
+  ingress:
+    enabled: false
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    path: /
+    hosts:
+      - chart-example.local
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: "4Gi"
+    # storageClass: "ssd"
+
+  antiAffinity: "soft"
+
+  nodeAffinity: {}
+
+  nodeSelector: {}
+
+  securityContext:
+    fsGroup: 1000
+
+  tolerations: []
+
+  resources:
+     limits:
+       cpu: 2
+       memory: 2Gi
+     requests:
+       cpu: 500m
+       memory: 512Mi
+
+  serviceAccount:
+    # -- Create a service account for the overlord
+    create: true
+    # -- Service Account name
+    name:
+    # -- Annotations applied to created service account
+    annotations: {}
+    # -- Labels applied to created service account
+    labels: {}
+    # -- Automount API credentials for the service account
+    automountServiceAccountToken: true
+
+  livenessProbeInitialDelaySeconds: 60
+  readinessProbeInitialDelaySeconds: 60
+
+  ## (dict) If specified, apply these annotations to each master Pod
+  podAnnotations: {}
+
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 2
+    maxUnavailable: 1
+
+  updateStrategy:
+    type: RollingUpdate
+
+  ## If tiered historical is set to true, please refer to the information under 'tierData' for customisation of historical.
+  ## All data given above would be overridden by the information in 'tierData' unless not specified.
+  tiers: false
+
+  ## The following will be effective only when tiers are enabled
+  tierData:
+    - name: default
+      replicas: 1
+      nodeSelector: {}
+      tolerations: []
+      resources:
+        limits:
+          cpu: 2
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+      config:
         DRUID_XMX: 512m
         DRUID_XMS: 512m
         DRUID_MAXDIRECTMEMORYSIZE: 400m
-
-        druid_server_tier: "tier_default"
-        druid_segmentCache_locations: '[{"path":"/opt/druid/var/druid/segment-cache","maxSize":"1GiB"}]'
-      resources: {}
-      #   requests:
-      #     memory: 256Mi
-      #     cpu: 50m
-      persistence:
-        size: 2Gi
-      # autoscaling:
-      #   enabled: false
-      #   minReplicas: 1
-      #   maxReplicas: 2
-      #   targetCPU: 80
-      #   targetMemory: 80
-      #   targetMetric:
-      #     name: druid_remaining_maintainer_tasks_instantaneous
-      #     service:
-      #     value: 7
-
-indexer:
-  enabled: true
-  defaults:
-    name: indexer
-    replicaCount: 3
-    port: 8091
-    podManagementPolicy: Parallel
-    updateStrategy:
-      type: RollingUpdate
-    service: {}
-      # resolveWithDNS: false
-    podSecurityContext:
-      fsGroup: 1000
-    containerSecurityContext:
-      enabled: false
-    livenessProbe:
-      enabled: true
-      initialDelaySeconds: 60
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 15
-      successThreshold: 1
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 60
-      periodSeconds: 10
-      timeoutSeconds: 1
-      failureThreshold: 5
-      successThreshold: 1
-    priorityClassName: ""
-    affinity: {}
-    nodeSelector: {}
-    tolerations: []
-    resources:
-      limits:
-        cpu: 1000m
-        memory: 5Gi
-      requests:
-        cpu: 500m
-        memory: 1Gi
-    envVars: {}
-    secretEnvVars: {}
-    serviceAccount:
-      # -- Create a service account for the coordinator
-      create: true
-      # -- Service Account name
-      name:
-      # -- Annotations applied to created service account
-      annotations: {}
-      # -- Labels applied to created service account
-      labels: {}
-      # -- Automount API credentials for the service account
-      automountServiceAccountToken: true
-  categories:
-    default:
-      # enabled: false
-      envVars:
-        DRUID_XMX: 1024m
-        DRUID_XMS: 1024m
-        druid_worker_capacity: "1"
-        druid_worker_category: "default"
+        druid_processing_buffer_sizeBytes: '50000000'
+        druid_processing_numMergeBuffers: 2
+        druid_processing_numThreads: 1
+        # druid_monitoring_monitors: '["org.apache.druid.client.cache.CacheMonitor", "org.apache.druid.server.metrics.HistoricalMetricsMonitor", "org.apache.druid.server.metrics.QueryCountStatsMonitor"]'
+        # druid_segmentCache_locations: '[{"path":"/opt/druid/var/druid/segment-cache","maxSize":300000000000}]'
+        druid_server_tier: default
+        druid_server_priority: 0
+    - name: hot
+      replicas: 1
+      nodeSelector: {}
+      tolerations: []
       resources:
-        limits:
-          cpu: 1000m
-          memory: 5Gi
-        requests:
-          cpu: 500m
-          memory: 1Gi
-      #   requests:
-      #     memory: 256Mi
-      #     cpu: 50m
-      emptyDir:
-        size: 1Gi
-      persistence:
-        enabled: false
-        size: "1Gi"
-        storageClass: ""
-        accessModes: "ReadWriteOnce"
-        persistentVolumeClaimRetentionPolicy:
-          whenDeleted: "Retain"
-          whenScaled: "Retain"
+         limits:
+           cpu: 2
+           memory: 2Gi
+         requests:
+           cpu: 500m
+           memory: 512Mi
+      config:
+        DRUID_XMX: 512m
+        DRUID_XMS: 512m
+        DRUID_MAXDIRECTMEMORYSIZE: 400m
+        druid_processing_buffer_sizeBytes: '50000000'
+        druid_processing_numMergeBuffers: 2
+        druid_processing_numThreads: 1
+        # druid_monitoring_monitors: '["org.apache.druid.client.cache.CacheMonitor", "org.apache.druid.server.metrics.HistoricalMetricsMonitor", "org.apache.druid.server.metrics.QueryCountStatsMonitor"]'
+        # druid_segmentCache_locations: '[{"path":"/opt/druid/var/druid/segment-cache","maxSize":300000000000}]'
+        druid_server_tier: hot
+        druid_server_priority: 1
+        
 
-      autoscaling:
-        enabled: true
-        minReplicas: 1
-        maxReplicas: 3
-        targetMetricValue: "80"
+middleManager:
+  ## If false, middleManager will not be installed
+  ##
+  enabled: true
+  name: middle-manager
+  replicaCount: 1
+  port: 8091
+  serviceType: ClusterIP
 
-# If using a zookeeper installed outside of this chart you must uncomment and set this line
-# zkHosts: "druid-zookeeper-headless:2181"
-zkHosts: ""
+  config:
+    DRUID_XMX: 64m
+    DRUID_XMS: 64m
+    druid_indexer_runner_javaOptsArray: '["-server", "-Xms256m", "-Xmx256m", "-XX:MaxDirectMemorySize=300m", "-Duser.timezone=UTC", "-Dfile.encoding=UTF-8", "-XX:+ExitOnOutOfMemoryError", "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"]'
+    druid_indexer_fork_property_druid_processing_buffer_sizeBytes: '25000000'
+
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 3
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 60
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 60
+
+  ingress:
+    enabled: false
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    path: /
+    hosts:
+      - chart-example.local
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: "4Gi"
+    # storageClass: "ssd"
+
+  antiAffinity: "soft"
+
+  nodeAffinity: {}
+
+  nodeSelector: {}
+
+  securityContext:
+    fsGroup: 1000
+
+  tolerations: []
+
+  resources:
+     limits:
+       cpu: 500m
+       memory: 1Gi
+     requests:
+       cpu: 250m
+       memory: 256Mi
+
+  serviceAccount:
+    # -- Create a service account for the middleManager
+    create: true
+    # -- Service Account name
+    name:
+    # -- Annotations applied to created service account
+    annotations: {}
+    # -- Labels applied to created service account
+    labels: {}
+    # -- Automount API credentials for the service account
+    automountServiceAccountToken: true
+
+  ## (dict) If specified, apply these annotations to each master Pod
+  podAnnotations: {}
+
+  podDisruptionBudget:
+    enabled: false
+    # minAvailable: 2
+    maxUnavailable: 1
+
+  updateStrategy:
+    type: RollingUpdate
+
+router:
+  ## If false, router will not be installed
+  ##
+  enabled: true
+  name: router
+  replicaCount: 1
+  port: 8888
+  serviceType: ClusterIP
+
+  config:
+    DRUID_XMX: 128m
+    DRUID_XMS: 128m
+    DRUID_MAXDIRECTMEMORYSIZE: 128m
+
+  ingress:
+    enabled: true
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    path: /
+    hosts:
+      - druid.localhost
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  resources:
+     limits:
+       cpu: 250m
+       memory: 256Mi
+     requests:
+       cpu: 100m
+       memory: 128Mi
+
+  serviceAccount:
+    # -- Create a service account for the router
+    create: true
+    # -- Service Account name
+    name:
+    # -- Annotations applied to created service account
+    annotations: {}
+    # -- Labels applied to created service account
+    labels: {}
+    # -- Automount API credentials for the service account
+    automountServiceAccountToken: true
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  affinity: {}
+
+  podAnnotations: {}
+
+# ------------------------------------------------------------------------------
+# ZooKeeper:
+# ------------------------------------------------------------------------------
+
+# If using a ZooKeeper installed outside of this chart you must uncomment and set this line
+# zkHosts: druid-zookeeper-headless:2181
 
 zookeeper:
-  enabled: false
-  image:
-    debug: true
-  podAnnotations: {}
-  podLabels: {}
+  enabled: true
+  ## Environmental variables to set in ZooKeeper
+  ##
+  env:
+    ## The JVM heap size to allocate to ZooKeeper
+    ZK_HEAP_SIZE: "512M"
+  ## Configure ZooKeeper headless
+  headless:
+    publishNotReadyAddresses: true
 
-gCloudStorage:
-  enabled: false
-  secretName: google-cloud-key
-
+# ------------------------------------------------------------------------------
+# MySQL:
+# ------------------------------------------------------------------------------
 mysql:
   enabled: false
-  auth:
-    rootPassword: mysql
-    username: druid
-    password: druid
-    database: druid
+  mysqlRootPassword: druidroot
+  mysqlUser: druid
+  mysqlPassword: druid
+  mysqlDatabase: druid
+  configurationFiles:
+    mysql_collate.cnf: |-
+      [mysqld]
+      character-set-server=utf8
+      collation-server=utf8_unicode_ci
 
+# ------------------------------------------------------------------------------
+# PostgreSQL:
+# ------------------------------------------------------------------------------
 postgresql:
   enabled: false
   auth:
-    postgresPassword: postgres
     username: druid
     password: druid
     database: druid
-  backup:
-    s3:
-      enabled: false
-      cronJob:
-        name: druid-postgresql-backup
-        imagePullSecrets: []
-        schedule: "0 12 * * *"
-        startingDeadlineSeconds: 600
-        concurrencyPolicy: "Forbid"
-        failedJobsHistoryLimit: 1
-        successfulJobsHistoryLimit: 1
-        resources: {}
-        priorityClassName: ""
-      awsConfig:
-        accessKeyId: ""
-        secretAccessKey: ""
-        bucketName: druid-postgresql-backup
-        retention: "15 days"
-        region: us-west-1
+  service:
+    port: 5432
 
-kube-hpa-scale-to-zero:
+# Secrets
+prometheus:
   enabled: false
-  # args: ["--hpa-namespace", "{{ .Release.Namespace }}"]
-  args: ["--hpa-namespace", "foo"]
-  resources: {}
-
-configJobs:
-  enabled: true
-  affinity: {}
-  tolerations: []
-  priorityClassName: ""
-  restartPolicy: Never
-  backoffLimit: 7
-  ttlSecondsAfterFinished: 3600
-  podSecurityContext:
-    fsGroup: 1000
-  containerSecurityContext:
-    enabled: false
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 2Gi
-    requests:
-      cpu: 200m
-      memory: 512Mi
-  changeComment: ""
-  dict:
-    overlord-dyn-cfg:
-      component:
-        scheme: http
-        name: coordinator
-        port: 8081
-        route: "/druid/indexer/v1/worker"
-      payload:
-        selectStrategy:
-          type: "equalDistributionWithCategorySpec"
-          workerCategorySpec:
-            strong: true
-            categoryMap:
-              index_parallel:
-                defaultCategory: "default"
-              index:
-                defaultCategory: "default"
-              single_phase_sub_task:
-                defaultCategory: "default"
-              kill:
-                defaultCategory: "default"
-              compact:
-                defaultCategory: "default"
-
-extra-objects:
-  enabled: false
-
-druid-tasks-exporter:
-  enabled: false
+  # pick the any port what you want
+  port: 9090
+  annotation:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
