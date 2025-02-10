@@ -264,7 +264,7 @@ broker:
       memory: 2Gi
     requests:
       cpu: 100m
-      memory: 1Gi
+      memory: 512Mi
   priorityClassName: ""
   nodeSelector: {}
   tolerations: []
@@ -328,7 +328,7 @@ coordinator:
       memory: 2Gi
     requests:
       cpu: 100m
-      memory: 1Gi
+      memory: 512Mi
   priorityClassName: ""
   nodeSelector: {}
   tolerations: []
@@ -393,7 +393,7 @@ historical:
         memory: 2Gi
       requests:
         cpu: 100m
-        memory: 1Gi
+        memory: 512Mi
     updateStrategy:
       type: RollingUpdate
     # Startup may be slow if a lot of segments.
@@ -621,7 +621,7 @@ configJobs:
       memory: 2Gi
     requests:
       cpu: 100m
-      memory: 1Gi
+      memory: 512Mi
   changeComment: ""
   dict:
     overlord-dyn-cfg:
