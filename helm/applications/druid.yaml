@@ -29,7 +29,7 @@ spec:
                 value: autoscaling/v2
           - target:
               kind: Ingress
-              name: {{ $fullName }}
+              name: druid-router
             patch: |-
               - op: replace
                 path: /apiVersion
