@@ -325,7 +325,7 @@ coordinator:
   resources:
     limits:
       cpu: 1000m
-      memory: 2Gi
+      memory: 3Gi
     requests:
       cpu: 200m
       memory: 512Mi
@@ -543,8 +543,8 @@ indexer:
 
       autoscaling:
         enabled: true
-        minReplicas: 3
-        maxReplicas: 6
+        minReplicas: 1
+        maxReplicas: 3
         targetMetricValue: "80"
 
 # If using a zookeeper installed outside of this chart you must uncomment and set this line
