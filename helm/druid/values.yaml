@@ -189,10 +189,10 @@ router:
     path: /
   resources:
     limits:
-      cpu: 200m
+      cpu: 1000m
       memory: 1Gi
     requests:
-      cpu: 100m
+      cpu: 200m
       memory: 512Mi
   priorityClassName: ""
   nodeSelector: {}
@@ -260,10 +260,10 @@ broker:
   terminationGracePeriodSeconds: 10
   resources:
     limits:
-      cpu: 200m
+      cpu: 1000m
       memory: 2Gi
     requests:
-      cpu: 100m
+      cpu: 200m
       memory: 512Mi
   priorityClassName: ""
   nodeSelector: {}
@@ -324,10 +324,10 @@ coordinator:
     successThreshold: 1
   resources:
     limits:
-      cpu: 200m
+      cpu: 1000m
       memory: 2Gi
     requests:
-      cpu: 100m
+      cpu: 200m
       memory: 512Mi
   priorityClassName: ""
   nodeSelector: {}
@@ -389,10 +389,10 @@ historical:
     tolerations: []
     resources:
       limits:
-        cpu: 200m
+        cpu: 1000m
         memory: 2Gi
       requests:
-        cpu: 100m
+        cpu: 200m
         memory: 512Mi
     updateStrategy:
       type: RollingUpdate
@@ -617,10 +617,10 @@ configJobs:
     enabled: false
   resources:
     limits:
-      cpu: 200m
+      cpu: 1000m
       memory: 2Gi
     requests:
-      cpu: 100m
+      cpu: 200m
       memory: 512Mi
   changeComment: ""
   dict:
