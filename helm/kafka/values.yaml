@@ -1393,7 +1393,7 @@ broker:
       - ReadWriteOnce
     ## @param broker.logPersistence.size PVC Storage Request for Kafka logs volume
     ##
-    size: 8Gi
+    size: 16Gi
     ## @param broker.logPersistence.annotations Annotations for the PVC
     ##
     annotations: {}
