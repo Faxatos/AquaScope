@@ -187,7 +187,13 @@ router:
       nginx.ingress.kubernetes.io/auth-type: basic
       kubernetes.io/tls-acme: "false"
     path: /
-  resources: {}
+  resources:
+    limits:
+      cpu: 200m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 512Mi
   priorityClassName: ""
   nodeSelector: {}
   tolerations: []
@@ -252,7 +258,13 @@ broker:
     path: /
     tls: []
   terminationGracePeriodSeconds: 10
-  resources: {}
+  resources:
+    limits:
+      cpu: 200m
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 1Gi
   priorityClassName: ""
   nodeSelector: {}
   tolerations: []
@@ -310,7 +322,13 @@ coordinator:
     timeoutSeconds: 60
     failureThreshold: 5
     successThreshold: 1
-  resources: {}
+  resources:
+    limits:
+      cpu: 200m
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 1Gi
   priorityClassName: ""
   nodeSelector: {}
   tolerations: []
@@ -369,7 +387,13 @@ historical:
     affinity: {}
     nodeSelector: {}
     tolerations: []
-    resources: {}
+  resources:
+    limits:
+      cpu: 200m
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 1Gi
     updateStrategy:
       type: RollingUpdate
     # Startup may be slow if a lot of segments.
@@ -468,7 +492,13 @@ indexer:
     affinity: {}
     nodeSelector: {}
     tolerations: []
-    resources: {}
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 5Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
     envVars: {}
     secretEnvVars: {}
     serviceAccount:
@@ -490,7 +520,13 @@ indexer:
         DRUID_XMS: 256m
         druid_worker_capacity: "1"
         druid_worker_category: "default"
-      resources: {}
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 5Gi
+          requests:
+            cpu: 500m
+            memory: 2Gi
       #   requests:
       #     memory: 256Mi
       #     cpu: 50m
@@ -579,7 +615,13 @@ configJobs:
     fsGroup: 1000
   containerSecurityContext:
     enabled: false
-  resources: {}
+  resources:
+    limits:
+      cpu: 200m
+      memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 1Gi
   changeComment: ""
   dict:
     overlord-dyn-cfg:
