@@ -436,8 +436,8 @@ historical:
     default:
       # enabled: false
       envVars:
-        DRUID_XMX: 256m
-        DRUID_XMS: 256m
+        DRUID_XMX: 512m
+        DRUID_XMS: 512m
         DRUID_MAXDIRECTMEMORYSIZE: 400m
 
         druid_server_tier: "tier_default"
@@ -516,8 +516,8 @@ indexer:
     default:
       # enabled: false
       envVars:
-        DRUID_XMX: 256m
-        DRUID_XMS: 256m
+        DRUID_XMX: 1024m
+        DRUID_XMS: 1024m
         druid_worker_capacity: "1"
         druid_worker_category: "default"
       resources:
@@ -526,7 +526,7 @@ indexer:
           memory: 5Gi
         requests:
           cpu: 500m
-          memory: 2Gi
+          memory: 1Gi
       #   requests:
       #     memory: 256Mi
       #     cpu: 50m
