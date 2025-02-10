@@ -22,10 +22,10 @@ MAX_DESTINATION_OFFSET = 1  # Max offset for destination in degrees (about 60 na
 
 # Kafka Configuration
 KAFKA_SERVER = os.getenv('KAFKA_SERVER')
-TOPIC = os.getenv('TOPIC', 'sat')
+TOPIC = os.getenv('TOPIC_SAT', 'sat')
 
 # Other env values
-VESS_NUM = int(os.getenv('VESS_NUM', '10'))
+VESS_NUM = int(os.getenv('VESS_NUM_SAT', '10'))
 ETA_UPDATE_INTERVAL = int(os.getenv('INTERVAL', '5'))  # We assume to get data every INTERVAL seconds
 
 # Initialize Kafka Producer
