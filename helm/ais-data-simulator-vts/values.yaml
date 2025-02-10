@@ -79,11 +79,11 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: 150m
-    memory: 70Mi
+    cpu: 300m
+    memory: 150Mi
   requests:
-    cpu: 130m
-    memory: 60Mi
+    cpu: 150m
+    memory: 100Mi
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 livenessProbe:
