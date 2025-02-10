@@ -197,6 +197,20 @@ configs:
     ## Ref: https://argo-cd.readthedocs.io/en/stable/user-guide/status-badge/
     statusbadge.enabled: false
 
+    kustomize.buildOptions: --enable-helm
+    
+    resource.customizations: |
+      networking.k8s.io/Ingress:
+        ignoreDifferences: |
+          jsonPointers:
+          - /status
+      networking.k8s.io/Ingress:
+        health.lua: |
+          hs = {}
+          hs.status = "Healthy"
+          hs.message = "Not verifying for Ingress"
+          return hs
+
     # Dex configuration
     # dex.config: |
     #   connectors:
