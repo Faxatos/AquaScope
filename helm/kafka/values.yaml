@@ -2457,7 +2457,7 @@ zookeeper:
     storageClass: ""
     accessModes:
       - ReadWriteOnce
-    size: 8Gi
+    size: 16Gi
 ## External Zookeeper Configuration
 ##
 externalZookeeper:
