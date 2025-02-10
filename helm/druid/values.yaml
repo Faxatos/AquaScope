@@ -498,7 +498,7 @@ indexer:
         memory: 5Gi
       requests:
         cpu: 500m
-        memory: 2Gi
+        memory: 1Gi
     envVars: {}
     secretEnvVars: {}
     serviceAccount:
