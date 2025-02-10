@@ -130,6 +130,6 @@ affinity: {}
 
 config:
   KAFKA_SERVER: kafka.kafka.svc.cluster.local:9092
-  TOPIC: vts
+  TOPIC_SAT: sat
   INTERVAL: 1
-  VESS_NUM: 100
+  VESS_NUM_SAT: 100
