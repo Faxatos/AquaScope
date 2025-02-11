@@ -4,9 +4,9 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.example.flink</groupId>
-    <artifactId>flink-cassandra-kafka-example</artifactId>
+    <artifactId>flink-log-processor</artifactId>
     <version>1.0.0</version>
-    <name>Flink Cassandra Kafka Example</name>
+    <name>Flink Log Processor</name>
 <properties>
     <flink.version>1.17.0</flink.version>
 </properties>
@@ -64,7 +64,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>flink-cassandra-kafka-example-1.0.0</finalName>
+                            <finalName>flink-log-processor-1.0.0</finalName>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
                     </execution>
@@ -78,7 +78,7 @@
                 <configuration>
                 <archive>
                     <manifest>
-                    <mainClass>com.example.flink.MainJob</mainClass>
+                    <mainClass>com.example.flink.FetchLogsJob</mainClass>
                     </manifest>
                 </archive>
                 </configuration>
