@@ -8,12 +8,11 @@ metadata:
     component: middle-manager
     heritage: Helm
     release: druid
-  name: druid-middle-manager
+  name: druid-middle-manager-pdb
   namespace: druid
 spec:
   minAvailable: 2
   selector:
     matchLabels:
-      app: druid
-      component: middle-manager
-      release: druid
+      name: druid-middle-manager
+      namespace: druid
