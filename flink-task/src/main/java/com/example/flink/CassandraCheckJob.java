@@ -22,10 +22,19 @@ public class CassandraCheckJob {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // 2) Build a Kafka source to consume messages from the 'vts' topic
-        KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
+        KafkaSource<String> kafkaSourceVts = KafkaSource.<String>builder()
                 .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
                 .setTopics("vts")
                 .setGroupId("flink-vts-consumer-group")
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .build();
+
+        //Build a Kafka source to consume messages from the 'sat' topic
+        KafkaSource<String> kafkaSourceSat = KafkaSource.<String>builder()
+                .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                .setTopics("sat")
+                .setGroupId("flink-sat-consumer-group")
                 .setStartingOffsets(OffsetsInitializer.earliest())
                 .setValueOnlyDeserializer(new SimpleStringSchema())
                 .build();
