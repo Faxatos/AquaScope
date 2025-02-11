@@ -24,7 +24,7 @@ spec:
       memory: "2048m"
       cpu: 1
   job:
-    jarURI: s3:///minio-tenant.minio.svc.cluster.local/flink-checkpoints/jar/flink-cassandra-kafka-example-1.0.0.jar
+    jarURI: s3://flink-checkpoints/jar/flink-cassandra-kafka-example-1.0.0.jar
     parallelism: 2
     upgradeMode: stateless
   podTemplate:
