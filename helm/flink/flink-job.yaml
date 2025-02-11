@@ -14,14 +14,14 @@ spec:
     s3.path.style.access: "true"
     state.checkpoints.dir: "s3://flink-checkpoints/checkpoints"
     state.savepoints.dir: "s3://flink-checkpoints/savepoints"
-    #job.autoscaler.enabled: "true"
-    #job.autoscaler.stabilization.interval: 1m
-    #job.autoscaler.metrics.window: 5m
-    #job.autoscaler.target.utilization: "0.6"
-    #job.autoscaler.target.utilization.boundary: "0.2"
-    #job.autoscaler.restart.time: 2m
-    #job.autoscaler.catch-up.duration: 5m
-    #pipeline.max-parallelism: "720"
+    job.autoscaler.enabled: "true"
+    job.autoscaler.stabilization.interval: 1m
+    job.autoscaler.metrics.window: 5m
+    job.autoscaler.target.utilization: "0.6"
+    job.autoscaler.target.utilization.boundary: "0.2"
+    job.autoscaler.restart.time: 2m
+    job.autoscaler.catch-up.duration: 5m
+    pipeline.max-parallelism: "720"
   serviceAccount: flink
   jobManager:
     resource:
