@@ -12,9 +12,9 @@ async function fetchVesselLogPage(mmsi: string, currentPage: number, itemsPerPag
   // If mmsi is provided, filter logs by MMSI, otherwise get all logs
   if (mmsi && mmsi.trim() !== '') {
     const parsedMmsi = parseInt(mmsi, 10);
-    query = `SELECT * FROM vessel_log WHERE MMSI = ${parsedMmsi} ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
+    query = `SELECT * FROM log_vessels WHERE MMSI = ${parsedMmsi} ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
   } else {
-    query = `SELECT * FROM vessel_log ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
+    query = `SELECT * FROM log_vessels ORDER BY __time DESC LIMIT ${itemsPerPage} OFFSET ${offset}`;
   }
   
   console.log(query); // Log the query for debugging
@@ -38,9 +38,9 @@ async function fetchTotalLogPages(mmsi: string, itemsPerPage: number) {
   // If mmsi is provided, count logs by MMSI, otherwise count all logs
   if (mmsi && mmsi.trim() !== '') {
     const parsedMmsi = parseInt(mmsi, 10);
-    query = `SELECT COUNT(*) AS total_logs FROM vessel_log WHERE MMSI = ${parsedMmsi}`;
+    query = `SELECT COUNT(*) AS total_logs FROM log_vessels WHERE MMSI = ${parsedMmsi}`;
   } else {
-    query = `SELECT COUNT(*) AS total_logs FROM vessel_log`;
+    query = `SELECT COUNT(*) AS total_logs FROM log_vessels`;
   }
 
   console.log(query); // Log the query for debugging
@@ -60,10 +60,10 @@ async function fetchTotalLogPages(mmsi: string, itemsPerPage: number) {
 async function fetchLatestLogs() {
   const query = `
     SELECT l.* 
-    FROM vessel_log l
+    FROM log_vessels l
     INNER JOIN (
       SELECT MMSI, MAX(CAST(__time AS TIMESTAMP)) AS max_timestamp
-      FROM vessel_log
+      FROM log_vessels
       GROUP BY MMSI
     ) latest
     ON l.MMSI = latest.MMSI AND l.__time = latest.max_timestamp
