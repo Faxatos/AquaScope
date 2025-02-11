@@ -482,7 +482,7 @@ middleManager:
   podDisruptionBudget:
     enabled: true
     minAvailable: 2
-    #maxUnavailable: 1
+    # maxUnavailable: 1
 
   updateStrategy:
     type: RollingUpdate
