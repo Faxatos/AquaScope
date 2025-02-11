@@ -18,22 +18,6 @@ spec:
       helm:
         valueFiles:
         - $values/helm/druid/values.yaml
-      kustomize:
-        patches:
-          - target:
-              kind: HorizontalPodAutoscaler
-              name: druid-middle-manager 
-            patch: |-
-              - op: replace
-                path: /apiVersion
-                value: autoscaling/v2
-          - target:
-              kind: Ingress
-              name: druid-router
-            patch: |-
-              - op: replace
-                path: /apiVersion
-                value: extensions/v1
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values
