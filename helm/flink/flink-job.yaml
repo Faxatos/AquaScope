@@ -8,6 +8,12 @@ spec:
   flinkVersion: v1_20
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
+    s3.access.key: "admin"
+    s3.secret.key: "password"
+    s3.endpoint: "http://minio-tenant.minio.svc.cluster.local:9000"
+    s3.path.style.access: "true"
+    state.checkpoints.dir: "s3://flink-checkpoints/checkpoints"
+    state.savepoints.dir: "s3://flink-checkpoints/savepoints"
   serviceAccount: flink
   jobManager:
     resource:
@@ -18,18 +24,13 @@ spec:
       memory: "2048m"
       cpu: 1
   job:
-    jarURI: local:///flink-data/flink-cassandra-kafka-example-1.0.0.jar
+    jarURI: s3:///minio-tenant.minio.svc.cluster.local/flink-checkpoints/jar/flink-cassandra-kafka-example-1.0.0.jar
     parallelism: 2
     upgradeMode: stateless
   podTemplate:
     spec:
       containers:
         - name: flink-main-container
-          volumeMounts:
-            - mountPath: /flink-data
-              name: flink-volume
-      volumes:
-        - name: flink-volume
-          hostPath:
-            path: /home/ubuntu/aquascope-flink-jobs
-            type: Directory
+          env:
+            - name: ENABLE_BUILT_IN_PLUGINS
+              value: flink-s3-fs-hadoop-1.20.0.jar
