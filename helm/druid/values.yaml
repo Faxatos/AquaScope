@@ -480,7 +480,7 @@ middleManager:
   podAnnotations: {}
 
   podDisruptionBudget:
-    enabled: true
+    enabled: false
     minAvailable: 2
 
   updateStrategy:
