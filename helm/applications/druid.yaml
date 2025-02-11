@@ -24,9 +24,15 @@ spec:
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       path: helm/druid # Tracking additional ingress file
+  ignoreDifferences:
+  - group: apps
+    kind: StatefulSet
+    jsonPointers:
+    - /spec/replicas
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
+    - RespectIgnoreDifferences=true
     automated:
       prune: true
       selfHeal: true
