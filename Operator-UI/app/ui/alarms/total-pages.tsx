@@ -19,7 +19,7 @@ export default function TotalPages({ query }: { query: string }) {
   }
 
   const { data: totalPages } = useSuspenseQuery({
-    queryKey: ["totalPages", query],
+    queryKey: ["totalAlarmPages", query],
     queryFn: () => fetchTotalAlarmPages(query),
     refetchInterval: 5000, // Auto-refresh logs every 5 seconds
     keepPreviousData: true,

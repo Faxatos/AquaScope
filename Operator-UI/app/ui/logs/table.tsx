@@ -31,7 +31,7 @@ export default function LogsTable({
     staleTime: 4000, // Helps reduce refetch frequency
   });
 
-  // 🚀 Show skeleton only on first load, not on refetch
+  // Show skeleton only on first load, not on refetch
   if (isLoading && !logs) return <LogsTableSkeleton />;
 
   return (

@@ -2,8 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import Search from '@/app/ui/shared/search';
-import VesselsTable from '@/app/ui/vessels/table'; 
-import { VesselTableSkeleton } from '@/app/ui/vessels/skeleton';
+import VesselsTable from '@/app/ui/vessels/table';
 import { Suspense } from 'react';
 import TotalPages from '@/app/ui/vessels/total-pages';
 
@@ -20,9 +19,7 @@ export default function Page(){
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
         <Search placeholder="Search with MMSI..." />
       </div>
-      <Suspense key={query + currentPage} fallback={<VesselTableSkeleton />}>
-        <VesselsTable query={query} currentPage={currentPage} />
-      </Suspense>
+      <VesselsTable query={query} currentPage={currentPage} />
       <div className="mt-5 flex w-full justify-center">
         <Suspense key={query + currentPage} fallback={<div>Loading number of pages...</div>}>
           <TotalPages query={query} />

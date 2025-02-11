@@ -1,5 +1,5 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { Alarm } from "@/app/lib/definitions";
+import { useQuery } from "@tanstack/react-query";
+import { AlarmsTableSkeleton } from '@/app/ui/alarms/skeleton';
 import { AlarmCardMobile, AlarmCardDesktop } from '@/app/ui/alarms/alarm-card';
 import { fetchAlarmPage } from '@/app/lib/cassandra/alarms';
 
@@ -20,13 +20,16 @@ export default function AlarmsTable({
 
   const mmsi = query === "" ? "" : query;
   
-  const { data: alarms } = useSuspenseQuery({
-      queryKey: ["alarms", query, currentPage],
-      queryFn: () => fetchAlarmPage(query, currentPage),
-      refetchInterval: 5000, // Auto-refresh logs every 5 seconds
-      keepPreviousData: true,
-      placeholderData: undefined,
-    });
+  const { data: alarms, isLoading } = useQuery({
+    queryKey: ["alarms", query, currentPage], // Unique key for alarms
+    queryFn: () => fetchAlarmPage(query, currentPage),
+    refetchInterval: 5000, // Auto-refresh every 5 seconds
+    keepPreviousData: true, // Keeps old data while fetching new data
+    staleTime: 4000, // Prevents excessive refetching
+  });
+  
+  // Show skeleton only on first load, not on refetch
+  if (isLoading && !alarms) return <AlarmsTableSkeleton />;
 
   return (
     <div className="mt-6 flow-root">

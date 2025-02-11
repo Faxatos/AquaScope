@@ -1,6 +1,7 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { VesselCardMobile, VesselCardDesktop } from '@/app/ui/vessels/vessel-card';
-import { fetchVesselInfosPage } from '@/app/lib/cassandra/vessels'; // Assuming a function to fetch vessel data page
+import { fetchVesselInfosPage } from '@/app/lib/cassandra/vessels';
+import { VesselTableSkeleton } from '@/app/ui/vessels/skeleton';
 
 export default function VesselTable({
   query,
@@ -22,13 +23,17 @@ export default function VesselTable({
   // If the query is valid, assign it directly (as a string) or use an empty string
   const mmsi = query === "" ? "" : query;
 
-  const { data: vessels } = useSuspenseQuery({
-    queryKey: ["vessels", query, currentPage],
+  const { data: vessels, isLoading } = useQuery({
+    queryKey: ["vessels", query, currentPage], // Unique key for vessels
     queryFn: () => fetchVesselInfosPage(mmsi, currentPage),
     refetchInterval: 5000, // Auto-refresh every 5 seconds
-    keepPreviousData: true,
-    placeholderData: undefined,
+    keepPreviousData: true, // Keeps old data visible while fetching
+    staleTime: 4000, // Helps reduce refetch frequency
   });
+  
+  // 🚀 Show skeleton only on first load, not on refetch
+  if (isLoading && !vessels) return <VesselTableSkeleton />;
+  
   
   return (
     <div className="mt-6 flow-root">
