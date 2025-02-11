@@ -17,18 +17,3 @@ spec:
         target:
           type: Utilization
           averageUtilization: 90
-  behavior:
-    scaleUp:
-      policies:
-        - type: Pods
-          value: 2
-          periodSeconds: 15
-      selectPolicy: Max
-      stabilizationWindowSeconds: 0
-    scaleDown:
-      policies:
-        - type: Pods
-          value: 2
-          periodSeconds: 15
-      selectPolicy: Max
-      stabilizationWindowSeconds: 300
