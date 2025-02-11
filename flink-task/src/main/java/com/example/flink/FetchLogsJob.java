@@ -123,12 +123,12 @@ public class FetchLogsJob {
             long mmsi = node.get("MMSI").asLong();
 
             // Extract fields used for vessel tracking.
-            double latitude = node.get("latitude").asDouble();
-            double longitude = node.get("longitude").asDouble();
-            String timestamp = node.get("timestamp").asText();
-            double destLat = node.get("destLat").asDouble();
-            double destLon = node.get("destLon").asDouble();
-            String etaAis = node.get("etaAis").asText();
+            double latitude = node.get("LATITUDE").asDouble();
+            double longitude = node.get("LONGITUDE").asDouble();
+            String timestamp = node.get("TIMESTAMP").asText();
+            double destLat = node.get("DEST_LAT").asDouble();
+            double destLon = node.get("DEST_LON").asDouble();
+            String etaAis = node.get("ETA_AIS").asText();
 
             VesselTracking vt = vesselState.value();
             if (vt == null) {
