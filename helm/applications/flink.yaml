@@ -21,9 +21,15 @@ spec:
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       path: helm/flink
+  ignoreDifferences:
+  - group: apiextensions.k8s.io
+    kind: CustomResourceDefinition
+    jqPathExpressions:
+    - ..|.priority?
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
+    - RespectIgnoreDifferences=true
     automated:
       prune: true
       selfHeal: true
