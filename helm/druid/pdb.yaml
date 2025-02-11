@@ -1,0 +1,19 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app: druid
+    argocd.argoproj.io/instance: druid
+    chart: druid-31.0.5
+    component: middle-manager
+    heritage: Helm
+    release: druid
+  name: druid-middle-manager
+  namespace: druid
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: druid
+      component: middle-manager
+      release: druid
