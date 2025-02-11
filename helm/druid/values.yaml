@@ -516,7 +516,7 @@ router:
 
   resources:
      limits:
-       cpu: 250m
+       cpu: 512m
        memory: 512Mi
      requests:
        cpu: 100m
