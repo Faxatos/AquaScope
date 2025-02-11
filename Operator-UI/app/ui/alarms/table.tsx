@@ -3,7 +3,7 @@ import { Alarm } from "@/app/lib/definitions";
 import { AlarmCardMobile, AlarmCardDesktop } from '@/app/ui/alarms/alarm-card';
 import { fetchAlarmPage } from '@/app/lib/cassandra/alarms';
 
-export default async function AlarmsTable({
+export default function AlarmsTable({
   query,
   currentPage,
   }: {

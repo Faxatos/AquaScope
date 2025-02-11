@@ -54,7 +54,7 @@ async function fetchTotalVesselInfosPage(
   mmsi: string,
   itemsPerPage: number
 ): Promise<number> {
-  let query = 'SELECT COUNT(*) FROM vessels';
+  let query = 'SELECT COUNT(*) FROM vessel';
   const params: any[] = [];
 
   if (mmsi) {

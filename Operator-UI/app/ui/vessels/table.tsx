@@ -2,7 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { VesselCardMobile, VesselCardDesktop } from '@/app/ui/vessels/vessel-card';
 import { fetchVesselInfosPage } from '@/app/lib/cassandra/vessels'; // Assuming a function to fetch vessel data page
 
-export default async function VesselTable({
+export default function VesselTable({
   query,
   currentPage,
 }: {

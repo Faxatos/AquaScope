@@ -5,7 +5,7 @@ import { generatePagination } from '@/app/lib/utils';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { PaginationArrow, PaginationNumber } from '@/app/ui/shared/pagination';
 
-export default async function TotalPages({ query }: { query: string }) {
+export default function TotalPages({ query }: { query: string }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get('page')) || 1;
