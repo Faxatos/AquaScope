@@ -12,12 +12,28 @@ spec:
     namespace: druid
   project: default
   sources:
-    - repoURL: https://wiremind.github.io/wiremind-helm-charts
+    - repoURL: https://asdf2014.github.io/druid-helm/
       chart: druid
-      targetRevision: 1.20.0
+      targetRevision: 31.0.5
       helm:
         valueFiles:
         - $values/helm/druid/values.yaml
+      kustomize:
+        patches:
+          - target:
+              kind: HorizontalPodAutoscaler
+              name: druid-middle-manager 
+            patch: |-
+              - op: replace
+                path: /apiVersion
+                value: autoscaling/v2
+          - target:
+              kind: Ingress
+              name: druid-router
+            patch: |-
+              - op: replace
+                path: /apiVersion
+                value: extensions/v1
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
       ref: values
