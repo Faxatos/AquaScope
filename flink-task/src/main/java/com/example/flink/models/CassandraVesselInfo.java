@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Fields:
  * - mmsi, imo, callsign, a, b, c, d, draught.
  */
-public static class CassandraVesselInfo implements Serializable {
+public class CassandraVesselInfo implements Serializable {
    private long mmsi;
    private long imo;
    private String callsign;

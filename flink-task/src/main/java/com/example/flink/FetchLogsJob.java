@@ -75,7 +75,7 @@ public class FetchLogsJob {
 
         // Instead of reading these events from Kafka in a separate job,
         // we attach our Cassandra sink (defined in CassandraJob.java) to process them.
-        cassandraEventStream.addSink(new CassandraJob.CassandraSink());
+        cassandraEventStream.addSink(new CassandraCheckJob.CassandraSink());
 
         // 6. Execute the job.
         env.execute("Fetchign logs from Kafka Job");

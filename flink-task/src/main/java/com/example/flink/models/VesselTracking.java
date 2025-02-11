@@ -8,7 +8,7 @@ package com.example.flink.models;
  *      * currentLat, currentLon, latestLogTimestamp (from the current log)
  */
 
-public static class VesselTracking {
+public class VesselTracking {
     private long mmsi;
     private double latSource;
     private double lonSource;
