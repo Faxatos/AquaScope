@@ -9,7 +9,7 @@ spec:
     kind: StatefulSet
     name: druid-middle-manager
   minReplicas: 2
-  maxReplicas: 8
+  maxReplicas: 9
   metrics:
     - type: Resource
       resource:
