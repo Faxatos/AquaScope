@@ -461,7 +461,7 @@ middleManager:
       cpu: '1'
       memory: 5Gi
     requests:
-      cpu: 250m
+      cpu: 500m
       memory: 1Gi
 
   serviceAccount:
