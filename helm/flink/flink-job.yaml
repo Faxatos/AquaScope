@@ -10,7 +10,7 @@ spec:
     taskmanager.numberOfTaskSlots: "2"
     s3.access.key: "admin"
     s3.secret.key: "password"
-    s3.endpoint: "http://minio-tenant.minio.svc.cluster.local:9000"
+    s3.endpoint: http://minio-tenant-headless.minio.svc.cluster.local:9000/
     s3.path.style.access: "true"
     state.checkpoints.dir: "s3://flink-checkpoints/checkpoints"
     state.savepoints.dir: "s3://flink-checkpoints/savepoints"
