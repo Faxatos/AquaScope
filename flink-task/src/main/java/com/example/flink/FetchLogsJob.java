@@ -32,6 +32,10 @@ public class FetchLogsJob {
     public static final OutputTag<CassandraVesselInfo> NEW_VESSEL_OUTPUT_TAG =
             new OutputTag<CassandraVesselInfo>("new-vessel") {};
 
+    // Side output tag for alarm events.
+    public static final OutputTag<String> ALARM_OUTPUT_TAG =
+            new OutputTag<String>("timeout-alarm") {};
+
     public static void main(String[] args) throws Exception {
         // 1. Set up the execution environment.
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -72,10 +76,12 @@ public class FetchLogsJob {
         // 5. Retrieve the side output stream (the new vessel events).
         DataStream<CassandraVesselInfo> cassandraEventStream =
                 vesselTrackingStream.getSideOutput(NEW_VESSEL_OUTPUT_TAG);
+        DataStream<Alarm> alarmEventStream = 
+                vesselTrackingStream.getSideOutput(ALARM_OUTPUT_TAG);
 
-        // Instead of reading these events from Kafka in a separate job,
         // we attach our Cassandra sink (defined in CassandraJob.java) to process them.
         cassandraEventStream.addSink(new CassandraCheckJob.CassandraSink());
+        alarmEventStream.addSink(new CassandraAlarmJob.CassandraAlarmSink());
 
         // 6. Execute the job.
         env.execute("Fetchign logs from Kafka Job");
@@ -98,23 +104,37 @@ public class FetchLogsJob {
      * A KeyedProcessFunction that uses a ValueState to track VesselTracking per MMSI.
      *
      * For each incoming JSON log:
-     * - It extracts the fields for tracking (latitude, timestamp, destination info, etc.).
-     * - If no state exists yet (i.e. first log for that MMSI), it creates a new VesselTracking record,
-     *   updates the state, and emits a side output event (CassandraVesselInfo) to be processed by a separate job.
-     * - Otherwise, it updates the current position and latest timestamp.
+     * - It extracts the fields for tracking.
+     * - If no state exists (i.e. first log for that MMSI), it creates a new VesselTracking record,
+     *   updates the state, and emits a side output event (CassandraVesselInfo) for new vessel processing.
+     * - Otherwise, it updates the existing VesselTracking state.
+     * Additionally, it registers (or re–registers) a 5–minute processing–time timer.
+     * When the timer fires (i.e. no new log has arrived for 5 minutes), it compares the latest log's timestamp
+     * with the stored etaAis:
+     *    - If the latest log timestamp is after the etaAis, the state is cleared.
+     *    - Otherwise, an alarm event is emitted (to be processed by an alarm job/sink), and the state is cleared.
      */
     public static class VesselTrackingProcessFunction extends KeyedProcessFunction<Long, String, VesselTracking> {
 
         // Managed keyed state for VesselTracking.
         private transient ValueState<VesselTracking> vesselState;
+        // State to hold the timestamp of the currently registered timer.
+        private transient ValueState<Long> timerState;
         
         private static final ObjectMapper mapper = new ObjectMapper();
 
+        // Timeout duration: 5 minutes in milliseconds.
+        private static final long TIMEOUT = 5 * 60 * 1000L;
+
         @Override
         public void open(Configuration parameters) throws Exception {
-            ValueStateDescriptor<VesselTracking> descriptor =
+            ValueStateDescriptor<VesselTracking> vesselDescriptor =
                     new ValueStateDescriptor<>("vesselTrackingState", VesselTracking.class);
-            vesselState = getRuntimeContext().getState(descriptor);
+            vesselState = getRuntimeContext().getState(vesselDescriptor);
+
+            ValueStateDescriptor<Long> timerDescriptor =
+                    new ValueStateDescriptor<>("timerState", Long.class);
+            timerState = getRuntimeContext().getState(timerDescriptor);
         }
 
         @Override
@@ -156,7 +176,57 @@ public class FetchLogsJob {
                 vt.setLatestLogTimestamp(timestamp);
                 vesselState.update(vt);
             }
+
+            // (Re)register the TIMEOUT timeout.
+            long currentTime = ctx.timerService().currentProcessingTime();
+            long newTimeout = currentTime + TIMEOUT;
+            Long currentTimer = timerState.value();
+            if (currentTimer != null) {
+                ctx.timerService().deleteProcessingTimeTimer(currentTimer);
+            }
+            ctx.timerService().registerProcessingTimeTimer(newTimeout);
+            timerState.update(newTimeout);
+
+            // Emit the current state.
             out.collect(vt);
+        }
+
+        @Override
+        public void onTimer(long timestamp, OnTimerContext ctx, Collector<VesselTracking> out) throws Exception {
+            VesselTracking vt = vesselState.value();
+            if (vt != null) {
+                try {
+                    // Parse the latest log timestamp and the etaAis as OffsetDateTime.
+                    OffsetDateTime latestLogTime = OffsetDateTime.parse(vt.getLatestLogTimestamp());
+                    OffsetDateTime etaTime = OffsetDateTime.parse(vt.getEtaAis());
+                    // Add a margin error value: TIMEOUT/2 milliseconds added to the latest log time.
+                    OffsetDateTime marginTime = latestLogTime.plusMillis(TIMEOUT / 2);
+                    if (marginTime.isAfter(etaTime)) {
+                        // If the latest log timestamp + margin error is after the etaAis, clear the state.
+                        vesselState.clear();
+                        timerState.clear();
+                    } else {
+                        // Create an alarm with a unique alarm ID and a formatted description.
+                        Alarm alarm = new Alarm(
+                                UUID.randomUUID().toString(),                          // unique alarm ID
+                                vt.getMmsi(),                                          // vessel MMSI
+                                vt.getLatestLogTimestamp(),                            // alarm timestamp
+                                "E001",                                                // error code
+                                "Not received vessel AIS logs for " + Long.toString(TIMEOUT) + " minutes",
+                                "active"                                            
+                        );
+                        ctx.output(ALARM_OUTPUT_TAG, alarm);
+                        vesselState.clear();
+                        timerState.clear();
+                    }
+                } catch (DateTimeParseException e) {
+                    // In case of parsing errors, log the error and clear state.
+                    ctx.output(ALARM_OUTPUT_TAG, "Alarm for vessel " + vt.getMmsi() +
+                            ": error parsing timestamps (" + e.getMessage() + ")");
+                    vesselState.clear();
+                    timerState.clear();
+                }
+            }
         }
     }
 }
