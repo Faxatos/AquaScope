@@ -189,7 +189,7 @@ router:
     path: /
   resources:
     limits:
-      cpu: 1000m
+      cpu: 1
       memory: 1Gi
     requests:
       cpu: 200m
@@ -260,7 +260,7 @@ broker:
   terminationGracePeriodSeconds: 10
   resources:
     limits:
-      cpu: 1000m
+      cpu: 1
       memory: 2Gi
     requests:
       cpu: 200m
@@ -324,7 +324,7 @@ coordinator:
     successThreshold: 1
   resources:
     limits:
-      cpu: 1000m
+      cpu: 1
       memory: 3Gi
     requests:
       cpu: 200m
@@ -389,7 +389,7 @@ historical:
     tolerations: []
     resources:
       limits:
-        cpu: 1000m
+        cpu: 1
         memory: 2Gi
       requests:
         cpu: 200m
@@ -494,7 +494,7 @@ indexer:
     tolerations: []
     resources:
       limits:
-        cpu: 1000m
+        cpu: 1
         memory: 5Gi
       requests:
         cpu: 500m
@@ -522,7 +522,7 @@ indexer:
         druid_worker_category: "default"
       resources:
         limits:
-          cpu: 1000m
+          cpu: 1
           memory: 5Gi
         requests:
           cpu: 500m
@@ -617,7 +617,7 @@ configJobs:
     enabled: false
   resources:
     limits:
-      cpu: 1000m
+      cpu: 1
       memory: 2Gi
     requests:
       cpu: 200m
