@@ -1,5 +1,7 @@
 package com.example.flink.models;
 
+import java.io.Serializable;
+
 /**
  * POJO to carry the fields needed for checking/inserting a vessel in Cassandra.
  * These values are extracted from the log when a new vessel is first encountered.
