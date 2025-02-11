@@ -178,13 +178,13 @@ coordinator:
     #    hosts:
     #      - chart-example.local
 
-  resources: {}
-    # limits:
-    #   cpu: 500m
-    #   memory: 1Gi
-    # requests:
-    #   cpu: 250m
-    #   memory: 512Mi
+  resources:
+     limits:
+       cpu: 500m
+       memory: 1Gi
+     requests:
+       cpu: 250m
+       memory: 256Mi
 
   serviceAccount:
     # -- Create a service account for the coordinator
@@ -215,7 +215,7 @@ overlord:
   port: 8081
   serviceType: ClusterIP
 
-  javaOpts: "-Xms1G -Xmx1G"
+  javaOpts: "-Xms256M -Xmx1G"
 
   ingress:
     enabled: false
@@ -230,7 +230,13 @@ overlord:
     #    hosts:
     #      - chart-example.local
 
-  resources: {}
+  resources:
+     limits:
+       cpu: 500m
+       memory: 1Gi
+     requests:
+       cpu: 250m
+       memory: 256Mi
 
   serviceAccount:
     # -- Create a service account for the overlord
@@ -368,12 +374,12 @@ historical:
       nodeSelector: {}
       tolerations: []
       resources:
-         limits:
-           cpu: 2
-           memory: 2Gi
-         requests:
-           cpu: 500m
-           memory: 512Mi
+        limits:
+          cpu: 2
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
       config:
         DRUID_XMX: 512m
         DRUID_XMS: 512m
@@ -451,12 +457,12 @@ middleManager:
   tolerations: []
 
   resources:
-     limits:
-       cpu: 500m
-       memory: 1Gi
-     requests:
-       cpu: 250m
-       memory: 256Mi
+    limits:
+      cpu: '1'
+      memory: 5Gi
+    requests:
+      cpu: 250m
+      memory: 1Gi
 
   serviceAccount:
     # -- Create a service account for the middleManager
@@ -491,9 +497,9 @@ router:
   serviceType: ClusterIP
 
   config:
-    DRUID_XMX: 128m
-    DRUID_XMS: 128m
-    DRUID_MAXDIRECTMEMORYSIZE: 128m
+    DRUID_XMX: 256m
+    DRUID_XMS: 256m
+    DRUID_MAXDIRECTMEMORYSIZE: 256m
 
   ingress:
     enabled: false
@@ -511,10 +517,10 @@ router:
   resources:
      limits:
        cpu: 250m
-       memory: 256Mi
+       memory: 512Mi
      requests:
        cpu: 100m
-       memory: 128Mi
+       memory: 256Mi
 
   serviceAccount:
     # -- Create a service account for the router
