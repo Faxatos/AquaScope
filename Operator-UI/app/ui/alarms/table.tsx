@@ -21,7 +21,7 @@ export default function AlarmsTable({
   const mmsi = query === "" ? "" : query;
   
   const { data: alarms } = useSuspenseQuery({
-      queryKey: ["logs", query, currentPage],
+      queryKey: ["alarms", query, currentPage],
       queryFn: () => fetchAlarmPage(query, currentPage),
       refetchInterval: 5000, // Auto-refresh logs every 5 seconds
       keepPreviousData: true,
