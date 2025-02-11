@@ -651,4 +651,4 @@ extra-objects:
   enabled: false
 
 druid-tasks-exporter:
-  enabled: false
+  enabled: true
