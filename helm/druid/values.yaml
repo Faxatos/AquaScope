@@ -403,7 +403,7 @@ middleManager:
     druid_indexer_fork_property_druid_processing_buffer_sizeBytes: '25000000'
 
   autoscaling:
-    enabled: true
+    enabled: false
     minReplicas: 1
     maxReplicas: 3
     metrics:
@@ -496,7 +496,7 @@ router:
     DRUID_MAXDIRECTMEMORYSIZE: 128m
 
   ingress:
-    enabled: true
+    enabled: false
     annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
