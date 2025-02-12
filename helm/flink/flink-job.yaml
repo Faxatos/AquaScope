@@ -34,7 +34,7 @@ spec:
   job:
     jarURI: s3://flink-checkpoints/jar/flink-fetch-logs.jar
     parallelism: 2
-    upgradeMode: stateful
+    upgradeMode: savepoint
   podTemplate:
     spec:
       containers:
