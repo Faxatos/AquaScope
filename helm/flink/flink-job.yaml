@@ -25,7 +25,7 @@ spec:
   serviceAccount: flink
   jobManager:
     resource:
-      memory: "512m"
+      memory: "1024m"
       cpu: 1
   taskManager:
     resource:
@@ -70,11 +70,11 @@ spec:
   serviceAccount: flink
   jobManager:
     resource:
-      memory: "512m"
+      memory: "1024m"
       cpu: 1
   taskManager:
     resource:
-      memory: "512m"
+      memory: "1024m"
       cpu: 1
   job:
     jarURI: s3://flink-checkpoints/jar/flink-cassandra-alarm.jar
@@ -115,11 +115,11 @@ spec:
   serviceAccount: flink
   jobManager:
     resource:
-      memory: "512m"
+      memory: "1024m"
       cpu: 1
   taskManager:
     resource:
-      memory: "512m"
+      memory: "1024m"
       cpu: 1
   job:
     jarURI: s3://flink-checkpoints/jar/flink-cassandra-vessel.jar
