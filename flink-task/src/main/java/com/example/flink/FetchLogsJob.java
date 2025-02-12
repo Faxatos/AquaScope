@@ -120,7 +120,7 @@ public class FetchLogsJob {
         // Timeout duration: 5 minutes in milliseconds.
         private static final long TIMEOUT = 5 * 60 * 1000L;
         // Threshold for deviation from trajectory (in meters).
-        private static final double DEVIATION_THRESHOLD_METERS = 1000.0;
+        private static final double DEVIATION_THRESHOLD_METERS = 3000.0;
 
         // Initialize a KafkaProducer to send alarms directly.
         private transient KafkaProducer<String, String> alarmProducer;
