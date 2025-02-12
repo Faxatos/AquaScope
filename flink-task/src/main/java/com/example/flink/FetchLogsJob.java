@@ -125,6 +125,8 @@ public class FetchLogsJob {
 
         // Timeout duration: 5 minutes in milliseconds.
         private static final long TIMEOUT = 5 * 60 * 1000L;
+        // Threshold for deviation from trajectory (in meters).
+        private static final double DEVIATION_THRESHOLD_METERS = 1000.0;
 
         @Override
         public void open(Configuration parameters) throws Exception {
@@ -177,6 +179,25 @@ public class FetchLogsJob {
                 vesselState.update(vt);
             }
 
+            // --- Check for trajectory deviation ---
+            double deviation = computeCrossTrackDistance(
+                    vt.getLatSource(), vt.getLonSource(),
+                    vt.getDestLat(), vt.getDestLon(),
+                    vt.getCurrentLat(), vt.getCurrentLon()
+            );
+            if (deviation > DEVIATION_THRESHOLD_METERS) {
+                Alarm deviationAlarm = new Alarm(
+                        UUID.randomUUID().toString(),         // unique alarm ID
+                        vt.getMmsi(),                         // vessel MMSI
+                        vt.getLatestLogTimestamp(),           // alarm timestamp
+                        "E002",                               // error code for trajectory deviation
+                        "Vessel deviates from planned trajectory by " + deviation + " meters.",
+                        "active"
+                );
+                ctx.output(ALARM_OUTPUT_TAG, deviationAlarm);
+            }
+            // --- End trajectory deviation check ---
+
             // (Re)register the TIMEOUT timeout.
             long currentTime = ctx.timerService().currentProcessingTime();
             long newTimeout = currentTime + TIMEOUT;
@@ -227,6 +248,51 @@ public class FetchLogsJob {
                     timerState.clear();
                 }
             }
+        }
+
+        // --- Helper methods for computing cross-track distance ---
+        /**
+         * Computes the cross-track (perpendicular) distance from a point to the great-circle path
+         * defined by the start (lat1, lon1) and end (lat2, lon2) points.
+         * The returned distance is in meters.
+         */
+        private double computeCrossTrackDistance(double lat1, double lon1,
+                                                 double lat2, double lon2,
+                                                 double lat, double lon) {
+            double R = 6371000; // Earth radius in meters
+            double d13 = haversine(lat1, lon1, lat, lon);
+            double theta13 = initialBearing(lat1, lon1, lat, lon);
+            double theta12 = initialBearing(lat1, lon1, lat2, lon2);
+            // cross-track distance formula on a sphere
+            double crossTrack = Math.asin(Math.sin(d13 / R) * Math.sin(theta13 - theta12)) * R;
+            return Math.abs(crossTrack);
+        }
+
+        /**
+         * Computes the haversine distance (in meters) between two points specified in degrees.
+         */
+        private double haversine(double lat1, double lon1, double lat2, double lon2) {
+            double R = 6371000; // Earth radius in meters
+            double dLat = Math.toRadians(lat2 - lat1);
+            double dLon = Math.toRadians(lon2 - lon1);
+            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                       Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                       Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        /**
+         * Computes the initial bearing (in radians) from the start point to the end point.
+         */
+        private double initialBearing(double lat1, double lon1, double lat2, double lon2) {
+            double phi1 = Math.toRadians(lat1);
+            double phi2 = Math.toRadians(lat2);
+            double deltaLon = Math.toRadians(lon2 - lon1);
+            double y = Math.sin(deltaLon) * Math.cos(phi2);
+            double x = Math.cos(phi1) * Math.sin(phi2) -
+                       Math.sin(phi1) * Math.cos(phi2) * Math.cos(deltaLon);
+            return Math.atan2(y, x);
         }
     }
 }
