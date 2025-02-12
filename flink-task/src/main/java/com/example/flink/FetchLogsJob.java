@@ -179,24 +179,30 @@ public class FetchLogsJob {
                 vesselState.update(vt);
             }
 
-            // --- Check for trajectory deviation ---
-            double deviation = computeCrossTrackDistance(
-                    vt.getLatSource(), vt.getLonSource(),
-                    vt.getDestLat(), vt.getDestLon(),
-                    vt.getCurrentLat(), vt.getCurrentLon()
-            );
-            if (deviation > DEVIATION_THRESHOLD_METERS) {
-                Alarm deviationAlarm = new Alarm(
-                        UUID.randomUUID().toString(),         // unique alarm ID
-                        vt.getMmsi(),                         // vessel MMSI
-                        vt.getLatestLogTimestamp(),           // alarm timestamp
-                        "E002",                               // error code for trajectory deviation
-                        "Vessel deviates from planned trajectory by " + deviation + " meters.",
-                        "active"
+            long currentTime = ctx.timerService().currentProcessingTime();
+            // Check if sufficient time has elapsed since the last alarm.
+            if (currentTime >= vt.getLastDeviationAlarmTime() + TIMEOUT) {
+                // --- Check for trajectory deviation ---
+                double deviation = computeCrossTrackDistance(
+                        vt.getLatSource(), vt.getLonSource(),
+                        vt.getDestLat(), vt.getDestLon(),
+                        vt.getCurrentLat(), vt.getCurrentLon()
                 );
-                ctx.output(ALARM_OUTPUT_TAG, deviationAlarm);
+                if (deviation > DEVIATION_THRESHOLD_METERS) {
+                    Alarm deviationAlarm = new Alarm(
+                            UUID.randomUUID().toString(),         // unique alarm ID
+                            vt.getMmsi(),                         // vessel MMSI
+                            vt.getLatestLogTimestamp(),           // alarm timestamp
+                            "E002",                               // error code for trajectory deviation
+                            "Vessel deviates from planned trajectory by " + deviation + " meters.",
+                            "active"
+                    );
+                    ctx.output(ALARM_OUTPUT_TAG, deviationAlarm);
+                    vt.setLastDeviationAlarmTime(currentTime);
+                    vesselState.update(vt);
+                }
+                // --- End trajectory deviation check ---
             }
-            // --- End trajectory deviation check ---
 
             // (Re)register the TIMEOUT timeout.
             long currentTime = ctx.timerService().currentProcessingTime();

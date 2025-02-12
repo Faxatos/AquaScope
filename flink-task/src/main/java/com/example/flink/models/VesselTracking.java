@@ -19,6 +19,8 @@ public class VesselTracking {
     private double destLat;
     private double destLon;
     private String etaAis;
+    //field to store the processing time (in ms) when the last deviation alarm was generated.
+    private long lastDeviationAlarmTime;
 
     public VesselTracking(long mmsi,
                             double latSource,
@@ -40,6 +42,7 @@ public class VesselTracking {
         this.destLat = destLat;
         this.destLon = destLon;
         this.etaAis = etaAis;
+        this.lastDeviationAlarmTime = 0;
     }
 
     // Getters and setters
@@ -108,6 +111,14 @@ public class VesselTracking {
         this.etaAis = etaAis;
     }
 
+    public long getLastDeviationAlarmTime() {
+        return lastDeviationAlarmTime; 
+    }
+
+    public void setLastDeviationAlarmTime(long lastDeviationAlarmTime) {
+        this.lastDeviationAlarmTime = lastDeviationAlarmTime;
+    }
+
     @Override
     public String toString() {
         return "VesselTracking{" +
@@ -121,6 +132,7 @@ public class VesselTracking {
                 ", destLat=" + destLat +
                 ", destLon=" + destLon +
                 ", etaAis='" + etaAis + '\'' +
+                ", lastAlarmDeviationTime=" + lastDeviationAlarmTime +
                 '}';
     }
 }
