@@ -17,7 +17,7 @@ public class Alarm implements Serializable {
     // No-argument constructor is required for (de)serialization.
     public Alarm() {}
 
-    public Alarm(String alarmId, long mmsi, String timestamp, String code, String description, String status) {
+    public Alarm(String alarmId, long mmsi, Instant timestamp, String code, String description, String status) {
         this.alarmId = alarmId;
         this.mmsi = mmsi;
         this.timestamp = timestamp;
@@ -35,7 +35,7 @@ public class Alarm implements Serializable {
         return mmsi;
     }
 
-    public String getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
