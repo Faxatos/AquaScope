@@ -30,13 +30,7 @@ public class CassandraVesselJob {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // 1. Create a Kafka source for vessel events from topic "vessel".
-        KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
-                .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
-                .setTopics("vessel")
-                .setGroupId("flink-vessel-consumer-group")
-                .setStartingOffsets(OffsetsInitializer.earliest())
-                .setValueOnlyDeserializer(new SimpleStringSchema())
-                .build();
+        KafkaSource<String> kafkaSource = createKafkaSourceWithRetry();
 
         DataStream<String> vesselJsonStream =
                 env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "KafkaVesselSource");
@@ -58,6 +52,32 @@ public class CassandraVesselJob {
         public CassandraVesselInfo map(String value) throws Exception {
             return mapper.readValue(value, CassandraVesselInfo.class);
         }
+    }
+
+    /**
+     * Creates a Kafka source with retry logic if Kafka is unavailable.
+     */
+    private static KafkaSource<String> createKafkaSourceWithRetry() throws InterruptedException {
+        final int MAX_RETRIES = 5;
+        final long RETRY_DELAY_MS = 5000;
+        int attempt = 0;
+
+        while (attempt < MAX_RETRIES) {
+            try {
+                return KafkaSource.<String>builder()
+                    .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                    .setTopics("vessel")
+                    .setGroupId("flink-vessel-consumer-group")
+                    .setStartingOffsets(OffsetsInitializer.earliest())
+                    .setValueOnlyDeserializer(new SimpleStringSchema())
+                    .build();
+            } catch (Exception e) {
+                attempt++;
+                System.err.println("Kafka connection failed (attempt " + attempt + "). Retrying in " + (RETRY_DELAY_MS / 1000) + " seconds...");
+                TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
+            }
+        }
+        throw new RuntimeException("Failed to connect to Kafka after " + MAX_RETRIES + " attempts.");
     }
 
     public static class CassandraVesselProcessFunction extends ProcessFunction<CassandraVesselInfo, String> {
