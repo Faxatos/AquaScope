@@ -1,6 +1,7 @@
 package com.example.flink.models;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 /**
  * Model class for an Alarm.
@@ -8,7 +9,7 @@ import java.io.Serializable;
 public class Alarm implements Serializable {
     private String alarmId;
     private long mmsi;
-    private String timestamp; // ISO–8601 string (e.g., "2025-01-01T10:00:00Z")
+    private Instant timestamp; 
     private String code;
     private String description;
     private String status;
