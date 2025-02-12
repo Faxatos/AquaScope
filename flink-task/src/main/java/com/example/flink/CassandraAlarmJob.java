@@ -11,8 +11,8 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.RichProcessFunction;
-import org.apache.flink.streaming.api.functions.RichMapFunction;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.util.Collector;
 
 import java.net.InetSocketAddress;
@@ -56,7 +56,7 @@ public class CassandraAlarmJob {
         // 3. Map the JSON strings to Alarm objects.
         DataStream<Alarm> alarmStream = alarmJsonStream.map(new AlarmMapper());
 
-        // 4. Process each Alarm object using a RichProcessFunction that inserts it into Cassandra.
+        // 4. Process each Alarm object using a ProcessFunction that inserts it into Cassandra.
         DataStream<String> resultStream = alarmStream.process(new CassandraAlarmProcessFunction());
 
         // For debugging purposes, print the result messages.
@@ -68,7 +68,7 @@ public class CassandraAlarmJob {
     /**
      * A mapper to convert JSON strings into Alarm objects.
      */
-    public static class AlarmMapper extends RichMapFunction<String, Alarm> {
+    public static class AlarmMapper implements MapFunction<String, Alarm> {
         private final ObjectMapper mapper = new ObjectMapper();
         @Override
         public Alarm map(String value) throws Exception {
@@ -77,10 +77,10 @@ public class CassandraAlarmJob {
     }
 
     /**
-     * A RichProcessFunction that inserts each Alarm object into Cassandra.
+     * A ProcessFunction that inserts each Alarm object into Cassandra.
      * Instead of using a dedicated sink, this function uses processElement() to perform the insert.
      */
-    public static class CassandraAlarmProcessFunction extends RichProcessFunction<Alarm, String> {
+    public static class CassandraAlarmProcessFunction extends ProcessFunction<Alarm, String> {
         private transient CqlSession session;
 
         @Override

@@ -11,8 +11,8 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.RichProcessFunction;
-import org.apache.flink.streaming.api.functions.RichMapFunction;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.util.Collector;
 
 import java.net.InetSocketAddress;
@@ -52,7 +52,7 @@ public class CassandraVesselJob {
         env.execute("Cassandra Vessel Job");
     }
 
-    public static class VesselInfoMapper extends RichMapFunction<String, CassandraVesselInfo> {
+    public static class VesselInfoMapper implements MapFunction<String, CassandraVesselInfo> {
         private final ObjectMapper mapper = new ObjectMapper();
         @Override
         public CassandraVesselInfo map(String value) throws Exception {
@@ -60,7 +60,7 @@ public class CassandraVesselJob {
         }
     }
 
-    public static class CassandraVesselProcessFunction extends RichProcessFunction<CassandraVesselInfo, String> {
+    public static class CassandraVesselProcessFunction extends ProcessFunction<CassandraVesselInfo, String> {
         private transient CqlSession session;
 
         @Override

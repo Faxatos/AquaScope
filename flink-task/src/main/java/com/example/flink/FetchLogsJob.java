@@ -21,6 +21,7 @@ import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 
 import java.time.OffsetDateTime;
+import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.Properties;
 import java.util.UUID;
@@ -220,7 +221,7 @@ public class FetchLogsJob {
             }
 
             // (Re)register the TIMEOUT timeout.
-            long currentTime = ctx.timerService().currentProcessingTime();
+            currentTime = ctx.timerService().currentProcessingTime();
             long newTimeout = currentTime + TIMEOUT;
             Long currentTimer = timerState.value();
             if (currentTimer != null) {
@@ -242,7 +243,7 @@ public class FetchLogsJob {
                     OffsetDateTime latestLogTime = OffsetDateTime.parse(vt.getLatestLogTimestamp());
                     OffsetDateTime etaTime = OffsetDateTime.parse(vt.getEtaAis());
                     // Add a margin error value: TIMEOUT/2 milliseconds added to the latest log time.
-                    OffsetDateTime marginTime = latestLogTime.plusMillis(TIMEOUT / 2);
+                    OffsetDateTime marginTime = latestLogTime.plus(Duration.ofMillis(TIMEOUT / 2));
                     if (marginTime.isAfter(etaTime)) {
                         // If the latest log timestamp + margin error is after the etaAis, clear the state.
                         vesselState.clear();
@@ -262,9 +263,6 @@ public class FetchLogsJob {
                         timerState.clear();
                     }
                 } catch (DateTimeParseException e) {
-                    // In case of parsing errors, log the error and clear state.
-                    ctx.output(ALARM_OUTPUT_TAG, "Alarm for vessel " + vt.getMmsi() +
-                            ": error parsing timestamps (" + e.getMessage() + ")");
                     vesselState.clear();
                     timerState.clear();
                 }
