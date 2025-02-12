@@ -1,7 +1,7 @@
 apiVersion: flink.apache.org/v1beta1
 kind: FlinkDeployment
 metadata:
-  name: logprocessor
+  name: fetchlogs
   namespace: flink
 spec:
   image: flink:1.20
@@ -25,14 +25,104 @@ spec:
   serviceAccount: flink
   jobManager:
     resource:
-      memory: "2048m"
+      memory: "512m"
       cpu: 1
   taskManager:
     resource:
-      memory: "2048m"
+      memory: "1024m"
       cpu: 1
   job:
-    jarURI: s3://flink-checkpoints/jar/flink-log-processor-1.0.0.jar
+    jarURI: s3://flink-checkpoints/jar/flink-fetch-logs.jar
+    parallelism: 2
+    upgradeMode: stateful
+  podTemplate:
+    spec:
+      containers:
+        - name: flink-main-container
+          env:
+            - name: ENABLE_BUILT_IN_PLUGINS
+              value: flink-s3-fs-hadoop-1.20.0.jar
+---
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: cassandraalarm
+  namespace: flink
+spec:
+  image: flink:1.20
+  flinkVersion: v1_20
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    s3.access.key: "admin"
+    s3.secret.key: "password"
+    s3.endpoint: http://minio-tenant-headless.minio.svc.cluster.local:9000/
+    s3.path.style.access: "true"
+    state.checkpoints.dir: "s3://flink-checkpoints/checkpoints"
+    state.savepoints.dir: "s3://flink-checkpoints/savepoints"
+    job.autoscaler.enabled: "true"
+    job.autoscaler.stabilization.interval: 1m
+    job.autoscaler.metrics.window: 5m
+    job.autoscaler.target.utilization: "0.6"
+    job.autoscaler.target.utilization.boundary: "0.2"
+    job.autoscaler.restart.time: 2m
+    job.autoscaler.catch-up.duration: 5m
+    pipeline.max-parallelism: "720"
+  serviceAccount: flink
+  jobManager:
+    resource:
+      memory: "256m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "128m"
+      cpu: 1
+  job:
+    jarURI: s3://flink-checkpoints/jar/flink-cassandra-alarm.jar
+    parallelism: 2
+    upgradeMode: stateless
+  podTemplate:
+    spec:
+      containers:
+        - name: flink-main-container
+          env:
+            - name: ENABLE_BUILT_IN_PLUGINS
+              value: flink-s3-fs-hadoop-1.20.0.jar
+---
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: cassandravessel
+  namespace: flink
+spec:
+  image: flink:1.20
+  flinkVersion: v1_20
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    s3.access.key: "admin"
+    s3.secret.key: "password"
+    s3.endpoint: http://minio-tenant-headless.minio.svc.cluster.local:9000/
+    s3.path.style.access: "true"
+    state.checkpoints.dir: "s3://flink-checkpoints/checkpoints"
+    state.savepoints.dir: "s3://flink-checkpoints/savepoints"
+    job.autoscaler.enabled: "true"
+    job.autoscaler.stabilization.interval: 1m
+    job.autoscaler.metrics.window: 5m
+    job.autoscaler.target.utilization: "0.6"
+    job.autoscaler.target.utilization.boundary: "0.2"
+    job.autoscaler.restart.time: 2m
+    job.autoscaler.catch-up.duration: 5m
+    pipeline.max-parallelism: "720"
+  serviceAccount: flink
+  jobManager:
+    resource:
+      memory: "256m"
+      cpu: 1
+  taskManager:
+    resource:
+      memory: "128m"
+      cpu: 1
+  job:
+    jarURI: s3://flink-checkpoints/jar/flink-cassandra-vessel.jar
     parallelism: 2
     upgradeMode: stateless
   podTemplate:
