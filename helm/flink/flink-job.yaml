@@ -70,7 +70,7 @@ spec:
   serviceAccount: flink
   jobManager:
     resource:
-      memory: "256m"
+      memory: "512m"
       cpu: 1
   taskManager:
     resource:
@@ -115,7 +115,7 @@ spec:
   serviceAccount: flink
   jobManager:
     resource:
-      memory: "256m"
+      memory: "512m"
       cpu: 1
   taskManager:
     resource:
