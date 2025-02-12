@@ -1,7 +1,8 @@
 package com.example.flink;
 
-import com.example.flink.models.VesselTracking;
+import com.example.flink.models.Alarm;
 import com.example.flink.models.CassandraVesselInfo;
+import com.example.flink.models.VesselTracking;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -19,6 +20,14 @@ import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 import org.apache.flink.util.OutputTag;
 
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.Properties;
+import java.util.UUID;
+
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+
 import java.io.Serializable;
 
 /**
@@ -27,14 +36,6 @@ import java.io.Serializable;
  * and emits new vessel events (as CassandraVesselInfo objects) via a side output.
  */
 public class FetchLogsJob {
-
-    // The side output tag for new vessel events to be sent for Cassandra processing.
-    public static final OutputTag<CassandraVesselInfo> NEW_VESSEL_OUTPUT_TAG =
-            new OutputTag<CassandraVesselInfo>("new-vessel") {};
-
-    // Side output tag for alarm events.
-    public static final OutputTag<String> ALARM_OUTPUT_TAG =
-            new OutputTag<String>("timeout-alarm") {};
 
     public static void main(String[] args) throws Exception {
         // 1. Set up the execution environment.
@@ -73,17 +74,7 @@ public class FetchLogsJob {
         // 4. For demonstration, print the vessel tracking output.
         vesselTrackingStream.print("Vessel Tracking");
 
-        // 5. Retrieve the side output stream (the new vessel events).
-        DataStream<CassandraVesselInfo> cassandraEventStream =
-                vesselTrackingStream.getSideOutput(NEW_VESSEL_OUTPUT_TAG);
-        DataStream<Alarm> alarmEventStream = 
-                vesselTrackingStream.getSideOutput(ALARM_OUTPUT_TAG);
-
-        // we attach our Cassandra sink (defined in CassandraJob.java) to process them.
-        cassandraEventStream.addSink(new CassandraCheckJob.CassandraSink());
-        alarmEventStream.addSink(new CassandraAlarmJob.CassandraAlarmSink());
-
-        // 6. Execute the job.
+        // 5. Execute the job.
         env.execute("Fetchign logs from Kafka Job");
     }
 
@@ -106,13 +97,13 @@ public class FetchLogsJob {
      * For each incoming JSON log:
      * - It extracts the fields for tracking.
      * - If no state exists (i.e. first log for that MMSI), it creates a new VesselTracking record,
-     *   updates the state, and emits a side output event (CassandraVesselInfo) for new vessel processing.
+     *   updates the state, and emits a message to a kafka topic (vessel) for new vessel processing.
      * - Otherwise, it updates the existing VesselTracking state.
      * Additionally, it registers (or re–registers) a 5–minute processing–time timer.
      * When the timer fires (i.e. no new log has arrived for 5 minutes), it compares the latest log's timestamp
      * with the stored etaAis:
      *    - If the latest log timestamp is after the etaAis, the state is cleared.
-     *    - Otherwise, an alarm event is emitted (to be processed by an alarm job/sink), and the state is cleared.
+     *    - Otherwise, an alarm event is emitted (to be processed by an alarm job), and the state is cleared.
      */
     public static class VesselTrackingProcessFunction extends KeyedProcessFunction<Long, String, VesselTracking> {
 
@@ -128,6 +119,11 @@ public class FetchLogsJob {
         // Threshold for deviation from trajectory (in meters).
         private static final double DEVIATION_THRESHOLD_METERS = 1000.0;
 
+        // Initialize a KafkaProducer to send alarms directly.
+        private transient KafkaProducer<String, String> alarmProducer;
+        // KafkaProducer for sending vessel events.
+        private transient KafkaProducer<String, String> vesselProducer;
+
         @Override
         public void open(Configuration parameters) throws Exception {
             ValueStateDescriptor<VesselTracking> vesselDescriptor =
@@ -137,6 +133,25 @@ public class FetchLogsJob {
             ValueStateDescriptor<Long> timerDescriptor =
                     new ValueStateDescriptor<>("timerState", Long.class);
             timerState = getRuntimeContext().getState(timerDescriptor);
+
+            // Set up KafkaProducer properties.
+            Properties props = new Properties();
+            props.put("bootstrap.servers", "kafka.kafka.svc.cluster.local:9092");
+            props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+            props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+            alarmProducer = new KafkaProducer<>(props);
+            vesselProducer = new KafkaProducer<>(props);
+        }
+
+        @Override
+        public void close() throws Exception {
+            if (alarmProducer != null) {
+                alarmProducer.close();
+            }
+            if (vesselProducer != null) {
+                vesselProducer.close();
+            }
         }
 
         @Override
@@ -170,7 +185,7 @@ public class FetchLogsJob {
 
                 // Emit a side output event for Cassandra processing.
                 CassandraVesselInfo cassandraEvent = new CassandraVesselInfo(mmsi, imo, callsign, a, b, c, d, draught);
-                ctx.output(NEW_VESSEL_OUTPUT_TAG, cassandraEvent);
+                sendVesselToKafka(cassandraEvent);
             } else {
                 // Update the existing record with the latest position and timestamp.
                 vt.setCurrentLat(latitude);
@@ -197,7 +212,7 @@ public class FetchLogsJob {
                             "Vessel deviates from planned trajectory by " + deviation + " meters.",
                             "active"
                     );
-                    ctx.output(ALARM_OUTPUT_TAG, deviationAlarm);
+                    sendAlarmToKafka(deviationAlarm);
                     vt.setLastDeviationAlarmTime(currentTime);
                     vesselState.update(vt);
                 }
@@ -242,7 +257,7 @@ public class FetchLogsJob {
                                 "Not received vessel AIS logs for " + Long.toString(TIMEOUT) + " minutes",
                                 "active"                                            
                         );
-                        ctx.output(ALARM_OUTPUT_TAG, alarm);
+                        sendAlarmToKafka(alarm);
                         vesselState.clear();
                         timerState.clear();
                     }
@@ -254,6 +269,20 @@ public class FetchLogsJob {
                     timerState.clear();
                 }
             }
+        }
+
+        // Helper method: Send an Alarm object to Kafka (serialize as JSON).
+        private void sendAlarmToKafka(Alarm alarm) throws Exception {
+            String alarmJson = mapper.writeValueAsString(alarm);
+            ProducerRecord<String, String> record = new ProducerRecord<>("alarm", alarmJson);
+            alarmProducer.send(record);
+        }
+
+        // Helper method: Send a CassandraVesselInfo object to Kafka (serialize as JSON).
+        private void sendVesselToKafka(CassandraVesselInfo vesselInfo) throws Exception {
+            String vesselJson = mapper.writeValueAsString(vesselInfo);
+            ProducerRecord<String, String> record = new ProducerRecord<>("vessel", vesselJson);
+            vesselProducer.send(record);
         }
 
         // --- Helper methods for computing cross-track distance ---

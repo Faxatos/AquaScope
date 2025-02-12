@@ -3,13 +3,22 @@ package com.example.flink;
 import com.example.flink.models.Alarm;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.RichProcessFunction;
+import org.apache.flink.streaming.api.functions.RichMapFunction;
+import org.apache.flink.util.Collector;
 
 import java.net.InetSocketAddress;
 
 /**
- * CassandraAlarmJob contains a dedicated sink function that writes Alarm events into Cassandra.
+ * CassandraAlarmJob fetch data from the Kafka topic 'alarm', and writes Alarm events into Cassandra.
  *
  * The Cassandra alarm table is assumed to have the following schema:
  *
@@ -25,11 +34,53 @@ import java.net.InetSocketAddress;
  *
  *   CREATE INDEX IF NOT EXISTS alarm_mmsi_idx ON alarm (mmsi);
  *
- * You can attach this sink to a DataStream<Alarm> (for example, the alarm side output from your FetchLogsJob).
  */
 public class CassandraAlarmJob {
 
-    public static class CassandraAlarmSink extends RichSinkFunction<Alarm> {
+    public static void main(String[] args) throws Exception {
+        // 1. Set up the Flink execution environment.
+        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+        // 2. Create a Kafka source for alarm events from the topic "alarm".
+        KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
+                .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                .setTopics("alarm")
+                .setGroupId("flink-alarm-consumer-group")
+                .setStartingOffsets(OffsetsInitializer.earliest())
+                .setValueOnlyDeserializer(new SimpleStringSchema())
+                .build();
+
+        DataStream<String> alarmJsonStream =
+                env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), "KafkaAlarmSource");
+
+        // 3. Map the JSON strings to Alarm objects.
+        DataStream<Alarm> alarmStream = alarmJsonStream.map(new AlarmMapper());
+
+        // 4. Process each Alarm object using a RichProcessFunction that inserts it into Cassandra.
+        DataStream<String> resultStream = alarmStream.process(new CassandraAlarmProcessFunction());
+
+        // For debugging purposes, print the result messages.
+        resultStream.print();
+
+        env.execute("Cassandra Alarm Job");
+    }
+
+    /**
+     * A mapper to convert JSON strings into Alarm objects.
+     */
+    public static class AlarmMapper extends RichMapFunction<String, Alarm> {
+        private final ObjectMapper mapper = new ObjectMapper();
+        @Override
+        public Alarm map(String value) throws Exception {
+            return mapper.readValue(value, Alarm.class);
+        }
+    }
+
+    /**
+     * A RichProcessFunction that inserts each Alarm object into Cassandra.
+     * Instead of using a dedicated sink, this function uses processElement() to perform the insert.
+     */
+    public static class CassandraAlarmProcessFunction extends RichProcessFunction<Alarm, String> {
         private transient CqlSession session;
 
         @Override
@@ -44,7 +95,7 @@ public class CassandraAlarmJob {
         }
 
         @Override
-        public void invoke(Alarm alarm, Context context) throws Exception {
+        public void processElement(Alarm alarm, Context ctx, Collector<String> out) throws Exception {
             String insertQuery = "INSERT INTO alarm (alarm_id, timestamp, mmsi, code, description, status) " +
                                  "VALUES (?, ?, ?, ?, ?, ?)";
             session.execute(
@@ -57,14 +108,15 @@ public class CassandraAlarmJob {
                             alarm.getStatus()
                     )
             );
+            out.collect("Inserted alarm for vessel " + alarm.getMmsi());
         }
 
         @Override
         public void close() throws Exception {
-            super.close();
             if (session != null) {
                 session.close();
             }
+            super.close();
         }
     }
 }
