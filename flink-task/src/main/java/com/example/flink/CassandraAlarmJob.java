@@ -66,7 +66,7 @@ public class CassandraAlarmJob {
      */
     public static class AlarmMapper implements MapFunction<String, Alarm> {
         private final ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
+            .registerModule(new JavaTimeModule());
 
         @Override
         public Alarm map(String value) throws Exception {
