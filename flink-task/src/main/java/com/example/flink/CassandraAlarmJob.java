@@ -66,8 +66,7 @@ public class CassandraAlarmJob {
      * A mapper to convert JSON strings into Alarm objects.
      */
     public static class AlarmMapper implements MapFunction<String, Alarm> {
-        private final ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule());
+        private final ObjectMapper mapper = new ObjectMapper();
 
         @Override
         public Alarm map(String value) throws Exception {
