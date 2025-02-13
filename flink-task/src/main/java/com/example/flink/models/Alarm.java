@@ -1,7 +1,6 @@
 package com.example.flink.models;
 
 import java.io.Serializable;
-import java.time.Instant;
 
 /**
  * Model class for an Alarm.

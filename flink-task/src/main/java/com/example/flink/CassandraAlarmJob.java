@@ -6,6 +6,7 @@ import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import java.util.concurrent.TimeUnit;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.connector.kafka.source.KafkaSource;
