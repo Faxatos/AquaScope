@@ -117,10 +117,7 @@ public class FetchLogsJob {
         // State to hold the timestamp of the currently registered timer.
         private transient ValueState<Long> timerState;
         
-        private static final ObjectMapper mapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                // Optionally, disable writing dates as timestamps if you prefer ISO-8601 format.
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        private transient ObjectMapper mapper;
 
         // Timeout duration: 5 minutes in milliseconds.
         private static final long TIMEOUT = 5 * 60 * 1000L;
@@ -141,6 +138,11 @@ public class FetchLogsJob {
             ValueStateDescriptor<Long> timerDescriptor =
                     new ValueStateDescriptor<>("timerState", Long.class);
             timerState = getRuntimeContext().getState(timerDescriptor);
+
+            mapper = new ObjectMapper()
+                    .registerModule(new JavaTimeModule())
+                    // Optionally disable writing dates as timestamps:
+                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
             // Set up KafkaProducer properties.
             Properties props = new Properties();
