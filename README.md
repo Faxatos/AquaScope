@@ -17,7 +17,7 @@ This project aims to build a scalable platform to ingest, process, and analyze t
 The platform ensures scalability, fault tolerance, and low latency using modern distributed technologies.
 
 <p align="center">
-<img src="https://github.com/user-attachments/assets/54cc6606-a4bd-46c8-8d22-ba3fe37cdb0f" alt="drawing" width="700"/>
+<img src="https://github.com/user-attachments/assets/30fa361e-4981-4ef1-980b-383d5a97a481" alt="drawing" width="700"/>
 </p>
 
 ## Objectives
