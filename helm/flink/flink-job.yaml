@@ -1,7 +1,7 @@
 apiVersion: flink.apache.org/v1beta1
 kind: FlinkDeployment
 metadata:
-  name: fetchlogs
+  name: analyzelogs
   namespace: flink
 spec:
   image: flink:1.20
@@ -32,7 +32,7 @@ spec:
       memory: "1024m"
       cpu: 1
   job:
-    jarURI: s3://flink-checkpoints/jar/flink-fetch-logs.jar
+    jarURI: s3://flink-checkpoints/jar/flink-analyze-logs.jar
     parallelism: 2
     upgradeMode: savepoint
   podTemplate:
