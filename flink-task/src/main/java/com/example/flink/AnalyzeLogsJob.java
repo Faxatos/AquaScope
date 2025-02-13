@@ -217,7 +217,7 @@ public class FetchLogsJob {
                     Alarm deviationAlarm = new Alarm(
                             UUID.randomUUID().toString(),         // unique alarm ID
                             vt.getMmsi(),                         // vessel MMSI
-                            Instant.parse(vt.getLatestLogTimestamp()),          // alarm timestamp
+                            vt.getLatestLogTimestamp(),           // alarm timestamp
                             "E002",                               // error code for trajectory deviation
                             "Vessel deviates from planned trajectory by " + deviation + " meters.",
                             "active"
@@ -262,7 +262,7 @@ public class FetchLogsJob {
                         Alarm alarm = new Alarm(
                                 UUID.randomUUID().toString(),                          // unique alarm ID
                                 vt.getMmsi(),                                          // vessel MMSI
-                                OffsetDateTime.parse(vt.getLatestLogTimestamp()).toInstant(),  // alarm timestamp
+                                vt.getLatestLogTimestamp(),                            // alarm timestamp
                                 "E001",                                                // error code
                                 "Not received vessel AIS logs for " + Long.toString(TIMEOUT) + " minutes",
                                 "active"                                            

@@ -126,7 +126,7 @@ public class CassandraAlarmJob {
             session.execute(
                     session.prepare(insertQuery).bind(
                             alarm.getAlarmId(),
-                            alarm.getTimestamp(),
+                            Instant.parse(alarm.getTimestamp()),
                             alarm.getMmsi(),
                             alarm.getCode(),
                             alarm.getDescription(),

@@ -9,7 +9,7 @@ import java.time.Instant;
 public class Alarm implements Serializable {
     private String alarmId;
     private long mmsi;
-    private Instant timestamp; 
+    private String timestamp; 
     private String code;
     private String description;
     private String status;
@@ -17,7 +17,7 @@ public class Alarm implements Serializable {
     // No-argument constructor is required for (de)serialization.
     public Alarm() {}
 
-    public Alarm(String alarmId, long mmsi, Instant timestamp, String code, String description, String status) {
+    public Alarm(String alarmId, long mmsi, String timestamp, String code, String description, String status) {
         this.alarmId = alarmId;
         this.mmsi = mmsi;
         this.timestamp = timestamp;
@@ -35,7 +35,7 @@ public class Alarm implements Serializable {
         return mmsi;
     }
 
-    public Instant getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
