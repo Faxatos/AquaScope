@@ -38,7 +38,7 @@ export default function AlarmsTable({
           {/* Mobile View */}
           <div className="md:hidden">
             {alarms?.map((alarm) => (
-              <AlarmCardMobile key={`${alarm.alarm_id}-${alarm.mmsi}`} alarm={{ ...alarm, status: alarm.status as 'active' | 'resolved' }} />
+              <AlarmCardMobile key={`${alarm.alarm_id}-${alarm.mmsi}-${alarm.timestamp}`} alarm={{ ...alarm, status: alarm.status as 'active' | 'resolved' }} />
             ))}
           </div>
 
@@ -58,7 +58,7 @@ export default function AlarmsTable({
             </thead>
             <tbody className="bg-white">
               {alarms?.map((alarm) => (
-                <AlarmCardDesktop key={`${alarm.alarm_id}-${alarm.mmsi}`} alarm={{ ...alarm, status: alarm.status as 'active' | 'resolved' }} />
+                <AlarmCardDesktop key={`${alarm.alarm_id}-${alarm.mmsi}-${alarm.timestamp}`} alarm={{ ...alarm, status: alarm.status as 'active' | 'resolved' }} />
               ))}
             </tbody>
           </table>
