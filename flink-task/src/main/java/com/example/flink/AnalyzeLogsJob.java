@@ -139,10 +139,7 @@ public class AnalyzeLogsJob {
                     new ValueStateDescriptor<>("timerState", Long.class);
             timerState = getRuntimeContext().getState(timerDescriptor);
 
-            mapper = new ObjectMapper()
-                    .registerModule(new JavaTimeModule())
-                    // Optionally disable writing dates as timestamps:
-                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            mapper = new ObjectMapper();
 
             // Set up KafkaProducer properties.
             Properties props = new Properties();
@@ -217,7 +214,6 @@ public class AnalyzeLogsJob {
                     Alarm deviationAlarm = new Alarm(
                             UUID.randomUUID().toString(),         // unique alarm ID
                             vt.getMmsi(),                         // vessel MMSI
-                            vt.getLatestLogTimestamp(),           // alarm timestamp
                             "E002",                               // error code for trajectory deviation
                             "Vessel deviates from planned trajectory by " + deviation + " meters.",
                             "active"
@@ -262,7 +258,6 @@ public class AnalyzeLogsJob {
                         Alarm alarm = new Alarm(
                                 UUID.randomUUID().toString(),                          // unique alarm ID
                                 vt.getMmsi(),                                          // vessel MMSI
-                                vt.getLatestLogTimestamp(),                            // alarm timestamp
                                 "E001",                                                // error code
                                 "Not received vessel AIS logs for " + Long.toString(TIMEOUT) + " minutes",
                                 "active"                                            

@@ -15,9 +15,9 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.util.Collector;
-import java.util.concurrent.TimeUnit;
 
 import java.net.InetSocketAddress;
+import java.time.Instant;
 
 /**
  * CassandraAlarmJob fetch data from the Kafka topic 'alarm', and writes Alarm events into Cassandra.
@@ -121,12 +121,13 @@ public class CassandraAlarmJob {
 
         @Override
         public void processElement(Alarm alarm, Context ctx, Collector<String> out) throws Exception {
+            Instant now = Instant.now();
             String insertQuery = "INSERT INTO alarm (alarm_id, timestamp, mmsi, code, description, status) " +
                                  "VALUES (?, ?, ?, ?, ?, ?)";
             session.execute(
                     session.prepare(insertQuery).bind(
                             alarm.getAlarmId(),
-                            Instant.parse(alarm.getTimestamp()),
+                            now,
                             alarm.getMmsi(),
                             alarm.getCode(),
                             alarm.getDescription(),
