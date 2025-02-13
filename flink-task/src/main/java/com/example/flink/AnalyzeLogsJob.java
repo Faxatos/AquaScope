@@ -116,7 +116,7 @@ public class AnalyzeLogsJob {
         // Timeout duration: 5 minutes in milliseconds.
         private static final long TIMEOUT = 5 * 60 * 1000L;
         // Threshold for deviation from trajectory (in meters).
-        private static final double DEVIATION_THRESHOLD_METERS = 3000.0;
+        private static final double DEVIATION_THRESHOLD_METERS = 1000.0;
 
         // Initialize a KafkaProducer to send alarms directly.
         private transient KafkaProducer<String, String> alarmProducer;
@@ -253,7 +253,7 @@ public class AnalyzeLogsJob {
                                 UUID.randomUUID().toString(),                          // unique alarm ID
                                 vt.getMmsi(),                                          // vessel MMSI
                                 "E001",                                                // error code
-                                "Not received vessel AIS logs for " + Long.toString(TIMEOUT) + " minutes",
+                                "Not received vessel AIS logs for " + Long.toString(TIMEOUT / (60 * 1000)) + " minutes",
                                 "active"                                            
                         );
                         sendAlarmToKafka(alarm);
