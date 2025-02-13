@@ -36,11 +36,11 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import java.io.Serializable;
 
 /**
- * FetchLogsJob reads logs from the Kafka "vts" and "sat" topic, partitions them by MMSI using keyBy,
+ * AnalyzeLogsJob reads logs from the Kafka "vts" and "sat" topic, partitions them by MMSI using keyBy,
  * updates or creates a VesselTracking state (using a fault–tolerant ValueState),
  * and emits new vessel events (as CassandraVesselInfo objects) via a side output.
  */
-public class FetchLogsJob {
+public class AnalyzeLogsJob {
 
     public static void main(String[] args) throws Exception {
         // 1. Set up the execution environment.
