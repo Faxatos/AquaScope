@@ -58,7 +58,7 @@ export default function AlarmsTable({
             </thead>
             <tbody className="bg-white">
               {alarms?.map((alarm) => (
-                <AlarmCardDesktop key=key={`${alarm.alarm_id}-${alarm.mmsi}`} alarm={{ ...alarm, status: alarm.status as 'active' | 'resolved' }} />
+                <AlarmCardDesktop key={`${alarm.alarm_id}-${alarm.mmsi}`} alarm={{ ...alarm, status: alarm.status as 'active' | 'resolved' }} />
               ))}
             </tbody>
           </table>
