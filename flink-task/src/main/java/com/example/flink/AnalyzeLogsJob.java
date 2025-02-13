@@ -20,7 +20,6 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
-import org.apache.flink.util.OutputTag;
 
 import java.time.OffsetDateTime;
 import java.time.Duration;
@@ -28,12 +27,9 @@ import java.time.format.DateTimeParseException;
 import java.util.Properties;
 import java.util.UUID;
 
-import java.time.Instant;
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import java.io.Serializable;
 
 /**
  * AnalyzeLogsJob reads logs from the Kafka "vts" and "sat" topic, partitions them by MMSI using keyBy,
