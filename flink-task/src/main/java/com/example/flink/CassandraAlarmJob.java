@@ -4,6 +4,7 @@ import com.example.flink.models.Alarm;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.configuration.Configuration;
@@ -67,7 +68,6 @@ public class CassandraAlarmJob {
         private final ObjectMapper mapper = new ObjectMapper();
 
         public AlarmMapper() {
-            this.mapper = new ObjectMapper();
             this.mapper.registerModule(new JavaTimeModule()); // Register JavaTimeModule
         }
 
