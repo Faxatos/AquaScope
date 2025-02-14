@@ -2,7 +2,7 @@
 
 Real-time distributed platform for analyzing maritime traffic data from multiple sources, developed by Emiliano Sescu and Giovanni Bellini.
 
-Project for the Scalable and Distributed Computing Course - Final Grade: x/30
+Project for the Scalable and Distributed Computing Course - Final Grade: 30L/30
 
 ## Problem Context
 Maritime traffic monitoring is crucial for navigation safety, port management, and operational efficiency. The Automatic Identification System (AIS), placed in every vessel, provides vital data on vessel position, speed, and route. However, [AIS](https://shipping.nato.int/nsc/operations/news/2021/ais-automatic-identification-system-overview) data is often scattered across:
