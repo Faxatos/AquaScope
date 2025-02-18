@@ -16,7 +16,7 @@ import org.apache.flink.util.Collector;
 
 import java.util.Properties;
 
-public class InjectTrajectoryDeviationJob {
+public class InjectDeviationJob {
 
     public static void main(String[] args) throws Exception {
         // 1. Set up the execution environment.
