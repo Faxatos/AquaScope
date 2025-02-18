@@ -59,11 +59,10 @@ public class CassandraVesselJob {
      * Creates a Kafka source with retry logic if Kafka is unavailable.
      */
     private static KafkaSource<String> createKafkaSourceWithRetry() throws InterruptedException {
-        final int MAX_RETRIES = 5;
         final long RETRY_DELAY_MS = 5000;
         int attempt = 0;
 
-        while (attempt < MAX_RETRIES) {
+        while (true) {
             try {
                 return KafkaSource.<String>builder()
                     .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
@@ -82,46 +81,101 @@ public class CassandraVesselJob {
     }
 
     public static class CassandraVesselProcessFunction extends ProcessFunction<CassandraVesselInfo, String> {
+        private final long RETRY_DELAY_MS = 5000;
         private transient CqlSession session;
 
         @Override
         public void open(Configuration parameters) throws Exception {
             super.open(parameters);
-            CqlSessionBuilder builder = CqlSession.builder()
-                    .addContactPoint(new InetSocketAddress("cassandra.cassandra.svc.cluster.local", 9042))
-                    .withLocalDatacenter("datacenter1")
-                    .withKeyspace("vessel_management")
-                    .withAuthCredentials("cassandra", "cassandra");
-            session = builder.build();
+            boolean connected = false;
+            int attempt = 0;
+            while (!connected) {
+                try {
+                    CqlSessionBuilder builder = CqlSession.builder()
+                            .addContactPoint(new InetSocketAddress("cassandra.cassandra.svc.cluster.local", 9042))
+                            .withLocalDatacenter("datacenter1")
+                            .withKeyspace("vessel_management")
+                            .withAuthCredentials("cassandra", "cassandra");
+                    session = builder.build();
+                    connected = true;
+                } catch (Exception e) {
+                    attempt++;
+                    System.err.println("Cassandra connection failed (attempt " + attempt + "). Retrying in " + (RETRY_DELAY_MS / 1000) + " seconds...");
+                    Thread.sleep(RETRY_DELAY_MS);
+                }
+            }
         }
 
         @Override
         public void processElement(CassandraVesselInfo value, Context ctx, Collector<String> out) throws Exception {
-            // Check if the vessel already exists.
-            String selectQuery = "SELECT mmsi FROM vessel WHERE mmsi = ?";
-            boolean vesselExists = session.execute(
-                    session.prepare(selectQuery).bind(value.getMmsi())
-            ).one() != null;
-            if (!vesselExists) {
-                String insertQuery = "INSERT INTO vessel (mmsi, imo, callsign, a, b, c, d, draught) " +
-                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                session.execute(
-                        session.prepare(insertQuery).bind(
-                                value.getMmsi(),
-                                value.getImo(),
-                                value.getCallsign(),
-                                value.getA(),
-                                value.getB(),
-                                value.getC(),
-                                value.getD(),
-                                value.getDraught()
-                        )
-                );
-                out.collect("Inserted vessel with MMSI " + value.getMmsi());
-            } else {
-                out.collect("Vessel with MMSI " + value.getMmsi() + " already exists. Skipped insertion.");
+            boolean success = false;
+            int attempt = 0;
+
+            // Retry the insert indefinitely until successful.
+            while (!success) {
+                try {
+                    // Check if the vessel already exists.
+                    String selectQuery = "SELECT mmsi FROM vessel WHERE mmsi = ?";
+                    boolean vesselExists = session.execute(
+                            session.prepare(selectQuery).bind(value.getMmsi())
+                    ).one() != null;
+                    
+                    if (!vesselExists) {
+                        String insertQuery = "INSERT INTO vessel (mmsi, imo, callsign, a, b, c, d, draught) " +
+                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                        session.execute(
+                                session.prepare(insertQuery).bind(
+                                        value.getMmsi(),
+                                        value.getImo(),
+                                        value.getCallsign(),
+                                        value.getA(),
+                                        value.getB(),
+                                        value.getC(),
+                                        value.getD(),
+                                        value.getDraught()
+                                )
+                        );
+                        out.collect("Inserted vessel with MMSI " + value.getMmsi());
+                    } else {
+                        out.collect("Vessel with MMSI " + value.getMmsi() + " already exists. Skipped insertion.");
+                    }
+                    // Mark the operation as successful so we exit the retry loop.
+                    success = true;
+                } catch (Exception e) {
+                    attempt++;
+                    System.err.println("Error processing vessel with MMSI " + value.getMmsi() +
+                            " (attempt " + attempt + "). Retrying in " + (RETRY_DELAY_MS / 1000) + " seconds...");
+                    Thread.sleep(RETRY_DELAY_MS);
+                    
+                    // Attempt to re-establish the Cassandra connection.
+                    try {
+                        if (session != null) {
+                            session.close();
+                        }
+                    } catch (Exception ex) {
+                        // Ignore errors during session close.
+                    }
+                    
+                    boolean connected = false;
+                    while (!connected) {
+                        try {
+                            // Reinitialize the Cassandra session.
+                            CqlSessionBuilder builder = CqlSession.builder()
+                                    .addContactPoint(new InetSocketAddress("cassandra.cassandra.svc.cluster.local", 9042))
+                                    .withLocalDatacenter("datacenter1")
+                                    .withKeyspace("vessel_management")
+                                    .withAuthCredentials("cassandra", "cassandra");
+                            session = builder.build();
+                            connected = true;
+                        } catch (Exception connEx) {
+                            System.err.println("Reconnection to Cassandra failed. Retrying in " + (RETRY_DELAY_MS / 1000) + " seconds...");
+                            Thread.sleep(RETRY_DELAY_MS);
+                        }
+                    }
+                }
             }
         }
+
 
         @Override
         public void close() throws Exception {

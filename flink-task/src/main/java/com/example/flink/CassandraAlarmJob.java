@@ -79,11 +79,10 @@ public class CassandraAlarmJob {
      * Creates a Kafka source with retry logic if Kafka is unavailable.
      */
     private static KafkaSource<String> createKafkaSourceWithRetry() throws InterruptedException {
-        final int MAX_RETRIES = 5;
         final long RETRY_DELAY_MS = 5000;
         int attempt = 0;
 
-        while (attempt < MAX_RETRIES) {
+        while (true) {
             try {
                 return KafkaSource.<String>builder()
                         .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
@@ -106,35 +105,83 @@ public class CassandraAlarmJob {
      * Instead of using a dedicated sink, this function uses processElement() to perform the insert.
      */
     public static class CassandraAlarmProcessFunction extends ProcessFunction<Alarm, String> {
+        private final long RETRY_DELAY_MS = 5000;
         private transient CqlSession session;
 
         @Override
         public void open(Configuration parameters) throws Exception {
             super.open(parameters);
-            CqlSessionBuilder builder = CqlSession.builder()
-                    .addContactPoint(new InetSocketAddress("cassandra.cassandra.svc.cluster.local", 9042))
-                    .withLocalDatacenter("datacenter1")
-                    .withKeyspace("vessel_management")
-                    .withAuthCredentials("cassandra", "cassandra");
-            session = builder.build();
+            boolean connected = false;
+            int attempt = 0;
+            while (!connected) {
+                try {
+                    CqlSessionBuilder builder = CqlSession.builder()
+                            .addContactPoint(new InetSocketAddress("cassandra.cassandra.svc.cluster.local", 9042))
+                            .withLocalDatacenter("datacenter1")
+                            .withKeyspace("vessel_management")
+                            .withAuthCredentials("cassandra", "cassandra");
+                    session = builder.build();
+                    connected = true;
+                } catch (Exception e) {
+                    attempt++;
+                    System.err.println("Cassandra connection failed (attempt " + attempt + "). Retrying in " + (RETRY_DELAY_MS / 1000) + " seconds...");
+                    Thread.sleep(RETRY_DELAY_MS);
+                }
+            }
         }
 
-        @Override
         public void processElement(Alarm alarm, Context ctx, Collector<String> out) throws Exception {
             Instant now = Instant.now();
-            String insertQuery = "INSERT INTO alarm (alarm_id, timestamp, mmsi, code, description, status) " +
-                                 "VALUES (?, ?, ?, ?, ?, ?)";
-            session.execute(
-                    session.prepare(insertQuery).bind(
-                            alarm.getAlarmId(),
-                            now,
-                            alarm.getMmsi(),
-                            alarm.getCode(),
-                            alarm.getDescription(),
-                            alarm.getStatus()
-                    )
-            );
-            out.collect("Inserted alarm for vessel " + alarm.getMmsi());
+            String insertQuery = "INSERT INTO alarm (alarm_id, timestamp, mmsi, code, description, status) VALUES (?, ?, ?, ?, ?, ?)";
+            boolean inserted = false;
+            int attempt = 0;
+
+            // Retry the insert indefinitely until successful.
+            while (!inserted) {
+                try {
+                    session.execute(
+                            session.prepare(insertQuery).bind(
+                                    alarm.getAlarmId(),
+                                    now,
+                                    alarm.getMmsi(),
+                                    alarm.getCode(),
+                                    alarm.getDescription(),
+                                    alarm.getStatus()
+                            )
+                    );
+                    inserted = true;
+                    out.collect("Inserted alarm for vessel " + alarm.getMmsi());
+                } catch (Exception e) {
+                    attempt++;
+                    System.err.println("Failed to insert alarm for vessel " + alarm.getMmsi() +
+                            " (attempt " + attempt + "). Retrying in " + (RETRY_DELAY_MS / 1000) + " seconds...");
+                    Thread.sleep(RETRY_DELAY_MS);
+
+                    // Attempt to re-establish the Cassandra connection.
+                    try {
+                        if (session != null) {
+                            session.close();
+                        }
+                    } catch (Exception ex) {
+                        // Ignore errors on close.
+                    }
+                    boolean connected = false;
+                    while (!connected) {
+                        try {
+                            CqlSessionBuilder builder = CqlSession.builder()
+                                    .addContactPoint(new InetSocketAddress("cassandra.cassandra.svc.cluster.local", 9042))
+                                    .withLocalDatacenter("datacenter1")
+                                    .withKeyspace("vessel_management")
+                                    .withAuthCredentials("cassandra", "cassandra");
+                            session = builder.build();
+                            connected = true;
+                        } catch (Exception connEx) {
+                            System.err.println("Reconnection to Cassandra failed. Retrying in " + (RETRY_DELAY_MS / 1000) + " seconds...");
+                            Thread.sleep(RETRY_DELAY_MS);
+                        }
+                    }
+                }
+            }
         }
 
         @Override
