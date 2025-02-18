@@ -117,6 +117,8 @@ public class AnalyzeLogsJob {
         private static final long TIMEOUT = 5 * 60 * 1000L;
         // Threshold for deviation from trajectory (in meters).
         private static final double DEVIATION_THRESHOLD_METERS = 1000.0;
+        // Define an acceptable margin (in meters) for reaching the destination.
+        private static final double DESTINATION_MARGIN_METERS = 500.0;
 
         // Initialize a KafkaProducer to send alarms directly.
         private transient KafkaProducer<String, String> alarmProducer;
@@ -237,30 +239,26 @@ public class AnalyzeLogsJob {
         public void onTimer(long timestamp, OnTimerContext ctx, Collector<VesselTracking> out) throws Exception {
             VesselTracking vt = vesselState.value();
             if (vt != null) {
-                try {
-                    // Parse the latest log timestamp and the etaAis as OffsetDateTime.
-                    OffsetDateTime latestLogTime = OffsetDateTime.parse(vt.getLatestLogTimestamp());
-                    OffsetDateTime etaTime = OffsetDateTime.parse(vt.getEtaAis());
-                    // Add a margin error value: TIMEOUT/2 milliseconds added to the latest log time.
-                    OffsetDateTime marginTime = latestLogTime.plus(Duration.ofMillis(TIMEOUT / 2));
-                    if (marginTime.isAfter(etaTime)) {
-                        // If the latest log timestamp + margin error is after the etaAis, clear the state.
-                        vesselState.clear();
-                        timerState.clear();
-                    } else {
-                        // Create an alarm with a unique alarm ID and a formatted description.
-                        Alarm alarm = new Alarm(
-                                UUID.randomUUID().toString(),                          // unique alarm ID
-                                vt.getMmsi(),                                          // vessel MMSI
-                                "E001",                                                // error code
-                                "Not received vessel AIS logs for " + Long.toString(TIMEOUT / (60 * 1000)) + " minutes",
-                                "active"                                            
-                        );
-                        sendAlarmToKafka(alarm);
-                        vesselState.clear();
-                        timerState.clear();
-                    }
-                } catch (DateTimeParseException e) {
+                // Compute the distance between the vessel's current position and its destination.
+                double distanceToDestination = haversine(
+                        vt.getCurrentLat(), vt.getCurrentLon(),
+                        vt.getDestLat(), vt.getDestLon()
+                );
+                
+                if (distanceToDestination <= DESTINATION_MARGIN_METERS) {
+                    // The vessel is considered to have reached its destination.
+                    vesselState.clear();
+                    timerState.clear();
+                } else {
+                    // Create an alarm with a unique alarm ID and a formatted description.
+                    Alarm alarm = new Alarm(
+                        UUID.randomUUID().toString(),                          // unique alarm ID
+                        vt.getMmsi(),                                          // vessel MMSI
+                        "E001",                                                // error code
+                        "Not received vessel AIS logs for " + Long.toString(TIMEOUT / (60 * 1000)) + " minutes",
+                        "active"                                            
+                    );
+                    sendAlarmToKafka(alarm);
                     vesselState.clear();
                     timerState.clear();
                 }
