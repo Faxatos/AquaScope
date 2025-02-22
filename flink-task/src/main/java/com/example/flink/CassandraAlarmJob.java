@@ -4,7 +4,6 @@ import com.example.flink.models.Alarm;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.CqlSessionBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import java.util.concurrent.TimeUnit;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -97,7 +96,6 @@ public class CassandraAlarmJob {
                 TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
             }
         }
-        throw new RuntimeException("Failed to connect to Kafka after " + MAX_RETRIES + " attempts.");
     }
 
     /**

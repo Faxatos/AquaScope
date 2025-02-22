@@ -77,7 +77,6 @@ public class CassandraVesselJob {
                 TimeUnit.MILLISECONDS.sleep(RETRY_DELAY_MS);
             }
         }
-        throw new RuntimeException("Failed to connect to Kafka after " + MAX_RETRIES + " attempts.");
     }
 
     public static class CassandraVesselProcessFunction extends ProcessFunction<CassandraVesselInfo, String> {

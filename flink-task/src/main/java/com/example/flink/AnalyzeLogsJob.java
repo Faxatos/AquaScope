@@ -19,9 +19,6 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
 
-import java.time.OffsetDateTime;
-import java.time.Duration;
-import java.time.format.DateTimeParseException;
 import java.util.Properties;
 import java.util.UUID;
 
