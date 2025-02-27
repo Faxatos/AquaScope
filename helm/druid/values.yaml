@@ -275,7 +275,7 @@ historical:
     druid_processing_numMergeBuffers: 2
     druid_processing_numThreads: 1
     # druid_monitoring_monitors: '["org.apache.druid.client.cache.CacheMonitor", "org.apache.druid.server.metrics.HistoricalMetricsMonitor", "org.apache.druid.server.metrics.QueryCountStatsMonitor"]'
-    # druid_segmentCache_locations: '[{"path":"/opt/druid/var/druid/segment-cache","maxSize":300000000000}]'
+    druid_segmentCache_locations: '[{"path":"/opt/druid/var/druid/segment-cache","maxSize":8000000000}]'
 
   ingress:
     enabled: false
