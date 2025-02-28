@@ -11,7 +11,7 @@ spec:
       targetRevision: 7.10.5
   destination:
     server: https://kubernetes.default.svc
-    namespace: cnpg-database
+    namespace: kubernetes-dashboard
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
