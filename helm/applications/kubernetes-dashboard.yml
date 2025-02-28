@@ -9,6 +9,12 @@ spec:
     - repoURL: https://kubernetes.github.io/dashboard/
       chart: kubernetes-dashboard
       targetRevision: 7.10.5
+      helm:
+        valueFiles:
+        - $values/helm/kube-prometheus/values.yaml
+    - repoURL: https://github.com/Faxatos/AquaScope.git
+      targetRevision: main
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: kubernetes-dashboard
