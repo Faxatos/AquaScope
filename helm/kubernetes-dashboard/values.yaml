@@ -257,17 +257,13 @@ web:
   containers:
     ports:
       - name: web
-        containerPort: 9090
+        containerPort: 8000
         protocol: TCP
     # Additional container arguments
     # Full list of arguments: https://github.com/kubernetes/dashboard/blob/master/docs/common/arguments.md
     # args:
     # - --system-banner="Welcome to the Kubernetes Dashboard"
-    args:
-      - "--enable-skip-login"
-      - "--disable-settings-authorizer"
-      - "--enable-insecure-login"
-      - "--insecure-bind-address=0.0.0.0"
+    args: []
     # Additional container environment variables
     # env:
     # - name: SOME_VAR
