@@ -17,7 +17,7 @@ spec:
       ref: values
     - repoURL: https://github.com/Faxatos/AquaScope.git
       targetRevision: main
-      path: helm/kubernetes-dashboard
+      path: helm/kubernetes-dashboard/accounts
   destination:
     server: https://kubernetes.default.svc
     namespace: kubernetes-dashboard
