@@ -136,7 +136,7 @@ app:
     labels: {}
     annotations:
       traefik.ingress.kubernetes.io/router.tls: "true"
-      traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+      traefik.ingress.kubernetes.io/router.entrypoints: "web"
   # Use the following toleration if Dashboard can be deployed on a tainted control-plane nodes
   # - key: node-role.kubernetes.io/control-plane
   #   effect: NoSchedule
