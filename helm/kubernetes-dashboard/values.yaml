@@ -116,7 +116,7 @@ app:
     #    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     #    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     #    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    useDefaultAnnotations: false
+    useDefaultAnnotations: true
     pathType: ImplementationSpecific
     # If path is not the default (/), rewrite-target annotation will be added to the Ingress.
     # It allows serving Kubernetes Dashboard on a sub-path. Make sure that the configured path
