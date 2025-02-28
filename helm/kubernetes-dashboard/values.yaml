@@ -388,7 +388,7 @@ kong:
     plugins: 'off'
     nginx_worker_processes: 1
   ingressController:
-    enabled: false
+    enabled: true
   manager:
     enabled: false
   dblessConfig:
