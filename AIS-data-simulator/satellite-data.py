@@ -249,7 +249,7 @@ def simulate_vessels(ocean_gdf):
                 print(f"Vessel {vessel['MMSI']} reached destination. Removing.")
                 vessels.remove(vessel)
                 vessels.append(generate_vessel(ocean_gdf))
-            print(vessel)
+            #print(vessel)
             
             # Send the vessel data to Kafka
             try:
