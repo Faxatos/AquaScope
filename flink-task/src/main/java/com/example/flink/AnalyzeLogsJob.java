@@ -39,7 +39,7 @@ public class AnalyzeLogsJob {
 
         // 2) Build a Kafka source to consume messages from the 'vts' topic
         KafkaSource<String> kafkaSourceVts = KafkaSource.<String>builder()
-                .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                .setBootstrapServers("my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092")
                 .setTopics("vts")
                 .setGroupId("flink-vts-consumer-group")
                 .setStartingOffsets(OffsetsInitializer.earliest())
@@ -48,7 +48,7 @@ public class AnalyzeLogsJob {
 
         //Build a Kafka source to consume messages from the 'sat' topic
         KafkaSource<String> kafkaSourceSat = KafkaSource.<String>builder()
-                .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                .setBootstrapServers("my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092")
                 .setTopics("sat")
                 .setGroupId("flink-sat-consumer-group")
                 .setStartingOffsets(OffsetsInitializer.earliest())
@@ -136,7 +136,7 @@ public class AnalyzeLogsJob {
 
             // Set up KafkaProducer properties.
             Properties props = new Properties();
-            props.put("bootstrap.servers", "kafka.kafka.svc.cluster.local:9092");
+            props.put("bootstrap.servers", "my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092");
             props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
             props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 

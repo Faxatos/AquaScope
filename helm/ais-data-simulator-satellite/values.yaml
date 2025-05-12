@@ -129,7 +129,7 @@ tolerations: []
 affinity: {}
 
 config:
-  KAFKA_SERVER: kafka.kafka.svc.cluster.local:9092
+  KAFKA_SERVER: my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
   TOPIC_SAT: sat
   INTERVAL: 1
   VESS_NUM_SAT: 100

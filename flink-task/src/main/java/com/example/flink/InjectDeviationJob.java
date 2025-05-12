@@ -23,7 +23,7 @@ public class InjectDeviationJob {
 
         // 2. Build Kafka sources to consume messages from the 'vts' and 'sat' topics.
         KafkaSource<String> kafkaSourceVts = KafkaSource.<String>builder()
-                .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                .setBootstrapServers("my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092")
                 .setTopics("vts")
                 .setGroupId("flink-vts-deviation-consumer-group")
                 .setStartingOffsets(OffsetsInitializer.earliest())
@@ -31,7 +31,7 @@ public class InjectDeviationJob {
                 .build();
 
         KafkaSource<String> kafkaSourceSat = KafkaSource.<String>builder()
-                .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                .setBootstrapServers("my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092")
                 .setTopics("sat")
                 .setGroupId("flink-sat-deviation-consumer-group")
                 .setStartingOffsets(OffsetsInitializer.earliest())
@@ -85,7 +85,7 @@ public class InjectDeviationJob {
         // 6. Define a Kafka sink to send the modified logs back to Kafka.
         //    Here we write them to the "vts" topic, but you can choose another topic if needed.
         KafkaSink<String> kafkaSink = KafkaSink.<String>builder()
-                .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                .setBootstrapServers("my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092")
                 .setRecordSerializer(KafkaRecordSerializationSchema.builder()
                         .setTopic("vts")
                         .setValueSerializationSchema(new SimpleStringSchema())

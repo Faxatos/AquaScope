@@ -84,7 +84,7 @@ public class CassandraAlarmJob {
         while (true) {
             try {
                 return KafkaSource.<String>builder()
-                        .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                        .setBootstrapServers("my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092")
                         .setTopics("alarm")
                         .setGroupId("flink-alarm-consumer-group")
                         .setStartingOffsets(OffsetsInitializer.earliest())

@@ -65,7 +65,7 @@ public class CassandraVesselJob {
         while (true) {
             try {
                 return KafkaSource.<String>builder()
-                    .setBootstrapServers("kafka.kafka.svc.cluster.local:9092")
+                    .setBootstrapServers("my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092")
                     .setTopics("vessel")
                     .setGroupId("flink-vessel-consumer-group")
                     .setStartingOffsets(OffsetsInitializer.earliest())
