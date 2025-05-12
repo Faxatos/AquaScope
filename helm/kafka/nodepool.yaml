@@ -6,9 +6,9 @@ metadata:
   labels:
     strimzi.io/cluster: my-cluster
 spec:
-  replicas: 5                       
+  replicas: 5
   roles:
-    - controller                     
+    - controller
   storage:
     type: persistent-claim
     size: 32Gi
@@ -22,9 +22,9 @@ metadata:
   labels:
     strimzi.io/cluster: my-cluster
 spec:
-  replicas: 2                        
+  replicas: 2
   roles:
-    - broker                         
+    - broker
   storage:
     type: persistent-claim
     size: 32Gi
