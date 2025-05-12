@@ -79,7 +79,7 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: 300m
+    cpu: 1
     memory: 350Mi
   requests:
     cpu: 150m
@@ -132,4 +132,4 @@ config:
   KAFKA_SERVER: my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
   TOPIC_SAT: sat
   INTERVAL: 1
-  VESS_NUM_SAT: 2000
+  VESS_NUM_SAT: 5000
