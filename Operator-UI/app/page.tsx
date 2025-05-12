@@ -1,6 +1,7 @@
 import AquaScopeLogoHome from '@/app/ui/shared/aquascope-logo';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Page() {
   return (
@@ -25,7 +26,13 @@ export default function Page() {
           </Link>
         </div>
         <div className="flex flex-col items-center justify-center gap-6 p-6 md:w-3/5 md:px-28 md:py-12">
-          {/* add platform image here */}
+          <Image 
+            src="/homepage_hero.png" 
+            alt="AquaScope Platform Visualization" 
+            width={1920} 
+            height={1193} 
+            className="w-full h-auto object-contain rounded-lg shadow-lg"
+          />
         </div>
       </div>
       <div className="mt-8 flex items-center justify-center">
