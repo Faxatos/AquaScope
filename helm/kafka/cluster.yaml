@@ -26,6 +26,13 @@ spec:
       type: persistent-claim
       size: 32Gi
       deleteClaim: false
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "750m"
+        memory: "1536Mi"
   cruiseControl:
     replicas: 1
     resources:
