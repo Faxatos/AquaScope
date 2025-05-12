@@ -14,7 +14,7 @@ spec:
         - name: installCRDs
           value: "true"
         - name: watchNamespaces
-          value: "[kafka]"
+          value: "{kafka}"
   destination:
     server: https://kubernetes.default.svc
     namespace: operators
