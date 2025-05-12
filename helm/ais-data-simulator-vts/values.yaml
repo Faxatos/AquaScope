@@ -133,4 +133,4 @@ config:
   KAFKA_SERVER: my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
   TOPIC_VTS: vts
   INTERVAL: 1
-  VESS_NUM_VTS: 100
+  VESS_NUM_VTS: 1000
