@@ -18,8 +18,8 @@ The platform ensures scalability, fault tolerance, and low latency using modern 
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/afcef6cc-5536-4f2b-ba03-16f6e6c2f218">
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/63132fbd-c776-4498-9e00-a5b607cf3860">
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/4477336e-53bb-45bf-9b2d-b9b7c1e16d88">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/31cb294a-5b6b-448a-991a-b4e722f284dc">
     <img alt="drawing" src="https://github.com/user-attachments/assets/63132fbd-c776-4498-9e00-a5b607cf3860" width="700">
   </picture>
 </p>
@@ -44,6 +44,7 @@ The platform ensures scalability, fault tolerance, and low latency using modern 
 | **Block Storage**          | Longhorn (Kafka persistence, Druid metadata in PostgreSQL) |
 | **Object Storage**         | MinIO (Druid segments, Flink checkpoints)                  |
 | **Orchestration**          | Kubernetes (K8s)                                           |
+| **Kafka Management**       | Strimzi (Kubernetes Operator with [Cruise Control](https://github.com/linkedin/cruise-control)|
 | **Ingress Controller**     | Traefik                                                    |
 | **Continuous Deployment**  | ArgoCD                                                     |
 | **Infrastructure as Code** | Ansible (with Kubespray)                                   |
