@@ -27,7 +27,6 @@ spec:
       size: 32Gi
       deleteClaim: false
   cruiseControl:
-    image: strimzi/cruise-control:2.5.0
     replicas: 1
     resources:
       limits:
