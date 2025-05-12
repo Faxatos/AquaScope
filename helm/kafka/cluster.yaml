@@ -43,8 +43,6 @@ spec:
       - mode: remove-brokers
         template:
           name: my-cluster-auto-rebalancing-template
-    config:
-      default.Goals: "RackAwareGoal,ResourceDistributionGoal"
   entityOperator:
     topicOperator: {}
     userOperator: {}
