@@ -9,6 +9,7 @@ spec:
   replicas: 5
   roles:
     - controller
+    - broker
   storage:
     type: persistent-claim
     size: 32Gi
