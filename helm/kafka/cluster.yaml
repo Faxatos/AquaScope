@@ -27,7 +27,6 @@ spec:
       type: persistent-claim
       size: 32Gi
       deleteClaim: false
-  zookeeper: {}
   cruiseControl:
     image: strimzi/cruise-control:2.5.0    
     replicas: 1
