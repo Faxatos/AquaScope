@@ -8,11 +8,13 @@ spec:
   source:
     repoURL: https://strimzi.io/charts/
     chart: strimzi-kafka-operator
-    targetRevision: 0.46.0          # versione del chart
+    targetRevision: 0.46.0
     helm:
       parameters:
         - name: installCRDs
-          value: "true"             # abilita l’installazione dei CRD
+          value: "true"
+        - name: watchNamespaces
+          value: "[kafka]"
   destination:
     server: https://kubernetes.default.svc
     namespace: operators
