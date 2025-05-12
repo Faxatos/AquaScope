@@ -1,32 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kafka
+  name: kafka-cluster
   namespace: argocd
 spec:
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: kafka
   project: default
-  sources:
-    - repoURL: registry-1.docker.io/bitnamicharts
-      chart: kafka
-      targetRevision: 31.3.1
-      helm:
-        valueFiles:
-        - $values/helm/kafka/values.yaml
-    - repoURL: https://github.com/Faxatos/AquaScope.git
-      targetRevision: main
-      ref: values
-  ignoreDifferences:
-  - group: apps
-    kind: StatefulSet
-    jsonPointers:
-    - /spec/replicas
+  source:
+    repoURL: https://github.com/Faxatos/AquaScope.git
+    targetRevision: main
+    path: 'kafka'
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: kafka
   syncPolicy:
-    syncOptions:
-    - CreateNamespace=true
-    - RespectIgnoreDifferences=true
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

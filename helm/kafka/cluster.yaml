@@ -1,0 +1,48 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: my-cluster
+  namespace: kafka
+  annotations:
+    strimzi.io/node-pools: enabled
+spec:
+  kafka:
+    version: 3.4.0
+    replicas: 3
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+    storage:
+      type: persistent-claim
+      size: 32Gi
+      deleteClaim: false
+  cruiseControl:
+    image: strimzi/cruise-control:2.5.0    
+    replicas: 1
+    resources:
+      limits:
+        cpu: "1"
+        memory: "2Gi"
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+    autoRebalance:
+      - mode: add-brokers
+        template:
+          name: my-cluster-auto-rebalancing-template
+      - mode: remove-brokers
+        template:
+          name: my-cluster-auto-rebalancing-template
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}

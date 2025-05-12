@@ -1,0 +1,13 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaRebalance
+metadata:
+  name: my-cluster-auto-rebalancing-template
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: my-cluster
+  annotations:
+    strimzi.io/rebalance-auto-approval: "true"
+spec:
+  goals:
+    - RackAwareGoal
+    - ResourceDistributionGoal
