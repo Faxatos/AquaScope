@@ -215,7 +215,7 @@ overlord:
   port: 8081
   serviceType: ClusterIP
 
-  javaOpts: "-Xms256M -Xmx512M"
+  javaOpts: "-Xms256M -Xmx256M"
 
   ingress:
     enabled: false
@@ -233,7 +233,7 @@ overlord:
   resources:
      limits:
        cpu: 500m
-       memory: 768Mi
+       memory: 512Mi
      requests:
        cpu: 250m
        memory: 256Mi
