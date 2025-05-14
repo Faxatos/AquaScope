@@ -9,7 +9,7 @@ spec:
   partitions: 15
   replicas: 3
   config:
-    retention.bytes: 8589934592   # 8 GiB
+    retention.bytes: 1073741824   # 1 GiB
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
@@ -22,7 +22,7 @@ spec:
   partitions: 15
   replicas: 3
   config:
-    retention.bytes: 8589934592   # 8 GiB
+    retention.bytes: 1073741824   # 1 GiB
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
@@ -35,7 +35,7 @@ spec:
   partitions: 15
   replicas: 3
   config:
-    retention.bytes: 8589934592   # 8 GiB
+    retention.bytes: 1073741824   # 1 GiB
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
@@ -48,4 +48,4 @@ spec:
   partitions: 15
   replicas: 3
   config:
-    retention.bytes: 8589934592   # 8 GiB
+    retention.bytes: 1073741824   # 1 GiB

@@ -215,7 +215,7 @@ overlord:
   port: 8081
   serviceType: ClusterIP
 
-  javaOpts: "-Xms256M -Xmx1G"
+  javaOpts: "-Xms256M -Xmx256M"
 
   ingress:
     enabled: false
