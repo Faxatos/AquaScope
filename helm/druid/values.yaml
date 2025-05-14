@@ -234,7 +234,7 @@ overlord:
   resources:
      limits:
        cpu: 500m
-       memory: 1Gi
+       memory: 1536Mi
      requests:
        cpu: 250m
        memory: 256Mi
