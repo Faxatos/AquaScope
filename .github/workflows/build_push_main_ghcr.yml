@@ -6,6 +6,10 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read     
+  packages: write   
+
 jobs:
   detect-changes:
     runs-on: ubuntu-22.04
