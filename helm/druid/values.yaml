@@ -68,6 +68,7 @@ configVars:
   druid_indexer_logs_s3Prefix: indexing-logs
   druid_processing_numThreads: "2"
   druid_processing_numMergeBuffers: "2"
+  druid_indexer_tasklock_batchSegmentAllocation: 'false'
 
   DRUID_LOG4J: |
     <?xml version="1.0" encoding="UTF-8" ?>
