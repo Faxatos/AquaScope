@@ -244,22 +244,26 @@ def simulate_vessels(ocean_gdf):
 
     while True:
         print(f"=== Current Vessel Data @ {datetime.now(timezone.utc).isoformat()} ===")
+
+        vessels_batch = []
+
         for vessel in vessels[:]:  # Iterate over a copy of the list
             if not update_vessel(vessel):
                 print(f"Vessel {vessel['MMSI']} reached destination. Removing.")
                 vessels.remove(vessel)
-                vessels.append(generate_vessel(ocean_gdf))
-            #print(vessel)
-            
-            # Send the vessel data to Kafka
-            try:
-                producer.send(TOPIC, value=vessel)
-                #future = producer.send(TOPIC, value=vessel)
-                #print("waiting for end future send call")
-                #future.get(timeout=10)  # Add a timeout for safety
-                #producer.flush()
-            except Exception as e:
-                print(f"Failed to send vessel data to Kafka: {e}")
+                new_vessel = generate_vessel(ocean_gdf)
+                vessels.append(new_vessel)
+                vessels_batch.append(new_vessel)
+            else:
+                vessels_batch.append(vessel)
+        
+        # Send the vessels batch directly to Kafka
+        try:
+            producer.send(TOPIC, value=vessels_batch)
+            producer.flush()  # Ensure all messages are sent
+            print(f"Sent batch of {len(vessels_batch)} vessels to Kafka")
+        except Exception as e:
+            print(f"Failed to send vessel batch to Kafka: {e}")
 
         time.sleep(ETA_UPDATE_INTERVAL)  # Wait before the next update
 
