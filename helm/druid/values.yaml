@@ -69,6 +69,7 @@ configVars:
   druid_processing_numThreads: "2"
   druid_processing_numMergeBuffers: "2"
   druid_indexer_tasklock_batchSegmentAllocation: 'false'
+  druid_worker_capacity: "2"
 
   DRUID_LOG4J: |
     <?xml version="1.0" encoding="UTF-8" ?>
@@ -459,7 +460,7 @@ middleManager:
 
   resources:
     limits:
-      cpu: '1'
+      cpu: '2'
       memory: 5Gi
     requests:
       cpu: 500m
