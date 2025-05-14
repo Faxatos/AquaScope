@@ -6,10 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: read     
-  packages: write   
-
 jobs:
   detect-changes:
     runs-on: ubuntu-22.04
@@ -59,9 +55,6 @@ jobs:
       group: build-operator-ui
       cancel-in-progress: false
     runs-on: ubuntu-22.04
-    permissions:
-      contents: read
-      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -74,7 +67,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Set outputs
         id: vars
@@ -102,9 +95,6 @@ jobs:
       group: build-ais-data-simulator
       cancel-in-progress: false
     runs-on: ubuntu-22.04
-    permissions:
-      contents: read
-      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -117,7 +107,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       - name: Set outputs
         id: vars
