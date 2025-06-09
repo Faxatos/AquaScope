@@ -263,7 +263,8 @@ def simulate_vessels(ocean_gdf, lat_range, lon_range):
         
         # Send the vessels batch directly to Kafka
         try:
-            producer.send(TOPIC, value=vessels_batch)
+            payload = '\n'.join(json.dumps(v) for v in vessels_batch)
+            producer.send(TOPIC, value=payload)
             producer.flush()  # Ensure all messages are sent
             print(f"Sent batch of {len(vessels_batch)} vessels to Kafka")
         except Exception as e:
