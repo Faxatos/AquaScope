@@ -31,7 +31,7 @@ ETA_UPDATE_INTERVAL = int(os.getenv('INTERVAL', '5'))  # We assume to get data e
 # Initialize Kafka Producer
 producer = KafkaProducer(
     bootstrap_servers=[KAFKA_SERVER],
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+    value_serializer=lambda v: v.encode('utf-8')
 )
 
 def check_kafka_connection_until_ready(kafka_server, delay=3):
