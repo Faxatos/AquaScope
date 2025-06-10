@@ -14,6 +14,9 @@ spec:
     type: persistent-claim
     size: 32Gi
     deleteClaim: false
+  jvmOptions:
+    -Xms: 2048m
+    -Xmx: 2048m
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
@@ -30,3 +33,6 @@ spec:
     type: persistent-claim
     size: 32Gi
     deleteClaim: false
+  jvmOptions:
+    -Xms: 2048m
+    -Xmx: 2048m
