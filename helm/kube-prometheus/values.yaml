@@ -4600,7 +4600,18 @@ prometheus:
     ##
     # fallbackScrapeProtocol: ""
 
-  additionalPodMonitors: []
+  additionalPodMonitors:
+  - name: druid-pods
+    namespaceSelector:
+      matchNames:            # namespace dove gira Druid
+        - druid
+    selector:                # label che i Pod Druid hanno già
+      matchLabels:
+        app.kubernetes.io/name: druid
+    podMetricsEndpoints:
+      - targetPort: 9090     # numero della porta esposta dal container
+        path: /metrics
+        interval: 30s
   ## Name of the PodMonitor to create
   ##
   # - name: ""
