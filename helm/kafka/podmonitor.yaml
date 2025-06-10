@@ -3,6 +3,8 @@ kind: PodMonitor
 metadata:
   name: demo-kafka
   namespace: kafka
+  labels:
+    release: kube-prometheus
 spec:
   podMetricsEndpoints:
     - interval: 30s

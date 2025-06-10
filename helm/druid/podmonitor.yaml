@@ -3,6 +3,8 @@ kind: PodMonitor
 metadata:
   name: druid-pods
   namespace: druid
+  labels:
+    release: kube-prometheus
 spec:
   podMetricsEndpoints:
       - targetPort: 9090
