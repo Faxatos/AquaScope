@@ -4465,7 +4465,17 @@ prometheus:
   #      - nodes/proxy
   #    verbs: [ "get", "list", "watch" ]
 
-  additionalServiceMonitors: []
+  additionalServiceMonitors:
+  - name: druid
+    namespaceSelector:
+      matchNames: [druid]          # namespace dove gira Druid
+    selector:
+      matchLabels:
+        app.kubernetes.io/instance: druid   # o il label reale del Service
+    endpoints:
+    - port: prometheus
+      path: /metrics
+      interval: 30s
   ## Name of the ServiceMonitor to create
   ##
   # - name: ""

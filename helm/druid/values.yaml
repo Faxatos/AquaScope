@@ -38,13 +38,13 @@ configVars:
   DRUID_USE_CONTAINER_IP: "true"
 
   ## Druid Common Configurations. ref: https://druid.apache.org/docs/latest/configuration/index.html#common-configurations
-  druid_extensions_loadList: '["druid-histogram", "druid-datasketches", "druid-lookups-cached-global", "postgresql-metadata-storage", "druid-kafka-indexing-service", "druid-s3-extensions"]'
+  druid_extensions_loadList: '["druid-histogram", "druid-datasketches", "druid-lookups-cached-global", "postgresql-metadata-storage", "druid-kafka-indexing-service", "druid-s3-extensions", "prometheus-emitter"]'
   druid_indexer_logs_directory: /opt/data/indexing-logs
 
   ## Druid Emitting Metrics. ref: https://druid.apache.org/docs/latest/configuration/index.html#emitting-metrics
-  druid_emitter: noop
+  druid_emitter: prometheus
   druid_emitter_logging_logLevel: debug
-  druid_emitter_http_recipientBaseUrl: http://druid_exporter_url:druid_exporter_port/druid
+  druid_emitter_prometheus_port: "9090"
 
   druid_zk_service_host: zookeeper
   druid_metadata_storage_host: ""
@@ -590,7 +590,7 @@ postgresql:
 
 # Secrets
 prometheus:
-  enabled: false
+  enabled: true
   # pick the any port what you want
   port: 9090
   annotation:
