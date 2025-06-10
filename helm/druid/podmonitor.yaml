@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: druid-pods
+  namespace: druid
+spec:
+  podMetricsEndpoints:
+      - targetPort: 9090
+        path: /metrics
+        interval: 30s
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: druid
+

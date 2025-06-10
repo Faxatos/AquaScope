@@ -43,7 +43,6 @@ configVars:
 
   ## Druid Emitting Metrics. ref: https://druid.apache.org/docs/latest/configuration/index.html#emitting-metrics
   druid_emitter: prometheus
-  druid_emitter_logging_logLevel: debug
   druid_emitter_prometheus_port: "9090"
 
   druid_zk_service_host: zookeeper

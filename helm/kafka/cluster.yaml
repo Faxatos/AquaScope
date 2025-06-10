@@ -33,6 +33,18 @@ spec:
       limits:
         cpu: "750m"
         memory: "1536Mi"
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          name: kafka-metrics
+          key: kafka-metrics-config.yml
+          namespace: kafka
+    template:
+      pod:
+        metadata:
+          labels:
+            kafka-metrics: 'true'
   cruiseControl:
     replicas: 1
     resources:

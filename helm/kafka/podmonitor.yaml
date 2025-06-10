@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: demo-kafka
+  namespace: kafka
+spec:
+  podMetricsEndpoints:
+    - interval: 30s
+      path: /metrics
+      targetPort: 9404
+      scheme: http
+  selector:
+    matchLabels:
+      kafka-metrics: 'true'
