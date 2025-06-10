@@ -6,7 +6,7 @@ metadata:
   labels:
     strimzi.io/cluster: my-cluster
 spec:
-  partitions: 15
+  partitions: 9
   replicas: 3
   config:
     retention.bytes: 1073741824   # 1 GiB
@@ -19,7 +19,7 @@ metadata:
   labels:
     strimzi.io/cluster: my-cluster
 spec:
-  partitions: 15
+  partitions: 9
   replicas: 3
   config:
     retention.bytes: 1073741824   # 1 GiB
@@ -32,7 +32,7 @@ metadata:
   labels:
     strimzi.io/cluster: my-cluster
 spec:
-  partitions: 15
+  partitions: 9
   replicas: 3
   config:
     retention.bytes: 1073741824   # 1 GiB
@@ -45,7 +45,7 @@ metadata:
   labels:
     strimzi.io/cluster: my-cluster
 spec:
-  partitions: 15
+  partitions: 9
   replicas: 3
   config:
     retention.bytes: 1073741824   # 1 GiB

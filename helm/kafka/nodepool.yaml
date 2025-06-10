@@ -6,7 +6,7 @@ metadata:
   labels:
     strimzi.io/cluster: my-cluster
 spec:
-  replicas: 5
+  replicas: 3
   roles:
     - controller
     - broker
@@ -23,7 +23,7 @@ metadata:
   labels:
     strimzi.io/cluster: my-cluster
 spec:
-  replicas: 2
+  replicas: 0
   roles:
     - broker
   storage:
