@@ -21,6 +21,7 @@ metadata:
   name: cluster-operator-metrics
   labels:
     app: strimzi
+    release: kube-prometheus
 spec:
   selector:
     matchLabels:
@@ -38,6 +39,7 @@ metadata:
   name: entity-operator-metrics
   labels:
     app: strimzi
+    release: kube-prometheus
 spec:
   selector:
     matchLabels:
@@ -55,6 +57,7 @@ metadata:
   name: bridge-metrics
   labels:
     app: strimzi
+    release: kube-prometheus
 spec:
   selector:
     matchLabels:
@@ -72,6 +75,7 @@ metadata:
   name: kafka-resources-metrics
   labels:
     app: strimzi
+    release: kube-prometheus
 spec:
   selector:
     matchExpressions:
