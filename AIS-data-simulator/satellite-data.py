@@ -261,7 +261,6 @@ def simulate_vessels(ocean_gdf):
             try:
                 payload = json.dumps(vessel)
                 producer.send(TOPIC, value=payload)
-                print(f"Sent vessel {vessel['MMSI']} to Kafka")
             except Exception as e:
                 print(f"Failed to send vessel {vessel['MMSI']} to Kafka: {e}")
 
