@@ -23,7 +23,7 @@ spec:
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2
       controller.quorum.fetch.timeout.ms: "10000"
-      controller.quorum.election.timeout.ms: "12000"
+      controller.quorum.election.timeout.ms: "20000"
       num.network.threads: 12
       queued.max.requests: 5000
     storage:
