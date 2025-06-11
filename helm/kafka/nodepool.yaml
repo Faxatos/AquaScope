@@ -14,6 +14,7 @@ spec:
     type: persistent-claim
     size: 32Gi
     deleteClaim: false
+    class: longhorn-no-replication
   jvmOptions:
     -Xms: 2048m
     -Xmx: 2048m
@@ -33,6 +34,7 @@ spec:
     type: persistent-claim
     size: 32Gi
     deleteClaim: false
+    class: longhorn-no-replication
   jvmOptions:
     -Xms: 2048m
     -Xmx: 2048m
