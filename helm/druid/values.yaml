@@ -69,6 +69,9 @@ configVars:
   druid_processing_numMergeBuffers: "2"
   druid_indexer_tasklock_batchSegmentAllocation: 'false'
   druid_worker_capacity: "2"
+  druid_coordinator_kill_on: 'true'                
+  druid_coordinator_kill_durationToRetain: PT0S
+  druid_coordinator_kill_period: PT1H
 
   DRUID_LOG4J: |
     <?xml version="1.0" encoding="UTF-8" ?>
