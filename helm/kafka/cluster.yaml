@@ -24,6 +24,8 @@ spec:
       transaction.state.log.min.isr: 2
       controller.quorum.fetch.timeout.ms: "10000"
       controller.quorum.election.timeout.ms: "12000"
+      num.network.threads: 12
+      queued.max.requests: 5000
     storage:
       type: persistent-claim
       size: 32Gi
