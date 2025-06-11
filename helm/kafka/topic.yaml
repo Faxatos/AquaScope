@@ -10,6 +10,7 @@ spec:
   replicas: 3
   config:
     retention.bytes: 1073741824   # 1 GiB
+    compression.type: snappy
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
@@ -23,6 +24,7 @@ spec:
   replicas: 3
   config:
     retention.bytes: 1073741824   # 1 GiB
+    compression.type: snappy
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
