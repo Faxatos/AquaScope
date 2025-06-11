@@ -1,6 +1,7 @@
 import random
 import uuid
 from datetime import datetime, timedelta, timezone
+from time import sleep, time
 import json
 import os
 from kafka import KafkaProducer
@@ -8,7 +9,6 @@ from kafka.admin import KafkaAdminClient
 import geopandas as gpd
 from shapely.geometry import Point
 import math
-import time
 
 from dotenv import load_dotenv
 
@@ -32,7 +32,9 @@ ETA_UPDATE_INTERVAL = int(os.getenv('INTERVAL', '5'))  # We assume to get data e
 producer = KafkaProducer(
     bootstrap_servers=[KAFKA_SERVER],
     value_serializer=lambda v: v.encode('utf-8'),
-    compression_type='snappy'
+    compression_type='snappy',
+    batch_size=65536,  # 64 KB
+    linger_ms= 5
 )
 
 def check_kafka_connection_until_ready(kafka_server, delay=3):
@@ -245,29 +247,27 @@ def simulate_vessels(ocean_gdf):
 
     while True:
         print(f"=== Current Vessel Data @ {datetime.now(timezone.utc).isoformat()} ===")
+        t0 = time()
 
-        vessels_batch = []
+        for vessel in vessels[:]:
+            
 
-        for vessel in vessels[:]:  # Iterate over a copy of the list
             if not update_vessel(vessel):
                 print(f"Vessel {vessel['MMSI']} reached destination. Removing.")
                 vessels.remove(vessel)
-                new_vessel = generate_vessel(ocean_gdf)
-                vessels.append(new_vessel)
-                vessels_batch.append(new_vessel)
-            else:
-                vessels_batch.append(vessel)
-        
-        # Send the vessels batch directly to Kafka
-        try:
-            payload = '\n'.join(json.dumps(v) for v in vessels_batch)
-            producer.send(TOPIC, value=payload)
-            producer.flush()  # Ensure all messages are sent
-            print(f"Sent batch of {len(vessels_batch)} vessels to Kafka")
-        except Exception as e:
-            print(f"Failed to send vessel batch to Kafka: {e}")
+                vessel = generate_vessel(ocean_gdf)
+                vessels.append(vessel)
 
-        time.sleep(ETA_UPDATE_INTERVAL)  # Wait before the next update
+            try:
+                payload = json.dumps(vessel)
+                producer.send(TOPIC, value=payload)
+                print(f"Sent vessel {vessel['MMSI']} to Kafka")
+            except Exception as e:
+                print(f"Failed to send vessel {vessel['MMSI']} to Kafka: {e}")
+
+        dt = time() - t0
+        if dt < ETA_UPDATE_INTERVAL:
+            sleep(ETA_UPDATE_INTERVAL - dt)
 
 if __name__ == "__main__":
     shapefile_path = "natural_earth_oceans/ne_110m_ocean.shp"
