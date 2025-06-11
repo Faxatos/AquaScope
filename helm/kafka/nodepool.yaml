@@ -34,5 +34,5 @@ spec:
     size: 32Gi
     deleteClaim: false
   jvmOptions:
-    -Xms: 1536m
-    -Xmx: 1536m
+    -Xms: 2048m
+    -Xmx: 2048m
