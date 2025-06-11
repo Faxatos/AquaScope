@@ -265,6 +265,9 @@ def simulate_vessels(ocean_gdf):
             except Exception as e:
                 print(f"Failed to send vessel {vessel['MMSI']} to Kafka: {e}")
 
+        producer.flush()
+        print(f"Sent batch ({len(vessels)} msgs) @ {t0:.3f}")
+
         dt = time() - t0
         if dt < ETA_UPDATE_INTERVAL:
             sleep(ETA_UPDATE_INTERVAL - dt)
