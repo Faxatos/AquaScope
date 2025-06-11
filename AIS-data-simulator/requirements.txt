@@ -2,3 +2,4 @@ geopandas
 shapely
 kafka-python==2.0.2
 python-dotenv
+python-snappy
