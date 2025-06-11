@@ -132,4 +132,4 @@ config:
   KAFKA_SERVER: my-cluster-kafka-bootstrap.kafka.svc.cluster.local:9092
   TOPIC_SAT: sat
   INTERVAL: 1
-  VESS_NUM_SAT: 2000
+  VESS_NUM_SAT: 100
