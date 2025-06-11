@@ -22,6 +22,8 @@ spec:
       offsets.topic.replication.factor: 3
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2
+      controller.quorum.fetch.timeout.ms: "10000"
+      controller.quorum.election.timeout.ms: "12000"
     storage:
       type: persistent-claim
       size: 32Gi
