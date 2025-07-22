@@ -138,7 +138,7 @@ initDB:
   init.cql: |
     -- Create Keyspace
     CREATE KEYSPACE IF NOT EXISTS vessel_management
-    WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+    WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3};
 
     -- Use the Keyspace
     USE vessel_management;
