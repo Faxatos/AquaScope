@@ -19,7 +19,7 @@ The platform ensures scalability, fault tolerance, and low latency using modern 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/cdbc876f-e4ee-4c57-89d0-997452b56f3c">
-    <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/31cb294a-5b6b-448a-991a-b4e722f284dc">
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/aquascope-diagram-light.png">
     <img alt="drawing" src="https://github.com/user-attachments/assets/63132fbd-c776-4498-9e00-a5b607cf3860" width="700">
   </picture>
 </p>
