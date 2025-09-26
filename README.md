@@ -18,7 +18,7 @@ The platform ensures scalability, fault tolerance, and low latency using modern 
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/aquascope-diagram-light.png">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/aquascope-diagram-dark.png">
     <source media="(prefers-color-scheme: light)" srcset="docs/assets/aquascope-diagram-light.png">
     <img alt="drawing" src="docs/assets/aquascope-diagram-light.png" width="700">
   </picture>
